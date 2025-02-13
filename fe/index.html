@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Multiplication Game">
+    <meta name="author" content="Roman Josipović">
+    <title>Multiplication Game</title>
+
+    <link rel="stylesheet" href="styles/style.css">
+</head>
+<body>
+    <main>
+        <h1>Multiplication Game</h1>
+        <div class='challenge'>
+            <p><span id='factorA'></span> x <span id='factorB'></span></p>
+        </div>
+        <div>
+            <p>
+                <input id="guess" type="number" placeholder="Enter your guess" required>
+            </p>    
+        </div>
+        <button class='btn' onclick='evaluateGuess()'>Guess</button>
+    </main>
+    <script src="scripts/index.js"></script>
+</body>
+</html>
