@@ -5,7 +5,7 @@ import lombok.Value;
 @Value
 public class ChallengeResultDTO {
 
-    String userAlias;
+    String userId;
     int factorA;
     int factorB;
     int guess;

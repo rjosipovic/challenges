@@ -20,11 +20,11 @@ class ChallengeServiceImplTest {
 
     @Test
     void testVerifyCorrectAttempt() {
-        var userAlias = "alias";
+        var userId = "userId";
         var factorA = 12;
         var factorB = 23;
         var guess = factorA * factorB;
-        var attemptDto = new ChallengeAttemptDTO(userAlias, factorA, factorB, guess);
+        var attemptDto = new ChallengeAttemptDTO(userId, factorA, factorB, guess);
         var result = challengeService.verifyAttempt(attemptDto);
 
         assertAll(
@@ -37,18 +37,18 @@ class ChallengeServiceImplTest {
         );
 
         verify(challengeAttemptRepository).save(
-                new ChallengeAttemptEntity(null, null, factorA, factorB, guess, true, null)
+                new ChallengeAttemptEntity(null, userId, factorA, factorB, guess, true, null)
         );
     }
 
     @Test
     void testVerifyIncorrectAttempt() {
-        var userAlias = "alias";
+        var userId = "userId";
         var factorA = 12;
         var factorB = 23;
         var guess = factorA * factorB + 1;
         var correctResult = factorA * factorB;
-        var attempt = new ChallengeAttemptDTO(userAlias, factorA, factorB, guess);
+        var attempt = new ChallengeAttemptDTO(userId, factorA, factorB, guess);
         var result = challengeService.verifyAttempt(attempt);
 
         assertAll(
@@ -61,6 +61,6 @@ class ChallengeServiceImplTest {
         );
 
         verify(challengeAttemptRepository).save(
-                new ChallengeAttemptEntity(null, null, factorA, factorB, guess, false, null));
+                new ChallengeAttemptEntity(null, userId, factorA, factorB, guess, false, null));
     }
 }

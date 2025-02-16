@@ -19,7 +19,7 @@ public class ChallengeAttemptEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-    private Long userId;
+    private String userId;
     private int factorA;
     private int factorB;
     private int resultAttempt;

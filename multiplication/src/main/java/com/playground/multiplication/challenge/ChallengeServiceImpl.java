@@ -11,7 +11,7 @@ public class ChallengeServiceImpl implements ChallengeService {
 
     @Override
     public ChallengeResultDTO verifyAttempt(ChallengeAttemptDTO attempt) {
-        var userAlias = attempt.getUserAlias();
+        var userId = attempt.getUserId();
         var factorA = attempt.getFactorA();
         var factorB = attempt.getFactorB();
         var guess = attempt.getGuess();
@@ -20,15 +20,15 @@ public class ChallengeServiceImpl implements ChallengeService {
 
 
         var isCorrect = factorA * factorB == guess;
-        var challengeAttempt = new ChallengeAttempt(null, null, factorA, factorB, guess, isCorrect);
+        var challengeAttempt = new ChallengeAttempt(null, userId, factorA, factorB, guess, isCorrect);
         saveAttempt(challengeAttempt);
-        return new ChallengeResultDTO(userAlias, factorA, factorB, guess, correctResult, isCorrect);
+        return new ChallengeResultDTO(userId, factorA, factorB, guess, correctResult, isCorrect);
     }
 
     private void saveAttempt(ChallengeAttempt challengeAttempt) {
         var challengeAttemptEntity = new ChallengeAttemptEntity(
                 null,
-                null,
+                challengeAttempt.getUserId(),
                 challengeAttempt.getFactorA(),
                 challengeAttempt.getFactorB(),
                 challengeAttempt.getResultAttempt(),

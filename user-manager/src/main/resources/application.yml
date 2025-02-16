@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: user-manager
+server:
+   port: 8081

@@ -12,7 +12,7 @@ import lombok.ToString;
 public class ChallengeAttempt {
 
     private String id;
-    private Long userId;
+    private String userId;
     private int factorA;
     private int factorB;
     private int resultAttempt;
