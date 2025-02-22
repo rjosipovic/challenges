@@ -17,9 +17,8 @@ public class ChallengeServiceImpl implements ChallengeService {
         var guess = attempt.getGuess();
         var correctResult = factorA * factorB;
 
-
-
         var isCorrect = factorA * factorB == guess;
+
         var challengeAttempt = new ChallengeAttempt(null, userId, factorA, factorB, guess, isCorrect);
         saveAttempt(challengeAttempt);
         return new ChallengeResultDTO(userId, factorA, factorB, guess, correctResult, isCorrect);

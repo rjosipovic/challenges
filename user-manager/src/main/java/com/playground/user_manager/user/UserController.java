@@ -20,10 +20,8 @@ public class UserController {
 
     @GetMapping("/alias/{alias}")
     public ResponseEntity<User> getUserByAlias(@PathVariable String alias) {
-        var userOptional = userService.getUserByAlias(alias);
-        return userOptional
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        var user = userService.getUserByAlias(alias);
+        return ResponseEntity.ok(user);
     }
 
     @PostMapping

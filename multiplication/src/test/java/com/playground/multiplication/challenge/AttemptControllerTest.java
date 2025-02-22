@@ -1,15 +1,14 @@
 package com.playground.multiplication.challenge;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -18,8 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
-@ExtendWith(SpringExtension.class)
-@AutoConfigureJsonTesters
+@ExtendWith(MockitoExtension.class)
 class AttemptControllerTest {
 
     @Mock
@@ -30,14 +28,15 @@ class AttemptControllerTest {
 
     private MockMvc mockMvc;
 
-    @Autowired
     private JacksonTester<ChallengeAttemptDTO> jsonChallengeAttempt;
-    @Autowired
     private JacksonTester<ChallengeResultDTO> jsonChallengeResult;
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(attemptController).build();//This allows us to test the controller in isolation, without having to create a full Spring Boot application.
+        JacksonTester.initFields(this, new ObjectMapper());
+        mockMvc = MockMvcBuilders
+                .standaloneSetup(attemptController)
+                .build();//This allows us to test the controller in isolation, without having to create a full Spring Boot application.
     }
 
     @Test

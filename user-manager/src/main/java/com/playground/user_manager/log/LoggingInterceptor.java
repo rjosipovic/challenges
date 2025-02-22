@@ -21,6 +21,6 @@ public class LoggingInterceptor implements HandlerInterceptor {
 
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
-        log.info("Request ID: {}, Status Code: {}", UUID.randomUUID(), response.getStatus());
+        log.info("Response ID: {}, Status Code: {}", UUID.randomUUID(), response.getStatus());
     }
 }

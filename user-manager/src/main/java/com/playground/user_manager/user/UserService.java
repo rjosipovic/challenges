@@ -4,6 +4,6 @@ import java.util.Optional;
 
 public interface UserService {
 
-    Optional<User> getUserByAlias(String alias);
+    User getUserByAlias(String alias);
     User createUser(CreateUserDTO createUserDTO);
 }

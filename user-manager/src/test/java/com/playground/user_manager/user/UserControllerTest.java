@@ -1,27 +1,28 @@
 package com.playground.user_manager.user;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.playground.user_manager.errors.ControllerAdvice;
+import com.playground.user_manager.errors.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 @AutoConfigureJsonTesters
 class UserControllerTest {
 
@@ -33,15 +34,16 @@ class UserControllerTest {
 
     private MockMvc mockMvc;
 
-    @Autowired
     private JacksonTester<User> userJacksonTester;
-
-    @Autowired
     private JacksonTester<CreateUserDTO> createUserJacksonTester;
 
     @BeforeEach
     void setup() {
-        mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
+        JacksonTester.initFields(this, new ObjectMapper());
+        mockMvc = MockMvcBuilders
+                .standaloneSetup(userController)
+                .setControllerAdvice(new ControllerAdvice())
+                .build();
     }
 
     @Test
@@ -49,7 +51,7 @@ class UserControllerTest {
 
         var user = new User("1", "test-user");
 
-        when(userService.getUserByAlias("test-user")).thenReturn(Optional.of(user));
+        when(userService.getUserByAlias("test-user")).thenReturn(user);
 
         var res = mockMvc.perform(get("/users/alias/test-user"))
                 .andReturn().getResponse();
@@ -58,26 +60,31 @@ class UserControllerTest {
                 () -> assertEquals(200, res.getStatus()),
                 () -> assertEquals("application/json", res.getContentType()),
                 () -> assertEquals("UTF-8", res.getCharacterEncoding()),
-                () -> assertEquals(user, userJacksonTester.parseObject(res.getContentAsString()))
+                () -> assertEquals(userJacksonTester.write(user).getJson(), res.getContentAsString())
         );
     }
 
     @Test
     void testGetUserByAlias_failure() throws Exception {
 
-        when(userService.getUserByAlias("test-user")).thenReturn(Optional.empty());
+        when(userService.getUserByAlias("test-user")).thenThrow(ResourceNotFoundException.class);
 
         var res = mockMvc.perform(get("/users/alias/test-user"))
                 .andReturn().getResponse();
 
         assertAll(
-                () -> assertEquals(404, res.getStatus())
+                () -> assertEquals(404, res.getStatus()),
+                () -> assertFalse(res.getContentAsString().isEmpty()),
+                () -> assertEquals("application/json", res.getContentType())
+
         );
     }
 
     @Test
     void testCreateUser() throws Exception {
         var alias = "test-user";
+        var userId = "1";
+        var user = new User(userId, alias);
         var createUser = new CreateUserDTO(alias);
 
         when(userService.createUser(createUser)).thenReturn(new User("1", alias));
@@ -91,7 +98,7 @@ class UserControllerTest {
                 () -> assertEquals(200, res.getStatus()),
                 () -> assertEquals("application/json", res.getContentType()),
                 () -> assertEquals("UTF-8", res.getCharacterEncoding()),
-                () -> assertEquals(new User("1", alias), userJacksonTester.parseObject(res.getContentAsString()))   
+                () -> assertEquals(userJacksonTester.write(user).getJson(), res.getContentAsString())
         );
     }
 }
