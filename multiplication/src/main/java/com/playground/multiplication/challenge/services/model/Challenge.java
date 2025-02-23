@@ -1,4 +1,4 @@
-package com.playground.multiplication.challenge;
+package com.playground.multiplication.challenge.services.model;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

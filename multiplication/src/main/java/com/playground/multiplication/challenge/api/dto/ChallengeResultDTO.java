@@ -1,4 +1,4 @@
-package com.playground.multiplication.challenge;
+package com.playground.multiplication.challenge.api.dto;
 
 import lombok.Value;
 

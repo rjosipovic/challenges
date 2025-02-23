@@ -1,6 +1,9 @@
 package com.playground.multiplication.challenge;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.playground.multiplication.challenge.api.controllers.ChallengeController;
+import com.playground.multiplication.challenge.services.model.Challenge;
+import com.playground.multiplication.challenge.services.interfaces.ChallengeGeneratorService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -1,4 +1,4 @@
-package com.playground.multiplication.challenge;
+package com.playground.multiplication.challenge.dataaccess.entities;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

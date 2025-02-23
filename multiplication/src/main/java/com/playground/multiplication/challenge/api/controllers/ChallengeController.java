@@ -1,5 +1,7 @@
-package com.playground.multiplication.challenge;
+package com.playground.multiplication.challenge.api.controllers;
 
+import com.playground.multiplication.challenge.services.model.Challenge;
+import com.playground.multiplication.challenge.services.interfaces.ChallengeGeneratorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

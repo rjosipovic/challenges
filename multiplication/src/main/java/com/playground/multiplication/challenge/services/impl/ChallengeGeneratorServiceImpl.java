@@ -1,4 +1,7 @@
-package com.playground.multiplication.challenge;
+package com.playground.multiplication.challenge.services.impl;
+
+import com.playground.multiplication.challenge.services.interfaces.ChallengeGeneratorService;
+import com.playground.multiplication.challenge.services.model.Challenge;
 
 import java.util.Random;
 

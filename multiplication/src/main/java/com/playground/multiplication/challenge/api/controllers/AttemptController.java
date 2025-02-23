@@ -1,5 +1,8 @@
-package com.playground.multiplication.challenge;
+package com.playground.multiplication.challenge.api.controllers;
 
+import com.playground.multiplication.challenge.api.dto.ChallengeAttemptDTO;
+import com.playground.multiplication.challenge.api.dto.ChallengeResultDTO;
+import com.playground.multiplication.challenge.services.interfaces.ChallengeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

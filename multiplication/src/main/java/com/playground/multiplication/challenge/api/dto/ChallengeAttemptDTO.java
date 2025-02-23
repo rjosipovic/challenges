@@ -1,4 +1,4 @@
-package com.playground.multiplication.challenge;
+package com.playground.multiplication.challenge.api.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;

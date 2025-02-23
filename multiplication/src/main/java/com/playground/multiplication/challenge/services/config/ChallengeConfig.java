@@ -1,5 +1,7 @@
-package com.playground.multiplication.challenge;
+package com.playground.multiplication.challenge.services.config;
 
+import com.playground.multiplication.challenge.services.interfaces.ChallengeGeneratorService;
+import com.playground.multiplication.challenge.services.impl.ChallengeGeneratorServiceImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
