@@ -14,6 +14,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -40,12 +42,12 @@ class ChallengeServiceImplTest {
 
     @Test
     void testVerifyCorrectAttempt() {
-        //gine
-        var userId = "userId";
+        //given
+        var userId = UUID.randomUUID();
         var factorA = 12;
         var factorB = 23;
         var guess = factorA * factorB;
-        var attemptDto = new ChallengeAttemptDTO(userId, factorA, factorB, guess);
+        var attemptDto = new ChallengeAttemptDTO(userId.toString(), factorA, factorB, guess);
 
         //when
         var result = challengeService.verifyAttempt(attemptDto);
@@ -67,12 +69,12 @@ class ChallengeServiceImplTest {
 
     @Test
     void testVerifyIncorrectAttempt() {
-        var userId = "userId";
+        var userId = UUID.randomUUID();
         var factorA = 12;
         var factorB = 23;
         var guess = factorA * factorB + 1;
         var correctResult = factorA * factorB;
-        var attempt = new ChallengeAttemptDTO(userId, factorA, factorB, guess);
+        var attempt = new ChallengeAttemptDTO(userId.toString(), factorA, factorB, guess);
         var result = challengeService.verifyAttempt(attempt);
 
         assertAll(

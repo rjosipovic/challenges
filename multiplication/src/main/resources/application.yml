@@ -2,15 +2,14 @@ spring:
   application:
     name: multiplication
   datasource:
-    url: jdbc:h2:mem:multiplication
-    driverClassName: org.h2.Driver
-    username: sa
-    password:
+    url: jdbc:postgresql://localhost:5432/multiplication-db
+    username: multiplication-user
+    password: secret
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+    enabled: true
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-  h2:
-    console:
-      enabled: true
+    show-sql: true
 server:
   error:
     include-message: always

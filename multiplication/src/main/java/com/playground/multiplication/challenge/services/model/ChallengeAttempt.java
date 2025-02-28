@@ -5,6 +5,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.util.UUID;
+
 @ToString
 @Getter
 @EqualsAndHashCode
@@ -12,7 +14,7 @@ import lombok.ToString;
 public class ChallengeAttempt {
 
     private String id;
-    private String userId;
+    private UUID userId;
     private int factorA;
     private int factorB;
     private int resultAttempt;

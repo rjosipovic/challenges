@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -28,12 +30,12 @@ class AttemptResultHandlerTest {
     @Test
     void shouldCreateCorrectAttemptResult() {
         //given
-        var userId = "userId";
+        var userId = UUID.randomUUID();
         var factorA = 12;
         var factorB = 23;
         var guess = 276;
         var isCorrect = true;
-        var attempt = new ChallengeAttemptDTO(userId, factorA, factorB, guess);
+        var attempt = new ChallengeAttemptDTO(userId.toString(), factorA, factorB, guess);
         var challengeAttempt = new ChallengeAttempt(null, userId, factorA, factorB, guess, isCorrect);
         var ctx = new AttemptVerifierContext(attempt);
         ctx.setChallengeAttempt(challengeAttempt);
@@ -45,7 +47,7 @@ class AttemptResultHandlerTest {
         var result = ctx.getChallengeResult();
         assertAll(
                 () -> assertNotNull(result),
-                () -> assertEquals(userId, result.getUserId()),
+                () -> assertEquals(userId.toString(), result.getUserId()),
                 () -> assertEquals(factorA, result.getFactorA()),
                 () -> assertEquals(factorB, result.getFactorB()),
                 () -> assertEquals(guess, result.getGuess()),
@@ -57,11 +59,11 @@ class AttemptResultHandlerTest {
     @Test
     void shouldCreateIncorrectAttemptResult() {
         //given
-        var userId = "userId";
+        var userId = UUID.randomUUID();
         var factorA = 12;
         var factorB = 23;
         var guess = 456;
-        var attempt = new ChallengeAttemptDTO(userId, factorA, factorB, guess);
+        var attempt = new ChallengeAttemptDTO(userId.toString(), factorA, factorB, guess);
         var challengeAttempt = new ChallengeAttempt(null, userId, factorA, factorB, guess, false);
         var ctx = new AttemptVerifierContext(attempt);
         ctx.setChallengeAttempt(challengeAttempt);
@@ -73,7 +75,7 @@ class AttemptResultHandlerTest {
         var result = ctx.getChallengeResult();
         assertAll(
                 () -> assertNotNull(result),
-                () -> assertEquals(userId, result.getUserId()),
+                () -> assertEquals(userId.toString(), result.getUserId()),
                 () -> assertEquals(factorA, result.getFactorA()),
                 () -> assertEquals(factorB, result.getFactorB()),
                 () -> assertEquals(guess, result.getGuess()),

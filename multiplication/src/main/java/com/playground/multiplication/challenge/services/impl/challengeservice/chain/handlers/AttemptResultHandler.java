@@ -9,7 +9,7 @@ public class AttemptResultHandler implements AttemptHandler {
     @Override
     public void handle(AttemptVerifierContext ctx) {
         var challengeAttempt = ctx.getChallengeAttempt();
-        var userId = challengeAttempt.getUserId();
+        var userId = challengeAttempt.getUserId().toString();
         var factorA = challengeAttempt.getFactorA();
         var factorB = challengeAttempt.getFactorB();
         var guess = challengeAttempt.getResultAttempt();

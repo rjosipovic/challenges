@@ -5,8 +5,6 @@ import com.playground.user_manager.errors.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
-
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -28,7 +26,7 @@ public class UserServiceImpl implements UserService {
         if (userRepository.findByAlias(alias).isPresent()) {
             throw new ResourceAlreadyExistsException("User with alias " + alias + " already exists", "user");
         }
-        var userEntity = new UserEntity(UUID.randomUUID(), alias);
+        var userEntity = new UserEntity(alias);
         var savedUserEntity = userRepository.save(userEntity);
         return new User(savedUserEntity.getId().toString(), savedUserEntity.getAlias());
     }

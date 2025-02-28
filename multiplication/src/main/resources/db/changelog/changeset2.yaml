@@ -1,0 +1,8 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2
+      author: roman
+      changes:
+        - renameTable:
+            oldTableName: challenge_attempt
+            newTableName: challenge_attempts

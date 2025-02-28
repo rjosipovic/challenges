@@ -1,5 +1,14 @@
 spring:
   application:
     name: user-manager
+  datasource:
+    url: jdbc:postgresql://localhost:5432/user-manager-db
+    username: user-manager-user
+    password: secret
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+  jpa:
+    show-sql: true
 server:
    port: 8081

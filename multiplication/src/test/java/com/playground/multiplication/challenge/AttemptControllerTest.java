@@ -16,6 +16,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
@@ -46,13 +48,13 @@ class AttemptControllerTest {
     @Test
     void testMakeAttempt() throws Exception {
         //given
-        var alias = "alias";
+        var userId = UUID.randomUUID();
         var factorA = 12;
         var factorB = 23;
         var guess = 276;
         var correct = 276;
-        var attempt = new ChallengeAttemptDTO(alias, factorA, factorB, guess);
-        var result = new ChallengeResultDTO(alias, factorA, factorB, guess, correct, true);
+        var attempt = new ChallengeAttemptDTO(userId.toString(), factorA, factorB, guess);
+        var result = new ChallengeResultDTO(userId.toString(), factorA, factorB, guess, correct, true);
         when(challengeService.verifyAttempt(attempt)).thenReturn(result);
 
         //when
@@ -72,13 +74,13 @@ class AttemptControllerTest {
     @Test
     void testMakeAttempt_Failure() throws Exception {
         //given
-        var alias = "alias";
+        var userId = UUID.randomUUID();
         var factorA = 12;
         var factorB = 23;
         var guess = 6789;
         var correct = 276;
-        var attempt = new ChallengeAttemptDTO(alias, factorA, factorB, guess);
-        var result = new ChallengeResultDTO(alias, factorA, factorB, guess, correct, false);
+        var attempt = new ChallengeAttemptDTO(userId.toString(), factorA, factorB, guess);
+        var result = new ChallengeResultDTO(userId.toString(), factorA, factorB, guess, correct, false);
         when(challengeService.verifyAttempt(attempt)).thenReturn(result);
 
         //when
@@ -118,10 +120,11 @@ class AttemptControllerTest {
     @Test
     void testMakeAttempt_factorAOutOfRange() throws Exception {
         //given
+        var userId = UUID.randomUUID();
         var factorA = 9;
         var factorB = 23;
         var guess = 6789;
-        var attempt = new ChallengeAttemptDTO(null, factorA, factorB, guess);
+        var attempt = new ChallengeAttemptDTO(userId.toString(), factorA, factorB, guess);
 
         //when
         var response = mockMvc.perform(post("/attempts")
@@ -138,10 +141,11 @@ class AttemptControllerTest {
     @Test
     void testMakeAttempt_factorBOutOfRange() throws Exception {
         //given
+        var userId = UUID.randomUUID();
         var factorA = 12;
         var factorB = 102;
         var guess = 6789;
-        var attempt = new ChallengeAttemptDTO(null, factorA, factorB, guess);
+        var attempt = new ChallengeAttemptDTO(userId.toString(), factorA, factorB, guess);
 
         //when
         var response = mockMvc.perform(post("/attempts")
@@ -158,11 +162,32 @@ class AttemptControllerTest {
     @Test
     void testMakeAttempt_negativeGuess() throws Exception {
         //given
+        var userId = UUID.randomUUID();
         var factorA = 12;
         var factorB = 23;
         var guess = -1234;
-        var attempt = new ChallengeAttemptDTO(null, factorA, factorB, guess);
+        var attempt = new ChallengeAttemptDTO(userId.toString(), factorA, factorB, guess);
 
+        //when
+        var response = mockMvc.perform(post("/attempts")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonChallengeAttempt.write(attempt).getJson()))
+                .andReturn().getResponse();
+
+        //then
+        assertAll(
+                () -> assertEquals(400, response.getStatus())
+        );
+    }
+
+    @Test
+    void testMakeAttempt_invalidUserId() throws Exception {
+        //given
+        var userId = "shouldBeUUID";
+        var factorA = 12;
+        var factorB = 23;
+        var guess = 6789;
+        var attempt = new ChallengeAttemptDTO(userId, factorA, factorB, guess);
         //when
         var response = mockMvc.perform(post("/attempts")
                         .contentType(MediaType.APPLICATION_JSON)

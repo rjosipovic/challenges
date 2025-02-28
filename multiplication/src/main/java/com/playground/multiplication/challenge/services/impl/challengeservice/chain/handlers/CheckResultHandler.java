@@ -5,12 +5,14 @@ import com.playground.multiplication.challenge.services.impl.challengeservice.ch
 import com.playground.multiplication.challenge.services.impl.challengeservice.chain.AttemptVerifierContext;
 import com.playground.multiplication.challenge.services.model.ChallengeAttempt;
 
+import java.util.UUID;
+
 public class CheckResultHandler implements AttemptHandler {
 
     @Override
     public void handle(AttemptVerifierContext ctx) {
         var attempt = ctx.getAttempt();
-        var userId = attempt.getUserId();
+        var userId = UUID.fromString(attempt.getUserId());
         var factorA = attempt.getFactorA();
         var factorB = attempt.getFactorB();
         var guess = attempt.getGuess();

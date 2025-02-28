@@ -1,22 +1,34 @@
 package com.playground.user_manager.user;
 
-import lombok.AllArgsConstructor;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.redis.core.RedisHash;
-import org.springframework.data.redis.core.index.Indexed;
 
 import java.util.UUID;
 
-@RedisHash
+@Entity(name = "users")
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class UserEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-    @Indexed
+    @Column(unique = true, name = "alias")
     private String alias;
+
+    public UserEntity() {
+        this.alias = "";
+    }
+
+    public UserEntity(String alias) {
+        this.alias = alias;
+    }
+
+    public UserEntity(UUID id, String alias) {
+        this.id = id;
+        this.alias = alias;
+    }
 }

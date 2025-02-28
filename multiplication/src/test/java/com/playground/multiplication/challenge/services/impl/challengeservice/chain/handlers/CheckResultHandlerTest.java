@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -26,11 +28,11 @@ class CheckResultHandlerTest {
     @Test
     void shouldCheckCorrectResult() {
         //given
-        var userId = "userId";
+        var userId = UUID.randomUUID();
         var factorA = 12;
         var factorB = 23;
         var guess = 276;
-        var attempt = new ChallengeAttemptDTO(userId, factorA, factorB, guess);
+        var attempt = new ChallengeAttemptDTO(userId.toString(), factorA, factorB, guess);
         var ctx = new AttemptVerifierContext(attempt);
 
         //when
@@ -51,11 +53,11 @@ class CheckResultHandlerTest {
     @Test
     void shouldCheckIncorrectResult() {
         //given
-        var userId = "userId";
+        var userId = UUID.randomUUID();
         var factorA = 12;
         var factorB = 23;
         var guess = 2764;
-        var attempt = new ChallengeAttemptDTO(userId, factorA, factorB, guess);
+        var attempt = new ChallengeAttemptDTO(userId.toString(), factorA, factorB, guess);
         var ctx = new AttemptVerifierContext(attempt);
 
         //when

@@ -11,6 +11,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.UUID;
+
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -26,11 +28,11 @@ class SaveAttemptHandlerTest {
     @Test
     void shouldSaveAttempt() {
         //given
-        var userId = "userId";
+        var userId = UUID.randomUUID();
         var factorA = 12;
         var factorB = 23;
         var guess = 2764;
-        var attempt = new ChallengeAttemptDTO(userId, factorA, factorB, guess);
+        var attempt = new ChallengeAttemptDTO(userId.toString(), factorA, factorB, guess);
         var ctx = new AttemptVerifierContext(attempt);
         var challengeAttempt = new ChallengeAttempt(null, userId, factorA, factorB, guess, false);
         ctx.setChallengeAttempt(challengeAttempt);

@@ -1,0 +1,43 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: roman
+      changes:
+        - createTable:
+            tableName: challenge_attempt
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: attempt_date
+                  type: "timestamp with time zone"
+                  constraints:
+                    notNull: true
+              - column:
+                  name: correct
+                  type: boolean
+                  constraints:
+                    notNull: true
+              - column:
+                  name: factor_a
+                  type: int
+                  constraints:
+                    notNull: true
+              - column:
+                  name: factor_b
+                  type: int
+                  constraints:
+                    notNull: true
+              - column:
+                  name: result_attempt
+                  type: int
+                  constraints:
+                    notNull: true
+              - column:
+                  name: user_id
+                  type: uuid
+                  constraints:
+                    notNull: true
