@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - changeSet:
+      id: 7
+      author: roman
+      changes:
+        - modifyDataType:
+            columnName: gender
+            tableName: users
+            newDataType: varchar
+            size: 6

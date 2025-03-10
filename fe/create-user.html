@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Multiplication Game">
+    <meta name="author" content="Roman Josipović">
+    <title>Multiplication Game</title>
+
+    <link rel="stylesheet" href="styles/style.css">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+            </ul>
+        </nav>
+        <figure><img src="images/challenges-logo.webp" alt="logo" height='300' width='300'></figure>
+        <h1>Register user</h1>
+    </header>
+    <main>
+        <p>
+            <label for="alias">Alias:</label>
+            <input id="alias" type="text" placeholder="Enter your alias" required>
+        </p>
+        <p>
+            <label for="email">Email:</label>
+            <input id="email" type="email" placeholder="Enter your email" required>
+        </p>
+        <p>
+            <label for="birthdate">Birthdate:</label>
+            <input id="birthdate" type="date" placeholder="Enter your birthdate">
+        </p>
+        <fieldset>
+            <legend>Gender</legend>
+            <input id="gender-male" type="radio" name="gender" value="male">
+            <label for="gender-male">Male</label>
+            <input id="gender-female" type="radio" name="gender" value="female">
+            <label for="gender-female">Female</label>
+        </fieldset>
+        <button class='btn' onclick='createUser()'>Register</button>
+    </main>
+    <footer>
+        <p>All content on this site &copy;Copyright - Multiplication game by Roman Josipović</p>
+    </footer>
+    <script src="scripts/create-user.js"></script>
+</body>
+
+</html>

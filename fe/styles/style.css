@@ -4,14 +4,17 @@ body {
     color: #333333;
     text-align: center;
   }
+
   
-  h1, h2, h3 {
+  header {
+    font-size: 34px;
     font-weight: bold;
     color: #3498db;
   }
-  
-  h1 {
-    font-size: 24px;
+
+  h1, h2, h3 {
+    font-weight: bold;
+    color: #3498db;
   }
   
   h2 {
@@ -29,6 +32,7 @@ body {
     padding: 10px 20px;
     border: none;
     cursor: pointer;
+    font-size: 16px;
   }
   
   button:hover {
@@ -72,4 +76,51 @@ body {
   
   nav a:hover {
     color: #cccccc;
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 80%;
+    margin: 40px auto;
+    background-color: #f9f9f9;
+    border: 1px solid #cccccc;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  th, td {
+    padding: 10px;
+    border: 1px solid #cccccc;
+    text-align: left;
+  }
+
+  th {
+    background-color: #3498db;
+    color: #ffffff;
+  }
+
+  td {
+    background-color: #f9f9f9;
+  }
+
+  td:nth-child(2) {
+    text-align: center;
+  }
+
+  td:nth-child(3) {
+    text-align: center;
+    color: #666666;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  .challenge {
+    margin: 20px 0;
+    font-size: 30px;
+    font-weight: bold;
+  }
+
+  .form {
+    font-size: large;
   }

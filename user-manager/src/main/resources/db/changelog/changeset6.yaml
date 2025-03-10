@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: 6
+      author: roman
+      changes:
+        -  addUniqueConstraint:
+            columnDataType:  varchar(255)
+            columnNames:  email
+            constraintName:  email-unique-constraint
+            tableName:  users
+            validate:  true

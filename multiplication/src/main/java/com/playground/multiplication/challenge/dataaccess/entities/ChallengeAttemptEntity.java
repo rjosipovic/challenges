@@ -7,6 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.ZonedDateTime;
@@ -14,6 +15,7 @@ import java.util.UUID;
 
 @Entity(name = "challenge_attempts")
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class ChallengeAttemptEntity {
 

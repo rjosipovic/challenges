@@ -5,30 +5,35 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity(name = "users")
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-    @Column(unique = true, name = "alias")
+
+    @Column(name = "alias", unique = true)
     private String alias;
 
-    public UserEntity() {
-        this.alias = "";
-    }
+    @Column(name = "email", unique = true)
+    private String email;
 
-    public UserEntity(String alias) {
-        this.alias = alias;
-    }
+    @Column(name = "birthdate")
+    private LocalDate birthdate;
 
-    public UserEntity(UUID id, String alias) {
-        this.id = id;
-        this.alias = alias;
-    }
+    @Column(name = "gender")
+    private String gender;
+
 }

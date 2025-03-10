@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 public class WebErrorConfiguration {
 
     private final String currentApiVersion = "1.0";
-    private final String sendReportUri = "http://localhost:8080/api/v1/errors";
+    private final String sendReportUri = "";
 
     @Bean
     public ErrorAttributes errorAttributes() {

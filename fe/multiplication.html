@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Multiplication Game">
+    <meta name="author" content="Roman Josipović">
+    <title>Multiplication Game</title>
+
+    <link rel="stylesheet" href="styles/style.css">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+            </ul>
+        </nav>
+        <figure><img src="images/challenges-logo.webp" alt="logo" height='300' width='300'></figure>
+        <h1>Multiplication</h1>
+    </header>
+
+    <main>
+        <h1>Solve the Challenge</h1>
+        <section class='challenge'>
+            <h2>Factors</h2>
+            <div><span id='factorA'></span> x <span id='factorB'></span></div>
+        </section>
+
+        <section>
+            <h2>Enter your guess</h2>
+            <p>
+                <label for="guess">Guess:</label>
+                <input id="guess" type="number" placeholder="Enter your guess" required>
+            </p>
+            <button class='btn' onclick='evaluateGuess()'>Guess</button>
+        </section>
+
+
+        <section>
+            <h2 id='attempts' class='hidden'>Attempts</h2>
+            <div id="result" class="hidden"></div>
+            <table id="attemptsTable" class='hidden'>
+                <caption>
+                    <h3>Attempt history</h3>
+                </caption>
+                <thead>
+                    <tr>
+                        <th>Challenge</th>
+                        <th>Your guess</th>
+                        <th>Correct</th>
+                    </tr>
+                </thead>
+                <tbody id="attemptsTableBody">
+                </tbody>
+            </table>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>All content on this site &copy;Copyright - Multiplication game by Roman Josipović</p>
+    </footer>
+    <script src="scripts/multiplication.js"></script>
+</body>
+
+</html>

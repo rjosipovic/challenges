@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -28,10 +29,11 @@ class UserServiceImplTest {
     void testSaveUser() {
         //given
         var alias = "test-user";
+        var email = "someemail@gmail.com";
         var uuid = UUID.randomUUID();
-        var createUserRequest = new CreateUserDTO(alias);
+        var createUserRequest = new CreateUserDTO(alias, email, null, null);
         when(userRepository.findByAlias(alias)).thenReturn(Optional.empty());
-        when(userRepository.save(any(UserEntity.class))).thenReturn(new UserEntity(uuid, alias));
+        when(userRepository.save(any(UserEntity.class))).thenReturn(UserEntity.builder().alias(alias).email(email).build());
         //when
         var savedUser = userService.createUser(createUserRequest);
         //then
@@ -42,4 +44,36 @@ class UserServiceImplTest {
         );
     }
 
+    @Test
+    void testGetUserByAlias() {
+        //given
+        var alias = "test-user";
+        var uuid = UUID.randomUUID();
+        when(userRepository.findByAlias(alias)).thenReturn(Optional.of(UserEntity.builder().alias(alias).build()));
+        //when
+        var user = userService.getUserByAlias(alias);
+        //then
+        assertAll(
+                () -> assertNotNull(user),
+                () -> assertEquals(uuid.toString(), user.getId()),
+                () -> assertEquals(alias, user.getAlias())
+        );
+    }
+
+    @Test
+    void testGetAllUsers() {
+        //given
+        var id1 = UUID.randomUUID();
+        var id2 = UUID.randomUUID();
+        var user1 = UserEntity.builder().id(id1).alias("test-user1").build();
+        var user2 = UserEntity.builder().id(id2).alias("test-user2").build();
+        when(userRepository.findAll()).thenReturn(Arrays.asList(user1, user2));
+        //when
+        var users = userService.getAllUsers();
+        //then
+        assertAll(
+                () -> assertNotNull(users),
+                () -> assertEquals(2, users.size())
+        );
+    }
 }

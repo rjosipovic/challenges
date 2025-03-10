@@ -14,6 +14,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -22,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ChallengeServiceImplTest {
@@ -37,7 +40,7 @@ class ChallengeServiceImplTest {
         chain.addHandler(new CheckResultHandler());
         chain.addHandler(saveAttemptHandler);
         chain.addHandler(new AttemptResultHandler());
-        challengeService = new ChallengeServiceImpl(chain);
+        challengeService = new ChallengeServiceImpl(chain, challengeAttemptRepository);
     }
 
     @Test
@@ -88,5 +91,43 @@ class ChallengeServiceImplTest {
 
         verify(challengeAttemptRepository).save(
                 new ChallengeAttemptEntity(null, userId, factorA, factorB, guess, false, null));
+    }
+
+    @Test
+    void testGetLast10AttemptsByUserId_shouldReturnEmptyList() {
+        //given
+        var userId = UUID.randomUUID();
+        when(challengeAttemptRepository.findLast10AttemptsByUser(userId)).thenReturn(List.of());
+        //when
+        var result = challengeService.findLast10ResultsForUser(userId);
+        //then
+        verify(challengeAttemptRepository).findLast10AttemptsByUser(userId);
+        assertAll(
+                () -> assertNotNull(result),
+                () -> assertTrue(result.isEmpty())
+        );
+    }
+
+    @Test
+    void testGetLast10AttemptsByUserId_shouldReturnNonEmptyList() {
+        //given
+        var userId = UUID.randomUUID();
+        var attemptId = UUID.randomUUID();
+        var attempt = new ChallengeAttemptEntity(attemptId, userId, 1, 2, 3, true, ZonedDateTime.now().minusDays(1));
+        when(challengeAttemptRepository.findLast10AttemptsByUser(userId)).thenReturn(List.of(attempt));
+        //when
+        var result = challengeService.findLast10ResultsForUser(userId);
+        //then
+        verify(challengeAttemptRepository).findLast10AttemptsByUser(userId);
+        assertAll(
+                () -> assertNotNull(result),
+                () -> assertFalse(result.isEmpty()),
+                () -> assertEquals(1, result.size()),
+                () -> assertEquals(userId.toString(), result.get(0).getUserId()),
+                () -> assertEquals(1, result.get(0).getFactorA()),
+                () -> assertEquals(2, result.get(0).getFactorB()),
+                () -> assertEquals(3, result.get(0).getGuess()),
+                () -> assertTrue(result.get(0).isCorrect())
+        );
     }
 }

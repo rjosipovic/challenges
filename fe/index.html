@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -10,25 +11,44 @@
 
     <link rel="stylesheet" href="styles/style.css">
 </head>
+
 <body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+            </ul>
+        </nav>
+        <figure><img src="images/challenges-logo.webp" alt="logo" height='300' width='300'></figure>
+        <h1>Math Challenges</h1>
+    </header>
+
     <main>
-        <h1>Multiplication Game</h1>
-        <div class='challenge'>
-            <p><span id='factorA'></span> x <span id='factorB'></span></p>
-        </div>
-        <div>
-            <p>
-                <label for="alias">Alias:</label>
-                <input id="alias" type="text" placeholder="Enter your alias" required>
-            </p>
-            <p>
-                <label for="guess">Guess:</label>
-                <input id="guess" type="number" placeholder="Enter your guess" required>
-            </p>    
-        </div>
-        <button class='btn' onclick='evaluateGuess()'>Guess</button>
-        
+        <h1>Users</h1>
+        <section>
+            <select id="user-select">
+                <option value="">Select a user</option>
+            </select>
+        </section>
+        <section>
+            <select id="challenge-select">
+                <option value="">Select a challenge</option>
+                <option value="multiplication">Multiplication</option>
+                <option value="subtraction">Subtraction</option>
+                <option value="addition">Addition</option>
+                <option value="division">Division</option>
+            </select>
+        </section>
+        <section>
+            <button class='btn' onclick='startChallenge()'>Start challenge</button>
+            <button class='btn' onclick='window.location.href="create-user.html"'>Register user</button>
+        </section>
     </main>
+
+    <footer>
+        <p>All content on this site &copy;Copyright - Multiplication game by Roman Josipović</p>
+    </footer>
     <script src="scripts/index.js"></script>
 </body>
+
 </html>
