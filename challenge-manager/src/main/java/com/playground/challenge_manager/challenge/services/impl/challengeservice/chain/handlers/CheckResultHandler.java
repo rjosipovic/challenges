@@ -1,0 +1,25 @@
+package com.playground.challenge_manager.challenge.services.impl.challengeservice.chain.handlers;
+
+
+import com.playground.challenge_manager.challenge.services.impl.challengeservice.chain.AttemptHandler;
+import com.playground.challenge_manager.challenge.services.impl.challengeservice.chain.AttemptVerifierContext;
+import com.playground.challenge_manager.challenge.services.model.ChallengeAttempt;
+
+import java.util.UUID;
+
+public class CheckResultHandler implements AttemptHandler {
+
+    @Override
+    public void handle(AttemptVerifierContext ctx) {
+        var attempt = ctx.getAttempt();
+        var userId = UUID.fromString(attempt.getUserId());
+        var factorA = attempt.getFactorA();
+        var factorB = attempt.getFactorB();
+        var guess = attempt.getGuess();
+
+        var isCorrect = factorA * factorB == guess;
+
+        var challengeAttempt = new ChallengeAttempt(null, userId, factorA, factorB, guess, isCorrect);
+        ctx.setChallengeAttempt(challengeAttempt);
+    }
+}

@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: challenge-manager
+  datasource:
+    url: jdbc:postgresql://localhost:5432/multiplication-db
+    username: multiplication-user
+    password: secret
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+    enabled: true
+  jpa:
+    show-sql: true
+server:
+  error:
+    include-message: always
+    include-binding-errors: always
+
+app:
+  challenge-generator:
+    min: 11
+    max: 99
