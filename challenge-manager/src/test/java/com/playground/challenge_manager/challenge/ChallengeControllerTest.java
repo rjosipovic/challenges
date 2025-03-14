@@ -45,7 +45,8 @@ class ChallengeControllerTest {
     void testGetRandomChallenge() throws Exception {
         //given
         var challenge = new Challenge(11, 12);
-        when(challengeGeneratorService.randomChallenge()).thenReturn(challenge);
+        var difficulty = "medium";
+        when(challengeGeneratorService.randomChallenge(difficulty)).thenReturn(challenge);
 
         //when then
         var response = mockMvc.perform(get("/challenges/random"))

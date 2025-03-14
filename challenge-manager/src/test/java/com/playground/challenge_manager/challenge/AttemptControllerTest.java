@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.playground.challenge_manager.challenge.api.controllers.AttemptController;
 import com.playground.challenge_manager.challenge.api.dto.ChallengeAttemptDTO;
 import com.playground.challenge_manager.challenge.api.dto.ChallengeResultDTO;
-import com.playground.challenge_manager.challenge.services.interfaces.ChallengeService;
+import com.playground.challenge_manager.challenge.services.interfaces.AttemptService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 class AttemptControllerTest {
 
     @Mock
-    private ChallengeService challengeService;
+    private AttemptService challengeService;
 
     @InjectMocks
     private AttemptController attemptController;
@@ -49,12 +49,13 @@ class AttemptControllerTest {
     void testMakeAttempt() throws Exception {
         //given
         var userId = UUID.randomUUID();
-        var factorA = 12;
-        var factorB = 23;
+        var firstNumber = 12;
+        var secondNumber = 23;
         var guess = 276;
         var correct = 276;
-        var attempt = new ChallengeAttemptDTO(userId.toString(), factorA, factorB, guess);
-        var result = new ChallengeResultDTO(userId.toString(), factorA, factorB, guess, correct, true);
+        var game = "multiplication";
+        var attempt = new ChallengeAttemptDTO(userId.toString(), firstNumber, secondNumber, guess, game);
+        var result = new ChallengeResultDTO(userId.toString(), firstNumber, secondNumber, guess, correct, true, game);
         when(challengeService.verifyAttempt(attempt)).thenReturn(result);
 
         //when
@@ -75,12 +76,13 @@ class AttemptControllerTest {
     void testMakeAttempt_Failure() throws Exception {
         //given
         var userId = UUID.randomUUID();
-        var factorA = 12;
-        var factorB = 23;
+        var firstNumber = 12;
+        var secondNumber = 23;
         var guess = 6789;
         var correct = 276;
-        var attempt = new ChallengeAttemptDTO(userId.toString(), factorA, factorB, guess);
-        var result = new ChallengeResultDTO(userId.toString(), factorA, factorB, guess, correct, false);
+        var game = "multiplication";
+        var attempt = new ChallengeAttemptDTO(userId.toString(), firstNumber, secondNumber, guess, game);
+        var result = new ChallengeResultDTO(userId.toString(), firstNumber, secondNumber, guess, correct, false, game);
         when(challengeService.verifyAttempt(attempt)).thenReturn(result);
 
         //when
@@ -98,12 +100,13 @@ class AttemptControllerTest {
     }
 
     @Test
-    void testMakeAttempt_missingUserAlias() throws Exception {
+    void testMakeAttempt_missingUserId() throws Exception {
         //given
-        var factorA = 12;
-        var factorB = 23;
+        var firstNumber = 12;
+        var secondNumber = 23;
         var guess = 6789;
-        var attempt = new ChallengeAttemptDTO(null, factorA, factorB, guess);
+        var game = "multiplication";
+        var attempt = new ChallengeAttemptDTO(null, firstNumber, secondNumber, guess, game);
 
         //when
         var response = mockMvc.perform(post("/attempts")
@@ -117,77 +120,122 @@ class AttemptControllerTest {
         );
     }
 
-    @Test
-    void testMakeAttempt_factorAOutOfRange() throws Exception {
-        //given
-        var userId = UUID.randomUUID();
-        var factorA = 9;
-        var factorB = 23;
-        var guess = 6789;
-        var attempt = new ChallengeAttemptDTO(userId.toString(), factorA, factorB, guess);
-
-        //when
-        var response = mockMvc.perform(post("/attempts")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonChallengeAttempt.write(attempt).getJson()))
-                .andReturn().getResponse();
-
-        //then
-        assertAll(
-                () -> assertEquals(400, response.getStatus())
-        );
-    }
-
-    @Test
-    void testMakeAttempt_factorBOutOfRange() throws Exception {
-        //given
-        var userId = UUID.randomUUID();
-        var factorA = 12;
-        var factorB = 102;
-        var guess = 6789;
-        var attempt = new ChallengeAttemptDTO(userId.toString(), factorA, factorB, guess);
-
-        //when
-        var response = mockMvc.perform(post("/attempts")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonChallengeAttempt.write(attempt).getJson()))
-                .andReturn().getResponse();
-
-        //then
-        assertAll(
-                () -> assertEquals(400, response.getStatus())
-        );
-    }
-
-    @Test
-    void testMakeAttempt_negativeGuess() throws Exception {
-        //given
-        var userId = UUID.randomUUID();
-        var factorA = 12;
-        var factorB = 23;
-        var guess = -1234;
-        var attempt = new ChallengeAttemptDTO(userId.toString(), factorA, factorB, guess);
-
-        //when
-        var response = mockMvc.perform(post("/attempts")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonChallengeAttempt.write(attempt).getJson()))
-                .andReturn().getResponse();
-
-        //then
-        assertAll(
-                () -> assertEquals(400, response.getStatus())
-        );
-    }
 
     @Test
     void testMakeAttempt_invalidUserId() throws Exception {
         //given
         var userId = "shouldBeUUID";
-        var factorA = 12;
-        var factorB = 23;
+        var firstNumber = 12;
+        var secondNumber = 23;
         var guess = 6789;
-        var attempt = new ChallengeAttemptDTO(userId, factorA, factorB, guess);
+        var game = "multiplication";
+        var attempt = new ChallengeAttemptDTO(userId, firstNumber, secondNumber, guess, game);
+        //when
+        var response = mockMvc.perform(post("/attempts")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonChallengeAttempt.write(attempt).getJson()))
+                .andReturn().getResponse();
+
+        //then
+        assertAll(
+                () -> assertEquals(400, response.getStatus())
+        );
+    }
+
+    @Test
+    void testMakeAttempt_missingFirstNumber() throws Exception {
+        //given
+        var userId = UUID.randomUUID();
+        var secondNumber = 23;
+        var guess = 6789;
+        var game = "multiplication";
+        var attempt = new ChallengeAttemptDTO(userId.toString(), null, secondNumber, guess, game);
+
+        //when
+        var response = mockMvc.perform(post("/attempts")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonChallengeAttempt.write(attempt).getJson()))
+                .andReturn().getResponse();
+
+        //then
+        assertAll(
+                () -> assertEquals(400, response.getStatus())
+        );
+    }
+
+    @Test
+    void testMakeAttempt_missingSecondNumber() throws Exception {
+        //given
+        var userId = UUID.randomUUID();
+        var firstNumber = 12;
+        var guess = 6789;
+        var game = "multiplication";
+        var attempt = new ChallengeAttemptDTO(userId.toString(), firstNumber, null, guess, game);
+
+        //when
+        var response = mockMvc.perform(post("/attempts")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonChallengeAttempt.write(attempt).getJson()))
+                .andReturn().getResponse();
+
+        //then
+        assertAll(
+                () -> assertEquals(400, response.getStatus())
+        );
+    }
+
+    @Test
+    void testMakeAttempt_missingGame() throws Exception {
+        //given
+        var userId = UUID.randomUUID();
+        var firstNumber = 12;
+        var secondNumber = 23;
+        var guess = 6789;
+        var attempt = new ChallengeAttemptDTO(userId.toString(), firstNumber, secondNumber, guess, null);
+
+        //when
+        var response = mockMvc.perform(post("/attempts")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonChallengeAttempt.write(attempt).getJson()))
+                .andReturn().getResponse();
+
+        //then
+        assertAll(
+                () -> assertEquals(400, response.getStatus())
+        );
+    }
+
+    @Test
+    void testMakeAttempt_invalidGame() throws Exception {
+        //given
+        var userId = UUID.randomUUID();
+        var firstNumber = 12;
+        var secondNumber = 23;
+        var guess = 6789;
+        var game = "invalidGame";
+        var attempt = new ChallengeAttemptDTO(userId.toString(), firstNumber, secondNumber, guess, game);
+
+        //when
+        var response = mockMvc.perform(post("/attempts")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonChallengeAttempt.write(attempt).getJson()))
+                .andReturn().getResponse();
+
+        //then
+        assertAll(
+                () -> assertEquals(400, response.getStatus())
+        );
+    }
+
+    @Test
+    void testMakeAttempt_missingGuess() throws Exception {
+        //given
+        var userId = UUID.randomUUID();
+        var firstNumber = 12;
+        var secondNumber = 23;
+        var game = "multiplication";
+        var attempt = new ChallengeAttemptDTO(userId.toString(), firstNumber, secondNumber, null, game);
+
         //when
         var response = mockMvc.perform(post("/attempts")
                         .contentType(MediaType.APPLICATION_JSON)

@@ -2,7 +2,7 @@ package com.playground.challenge_manager.challenge.api.controllers;
 
 import com.playground.challenge_manager.challenge.api.dto.ChallengeAttemptDTO;
 import com.playground.challenge_manager.challenge.api.dto.ChallengeResultDTO;
-import com.playground.challenge_manager.challenge.services.interfaces.ChallengeService;
+import com.playground.challenge_manager.challenge.services.interfaces.AttemptService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.UUID;
@@ -21,7 +21,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AttemptController {
 
-    private final ChallengeService challengeService;
+    private final AttemptService challengeService;
 
     @PostMapping
     public ResponseEntity<ChallengeResultDTO> verify(@RequestBody @Valid ChallengeAttemptDTO attempt) {
@@ -30,6 +30,6 @@ public class AttemptController {
 
     @GetMapping
     public ResponseEntity<List<ChallengeResultDTO>> findLast10ResultsForUser(@RequestParam("userId") @UUID String userId) {
-        return ResponseEntity.ok(challengeService.findLast10ResultsForUser(java.util.UUID.fromString(userId)));
+        return ResponseEntity.ok(challengeService.findLast10AttemptsForUser(java.util.UUID.fromString(userId)));
     }
 }

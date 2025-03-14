@@ -11,6 +11,6 @@ import lombok.ToString;
 @EqualsAndHashCode
 public class Challenge {
 
-    private final int factorA;
-    private final int factorB;
+    private final int firstNumber;
+    private final int secondNumber;
 }

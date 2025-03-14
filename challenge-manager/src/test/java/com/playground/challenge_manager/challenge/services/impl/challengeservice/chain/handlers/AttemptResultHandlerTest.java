@@ -31,12 +31,13 @@ class AttemptResultHandlerTest {
     void shouldCreateCorrectAttemptResult() {
         //given
         var userId = UUID.randomUUID();
-        var factorA = 12;
-        var factorB = 23;
+        var firstNumber = 12;
+        var secondNumber = 23;
         var guess = 276;
         var isCorrect = true;
-        var attempt = new ChallengeAttemptDTO(userId.toString(), factorA, factorB, guess);
-        var challengeAttempt = new ChallengeAttempt(null, userId, factorA, factorB, guess, isCorrect);
+        var game = "multiplication";
+        var attempt = new ChallengeAttemptDTO(userId.toString(), firstNumber, secondNumber, guess, game);
+        var challengeAttempt = new ChallengeAttempt(userId, firstNumber, secondNumber, guess, isCorrect, game);
         var ctx = new AttemptVerifierContext(attempt);
         ctx.setChallengeAttempt(challengeAttempt);
 
@@ -48,10 +49,10 @@ class AttemptResultHandlerTest {
         assertAll(
                 () -> assertNotNull(result),
                 () -> assertEquals(userId.toString(), result.getUserId()),
-                () -> assertEquals(factorA, result.getFactorA()),
-                () -> assertEquals(factorB, result.getFactorB()),
+                () -> assertEquals(firstNumber, result.getFirstNumber()),
+                () -> assertEquals(secondNumber, result.getSecondNumber()),
                 () -> assertEquals(guess, result.getGuess()),
-                () -> assertEquals(factorA * factorB, result.getCorrectResult()),
+                () -> assertEquals(firstNumber * secondNumber, result.getCorrectResult()),
                 () -> assertTrue(result.isCorrect())
         );
     }
@@ -60,11 +61,12 @@ class AttemptResultHandlerTest {
     void shouldCreateIncorrectAttemptResult() {
         //given
         var userId = UUID.randomUUID();
-        var factorA = 12;
-        var factorB = 23;
+        var firstNumber = 12;
+        var secondNumber = 23;
         var guess = 456;
-        var attempt = new ChallengeAttemptDTO(userId.toString(), factorA, factorB, guess);
-        var challengeAttempt = new ChallengeAttempt(null, userId, factorA, factorB, guess, false);
+        var game = "multiplication";
+        var attempt = new ChallengeAttemptDTO(userId.toString(), firstNumber, secondNumber, guess, game);
+        var challengeAttempt = new ChallengeAttempt(userId, firstNumber, secondNumber, guess, false, game);
         var ctx = new AttemptVerifierContext(attempt);
         ctx.setChallengeAttempt(challengeAttempt);
 
@@ -76,10 +78,10 @@ class AttemptResultHandlerTest {
         assertAll(
                 () -> assertNotNull(result),
                 () -> assertEquals(userId.toString(), result.getUserId()),
-                () -> assertEquals(factorA, result.getFactorA()),
-                () -> assertEquals(factorB, result.getFactorB()),
+                () -> assertEquals(firstNumber, result.getFirstNumber()),
+                () -> assertEquals(secondNumber, result.getSecondNumber()),
                 () -> assertEquals(guess, result.getGuess()),
-                () -> assertEquals(factorA * factorB, result.getCorrectResult()),
+                () -> assertEquals(firstNumber * secondNumber, result.getCorrectResult()),
                 () -> assertFalse(result.isCorrect())
         );
     }

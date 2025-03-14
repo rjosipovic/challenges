@@ -13,10 +13,10 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ChallengeAttempt {
 
-    private String id;
     private UUID userId;
-    private int factorA;
-    private int factorB;
+    private int firstNumber;
+    private int secondNumber;
     private int resultAttempt;
     private boolean correct;
+    private String game;
 }

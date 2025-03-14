@@ -24,14 +24,16 @@ public class ChallengeAttemptEntity {
     private UUID id;
     @Column(name = "user_id")
     private UUID userId;
-    @Column(name = "factor_a", length = 2)
-    private int factorA;
-    @Column(name = "factor_b", length = 2)
-    private int factorB;
+    @Column(name = "first_number", length = 2)
+    private int firstNumber;
+    @Column(name = "second_number", length = 2)
+    private int secondNumber;
     @Column(name = "result_attempt", length = 4)
     private int resultAttempt;
     @Column(name = "correct")
     private boolean correct;
+    @Column(name = "game")
+    private String game;
     @CreationTimestamp
     @Column(name = "attempt_date")
     private ZonedDateTime attemptDate;

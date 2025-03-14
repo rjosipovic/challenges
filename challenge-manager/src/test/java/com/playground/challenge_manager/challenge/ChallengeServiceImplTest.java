@@ -47,10 +47,11 @@ class ChallengeServiceImplTest {
     void testVerifyCorrectAttempt() {
         //given
         var userId = UUID.randomUUID();
-        var factorA = 12;
-        var factorB = 23;
-        var guess = factorA * factorB;
-        var attemptDto = new ChallengeAttemptDTO(userId.toString(), factorA, factorB, guess);
+        var firstNumber = 12;
+        var secondNumber = 23;
+        var guess = firstNumber * secondNumber;
+        var game = "multiplication";
+        var attemptDto = new ChallengeAttemptDTO(userId.toString(), firstNumber, secondNumber, guess, game);
 
         //when
         var result = challengeService.verifyAttempt(attemptDto);
@@ -58,39 +59,40 @@ class ChallengeServiceImplTest {
         //then
         assertAll(
                 () -> assertNotNull(result),
-                () -> assertEquals(factorA, result.getFactorA()),
-                () -> assertEquals(factorB, result.getFactorB()),
+                () -> assertEquals(firstNumber, result.getFirstNumber()),
+                () -> assertEquals(secondNumber, result.getSecondNumber()),
                 () -> assertEquals(guess, result.getGuess()),
                 () -> assertEquals(guess, result.getCorrectResult()),
                 () -> assertTrue(result.isCorrect())
         );
 
         verify(challengeAttemptRepository).save(
-                new ChallengeAttemptEntity(null, userId, factorA, factorB, guess, true, null)
+                new ChallengeAttemptEntity(null, userId, firstNumber, secondNumber, guess, true, game, null)
         );
     }
 
     @Test
     void testVerifyIncorrectAttempt() {
         var userId = UUID.randomUUID();
-        var factorA = 12;
-        var factorB = 23;
-        var guess = factorA * factorB + 1;
-        var correctResult = factorA * factorB;
-        var attempt = new ChallengeAttemptDTO(userId.toString(), factorA, factorB, guess);
+        var firstNumber = 12;
+        var secondNumber = 23;
+        var guess = firstNumber * secondNumber + 1;
+        var correctResult = firstNumber * secondNumber;
+        var game = "multiplication";
+        var attempt = new ChallengeAttemptDTO(userId.toString(), firstNumber, secondNumber, guess, game);
         var result = challengeService.verifyAttempt(attempt);
 
         assertAll(
                 () -> assertNotNull(attempt),
-                () -> assertEquals(factorA, attempt.getFactorA()),
-                () -> assertEquals(factorB, attempt.getFactorB()),
+                () -> assertEquals(firstNumber, attempt.getFirstNumber()),
+                () -> assertEquals(secondNumber, attempt.getSecondNumber()),
                 () -> assertEquals(guess, attempt.getGuess()),
                 () -> assertEquals(correctResult, result.getCorrectResult()),
                 () -> assertFalse(result.isCorrect())
         );
 
         verify(challengeAttemptRepository).save(
-                new ChallengeAttemptEntity(null, userId, factorA, factorB, guess, false, null));
+                new ChallengeAttemptEntity(null, userId, firstNumber, secondNumber, guess, false, game, null));
     }
 
     @Test
@@ -99,7 +101,7 @@ class ChallengeServiceImplTest {
         var userId = UUID.randomUUID();
         when(challengeAttemptRepository.findLast10AttemptsByUser(userId)).thenReturn(List.of());
         //when
-        var result = challengeService.findLast10ResultsForUser(userId);
+        var result = challengeService.findLast10AttemptsForUser(userId);
         //then
         verify(challengeAttemptRepository).findLast10AttemptsByUser(userId);
         assertAll(
@@ -113,10 +115,11 @@ class ChallengeServiceImplTest {
         //given
         var userId = UUID.randomUUID();
         var attemptId = UUID.randomUUID();
-        var attempt = new ChallengeAttemptEntity(attemptId, userId, 1, 2, 3, true, ZonedDateTime.now().minusDays(1));
+        var game = "multiplication";
+        var attempt = new ChallengeAttemptEntity(attemptId, userId, 1, 2, 3, true, game,  ZonedDateTime.now().minusDays(1));
         when(challengeAttemptRepository.findLast10AttemptsByUser(userId)).thenReturn(List.of(attempt));
         //when
-        var result = challengeService.findLast10ResultsForUser(userId);
+        var result = challengeService.findLast10AttemptsForUser(userId);
         //then
         verify(challengeAttemptRepository).findLast10AttemptsByUser(userId);
         assertAll(
@@ -124,8 +127,8 @@ class ChallengeServiceImplTest {
                 () -> assertFalse(result.isEmpty()),
                 () -> assertEquals(1, result.size()),
                 () -> assertEquals(userId.toString(), result.get(0).getUserId()),
-                () -> assertEquals(1, result.get(0).getFactorA()),
-                () -> assertEquals(2, result.get(0).getFactorB()),
+                () -> assertEquals(1, result.get(0).getFirstNumber()),
+                () -> assertEquals(2, result.get(0).getSecondNumber()),
                 () -> assertEquals(3, result.get(0).getGuess()),
                 () -> assertTrue(result.get(0).isCorrect())
         );

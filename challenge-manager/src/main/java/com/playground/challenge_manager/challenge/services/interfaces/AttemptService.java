@@ -6,8 +6,8 @@ import com.playground.challenge_manager.challenge.api.dto.ChallengeResultDTO;
 import java.util.List;
 import java.util.UUID;
 
-public interface ChallengeService {
+public interface AttemptService {
 
     ChallengeResultDTO verifyAttempt(ChallengeAttemptDTO attempt);
-    List<ChallengeResultDTO> findLast10ResultsForUser(UUID userId);
+    List<ChallengeResultDTO> findLast10AttemptsForUser(UUID userId);
 }

@@ -4,5 +4,5 @@ import com.playground.challenge_manager.challenge.services.model.Challenge;
 
 public interface ChallengeGeneratorService {
 
-    Challenge randomChallenge();
+    Challenge randomChallenge(String difficulty);
 }

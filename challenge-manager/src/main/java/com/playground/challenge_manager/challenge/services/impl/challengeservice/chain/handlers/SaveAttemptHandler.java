@@ -24,10 +24,11 @@ public class SaveAttemptHandler implements AttemptHandler {
         var challengeAttemptEntity = new ChallengeAttemptEntity(
                 null,
                 challengeAttempt.getUserId(),
-                challengeAttempt.getFactorA(),
-                challengeAttempt.getFactorB(),
+                challengeAttempt.getFirstNumber(),
+                challengeAttempt.getSecondNumber(),
                 challengeAttempt.getResultAttempt(),
                 challengeAttempt.isCorrect(),
+                challengeAttempt.getGame(),
                 null
         );
         challengeAttemptRepository.save(challengeAttemptEntity);

@@ -29,15 +29,16 @@ class SaveAttemptHandlerTest {
     void shouldSaveAttempt() {
         //given
         var userId = UUID.randomUUID();
-        var factorA = 12;
-        var factorB = 23;
+        var firstNumber = 12;
+        var secondNumber = 23;
         var guess = 2764;
-        var attempt = new ChallengeAttemptDTO(userId.toString(), factorA, factorB, guess);
+        var game = "multiplication";
+        var attempt = new ChallengeAttemptDTO(userId.toString(), firstNumber, secondNumber, guess, game);
         var ctx = new AttemptVerifierContext(attempt);
-        var challengeAttempt = new ChallengeAttempt(null, userId, factorA, factorB, guess, false);
+        var challengeAttempt = new ChallengeAttempt(userId, firstNumber, secondNumber, guess, false, game);
         ctx.setChallengeAttempt(challengeAttempt);
 
-        var entity = new ChallengeAttemptEntity(null, userId, factorA, factorB, guess, false, null);
+        var entity = new ChallengeAttemptEntity(null, userId, firstNumber, secondNumber, guess, false, game, null);
 
         //when
         saveAttemptHandler.handle(ctx);

@@ -5,7 +5,7 @@ import com.playground.challenge_manager.challenge.api.dto.ChallengeResultDTO;
 import com.playground.challenge_manager.challenge.dataaccess.repositories.ChallengeAttemptRepository;
 import com.playground.challenge_manager.challenge.services.impl.challengeservice.chain.AttemptVerifierChain;
 import com.playground.challenge_manager.challenge.services.impl.challengeservice.chain.AttemptVerifierContext;
-import com.playground.challenge_manager.challenge.services.interfaces.ChallengeService;
+import com.playground.challenge_manager.challenge.services.interfaces.AttemptService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +14,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class ChallengeServiceImpl implements ChallengeService {
+public class ChallengeServiceImpl implements AttemptService {
 
     private final AttemptVerifierChain attemptVerifierChain;
     private final ChallengeAttemptRepository challengeAttemptRepository;
@@ -27,16 +27,17 @@ public class ChallengeServiceImpl implements ChallengeService {
     }
 
     @Override
-    public List<ChallengeResultDTO> findLast10ResultsForUser(UUID userId) {
+    public List<ChallengeResultDTO> findLast10AttemptsForUser(UUID userId) {
         return challengeAttemptRepository.findLast10AttemptsByUser(userId)
                 .stream()
                 .map(entity -> new ChallengeResultDTO(
                         entity.getUserId().toString(),
-                        entity.getFactorA(),
-                        entity.getFactorB(),
+                        entity.getFirstNumber(),
+                        entity.getSecondNumber(),
                         entity.getResultAttempt(),
-                        entity.getFactorA() * entity.getFactorB(),
-                        entity.isCorrect()))
+                        entity.getFirstNumber() * entity.getSecondNumber(),
+                        entity.isCorrect(),
+                        entity.getGame()))
                 .toList();
     }
 }

@@ -1,0 +1,30 @@
+databaseChangeLog:
+  - changeSet:
+      id: 3
+      author: roman
+      changes:
+        - renameColumn:
+            tableName: challenge_attempts
+            oldColumnName: factor_a
+            newColumnName: first_number
+        - renameColumn:
+            tableName: challenge_attempts
+            oldColumnName: factor_b
+            newColumnName: second_number
+        - addColumn:
+            tableName: challenge_attempts
+            columns:
+              - column:
+                  name: game
+                  type: VARCHAR(25)
+        - update:
+            tableName: challenge_attempts
+            columns:
+              - column:
+                  name: game
+                  value: 'multiplication'
+        - addNotNullConstraint:
+            tableName: challenge_attempts
+            columnName: game
+            constraintName: challenge_attempts_game_not_null
+            validate: false

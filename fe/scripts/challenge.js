@@ -1,25 +1,29 @@
 console.log("Page is loaded");
 
 getChallenge();
+setGameName();
+setOperator();
 
 function evaluateGuess() {
-    const factorA = document.getElementById("factorA").innerHTML;
-    const factorB = document.getElementById("factorB").innerHTML;
+    const firstNumber = document.getElementById("firstNumber").innerHTML;
+    const secondNumber = document.getElementById("secondNumber").innerHTML;
     const guess = document.getElementById("guess").value;
     const urlParams = new URLSearchParams(window.location.search);
     const userId = urlParams.get('userId');
+    const game = urlParams.get('game');
 
     if (guess.trim() === "") {
         alert("Please enter a number");
         return;
     }
-    
+
     console.log(`User ID: ${userId}`);
     const guessData = {
         "userId": userId,
-        "factorA": parseInt(factorA),
-        "factorB": parseInt(factorB),
-        "guess": parseInt(guess)
+        "firstNumber": parseInt(firstNumber),
+        "secondNumber": parseInt(secondNumber),
+        "guess": parseInt(guess),
+        "game": game
     };
 
     fetch(`http://localhost:8080/attempts`, {
@@ -63,9 +67,10 @@ function populateTable(userId) {
         const tableBody = document.getElementById('attemptsTableBody');
         tableBody.innerHTML = '';
         data.forEach(attempt => {
+            const operator = getOperator(attempt.game);
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${attempt.factorA} x ${attempt.factorB}</td>
+                <td>${attempt.firstNumber} ${operator} ${attempt.secondNumber}</td>
                 <td>${attempt.guess}</td>
                 <td>${attempt.correct ? 'Correct' : 'Incorrect (' + attempt.correctResult + ')'}</td>
             `;
@@ -77,6 +82,20 @@ function populateTable(userId) {
     .catch(error => console.error(error));
 }
 
+
+function getOperator(game) {
+    let operator;
+    if (game === "multiplication") {
+        operator = "x";
+    } else if (game === "subtraction") {
+        operator = "-";
+    } else if (game === "addition") {
+        operator = "+";
+    } else if (game === "division") {
+        operator = "/";
+    }
+    return operator;
+}
 
 async function createUser(alias) {
     const apiUrl = `http://localhost:8081/users`;
@@ -94,11 +113,35 @@ async function createUser(alias) {
 
   
 function getChallenge() {
-    return fetch(`http://localhost:8080/challenges/random`)
+    const urlParams = new URLSearchParams(window.location.search);
+    const difficulty = urlParams.get('difficulty');
+    return fetch(`http://localhost:8080/challenges/random?difficulty=${difficulty}`)
     .then(response => response.json())
     .then(data => {
-        document.getElementById("factorA").innerHTML = data.factorA;
-        document.getElementById("factorB").innerHTML = data.factorB;
+        document.getElementById("firstNumber").innerHTML = data.firstNumber;
+        document.getElementById("secondNumber").innerHTML = data.secondNumber;
     })
     .catch(error => console.error(error));
+}
+
+function setGameName() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const game = urlParams.get('game');
+    document.getElementById("game").innerHTML = game;
+}
+
+function setOperator() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const game = urlParams.get('game');
+    let operator;
+    if (game === "multiplication") {
+        operator = "x";
+    } else if (game === "subtraction") {
+        operator = "-";
+    } else if (game === "addition") {
+        operator = "+";
+    } else if (game === "division") {
+        operator = "/";
+    }
+    document.getElementById("operator").innerHTML = operator;
 }

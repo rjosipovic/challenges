@@ -17,5 +17,16 @@ server:
 
 app:
   challenge-generator:
-    min: 11
-    max: 99
+    difficulty-levels:
+      - level: easy
+        min: 1
+        max: 9
+      - level: medium
+        min: 11
+        max: 99
+      - level: hard
+        min: 101
+        max: 999
+      - level: expert
+        min: 1001
+        max: 9999

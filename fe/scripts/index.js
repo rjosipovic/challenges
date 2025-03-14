@@ -18,27 +18,26 @@ function populateUsers() {
 }
 
 function startChallenge() {
-    const selectedUserId = document.getElementById("user-select").value;
-    const selectedChallenge = document.getElementById("challenge-select").value;
+    const userId = document.getElementById("user-select").value;
+    const game = document.getElementById("game-select").value;
+    var difficulty = document.getElementById("difficulty-select").value;
 
-    console.log("Selected user ID: " + selectedUserId);
-    console.log("Selected challenge: " + selectedChallenge);
 
-    if (selectedUserId === "") {
+    if (userId === "") {
         alert("Please select a user");
         return;
     }
 
-    if (selectedChallenge === "") {
-        alert("Please select a challenge");
+    if (game === "") {
+        alert("Please select a game");
         return;
     }
 
-    if (selectedChallenge === "multiplication") {
-        window.location.href = "multiplication.html?userId=" + selectedUserId;
-    } else {
-        window.location.href = "index.html";
+    if (difficulty === "") {
+        difficulty = "medium";
     }
+
+    window.location.href = "challenge.html?userId=" + userId + "&difficulty=" + difficulty + "&game=" + game;
 
 }
 

@@ -6,9 +6,10 @@ import lombok.Value;
 public class ChallengeResultDTO {
 
     String userId;
-    int factorA;
-    int factorB;
+    int firstNumber;
+    int secondNumber;
     int guess;
     int correctResult;
     boolean correct;
+    String game;
 }

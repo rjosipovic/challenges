@@ -29,10 +29,11 @@ class CheckResultHandlerTest {
     void shouldCheckCorrectResult() {
         //given
         var userId = UUID.randomUUID();
-        var factorA = 12;
-        var factorB = 23;
+        var firstNumber = 12;
+        var secondNumber = 23;
         var guess = 276;
-        var attempt = new ChallengeAttemptDTO(userId.toString(), factorA, factorB, guess);
+        var game = "multiplication";
+        var attempt = new ChallengeAttemptDTO(userId.toString(), firstNumber, secondNumber, guess, game);
         var ctx = new AttemptVerifierContext(attempt);
 
         //when
@@ -43,8 +44,8 @@ class CheckResultHandlerTest {
         assertAll(
                 () -> assertNotNull(challengeAttempt),
                 () -> assertEquals(userId, challengeAttempt.getUserId()),
-                () -> assertEquals(factorA, challengeAttempt.getFactorA()),
-                () -> assertEquals(factorB, challengeAttempt.getFactorB()),
+                () -> assertEquals(firstNumber, challengeAttempt.getFirstNumber()),
+                () -> assertEquals(secondNumber, challengeAttempt.getSecondNumber()),
                 () -> assertEquals(guess, challengeAttempt.getResultAttempt()),
                 () -> assertTrue(challengeAttempt.isCorrect())
         );
@@ -54,10 +55,11 @@ class CheckResultHandlerTest {
     void shouldCheckIncorrectResult() {
         //given
         var userId = UUID.randomUUID();
-        var factorA = 12;
-        var factorB = 23;
+        var firstNumber = 12;
+        var secondNumber = 23;
         var guess = 2764;
-        var attempt = new ChallengeAttemptDTO(userId.toString(), factorA, factorB, guess);
+        var game = "multiplication";
+        var attempt = new ChallengeAttemptDTO(userId.toString(), firstNumber, secondNumber, guess, game);
         var ctx = new AttemptVerifierContext(attempt);
 
         //when
@@ -68,8 +70,8 @@ class CheckResultHandlerTest {
         assertAll(
                 () -> assertNotNull(challengeAttempt),
                 () -> assertEquals(userId, challengeAttempt.getUserId()),
-                () -> assertEquals(factorA, challengeAttempt.getFactorA()),
-                () -> assertEquals(factorB, challengeAttempt.getFactorB()),
+                () -> assertEquals(firstNumber, challengeAttempt.getFirstNumber()),
+                () -> assertEquals(secondNumber, challengeAttempt.getSecondNumber()),
                 () -> assertEquals(guess, challengeAttempt.getResultAttempt()),
                 () -> assertFalse(challengeAttempt.isCorrect())
         );
