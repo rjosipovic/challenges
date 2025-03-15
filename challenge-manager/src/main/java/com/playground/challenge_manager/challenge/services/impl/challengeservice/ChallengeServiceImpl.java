@@ -5,6 +5,7 @@ import com.playground.challenge_manager.challenge.api.dto.ChallengeResultDTO;
 import com.playground.challenge_manager.challenge.dataaccess.repositories.ChallengeAttemptRepository;
 import com.playground.challenge_manager.challenge.services.impl.challengeservice.chain.AttemptVerifierChain;
 import com.playground.challenge_manager.challenge.services.impl.challengeservice.chain.AttemptVerifierContext;
+import com.playground.challenge_manager.challenge.services.impl.challengeservice.chain.util.MathUtil;
 import com.playground.challenge_manager.challenge.services.interfaces.AttemptService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -35,7 +36,7 @@ public class ChallengeServiceImpl implements AttemptService {
                         entity.getFirstNumber(),
                         entity.getSecondNumber(),
                         entity.getResultAttempt(),
-                        entity.getFirstNumber() * entity.getSecondNumber(),
+                        MathUtil.calculateResult(entity.getFirstNumber(), entity.getSecondNumber(), entity.getGame()),
                         entity.isCorrect(),
                         entity.getGame()))
                 .toList();

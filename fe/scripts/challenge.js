@@ -73,6 +73,7 @@ function populateTable(userId) {
                 <td>${attempt.firstNumber} ${operator} ${attempt.secondNumber}</td>
                 <td>${attempt.guess}</td>
                 <td>${attempt.correct ? 'Correct' : 'Incorrect (' + attempt.correctResult + ')'}</td>
+                <td>${attempt.game}</td>
             `;
             tableBody.appendChild(row);
         });
