@@ -1,4 +1,6 @@
 const ERROR_MSG = "Something went wrong. Please try again.";
+const CHALLENGE_API = 'http://localhost:8080/challenges';
+const ATTEMPT_API = 'http://localhost:8080/attempts';
 
 setUser();
 
@@ -26,7 +28,7 @@ async function setQuestion() {
 
     console.log("Retrieving challenge with difficulty: ", difficulty);
 
-    const apiUrl = `http://localhost:8080/challenges/random?difficulty=${difficulty}`;
+    const apiUrl = CHALLENGE_API + '/random?difficulty=' + difficulty;
 
     try {
         const response = await fetch(apiUrl);
@@ -38,15 +40,14 @@ async function setQuestion() {
             var selectedOperation = localStorage.getItem("selectedOperation");
             document.getElementById("operator").innerHTML = getOperatorSign(selectedOperation);
             document.getElementById("secondNumber").innerHTML = data.secondNumber;
-
         } else {
             const errorData = await response.json();
             alert(ERROR_MSG);
-            console.error('Getting challenge error:', errorData);
+            console.error('Error getting challenge:', errorData);
         }
     } catch (error) {
         alert(ERROR_MSG);
-        console.error('There was an error getting challenge', error);
+        console.error('Error getting challenge:', error);
     }
 }
 
@@ -70,41 +71,35 @@ async function submitAnswer() {
         "game": game
     };
 
-    const apiUrl = `http://localhost:8080/attempts`;
-
     try {
-        const response = await fetch(apiUrl, {
+        const response = await fetch(ATTEMPT_API, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(data)
         });
 
         if (response.ok) {
             const result = await response.json();
+            const resultElement = document.getElementById("result");
+            resultElement.classList.remove("hidden");
             if (result.correct) {
-                const result = document.getElementById("result");
-                result.classList.remove("hidden");
-                result.innerHTML = "Correct!";
+                resultElement.innerHTML = "Correct!";
             } else {
-                const result = document.getElementById("result");
-                result.classList.remove("hidden");
-                result.innerHTML = "Inorrect!";
+                resultElement.innerHTML = "Inorrect!";
             }
             const table = document.getElementById("attempts-table");
             table.classList.remove("hidden");
             setQuestion();
             clearAnswer();
-            populteAttemptsTable(user.id);
+            populateAttemptsTable(user.id);
         } else {
             const errorData = await response.json();
             alert(ERROR_MSG);
-            console.error('Getting challenge error:', errorData);
+            console.error('Error submitting answer:', errorData);
         }
     } catch (error) {
         alert(ERROR_MSG);
-        console.error('There was an error getting challenge', error);
+        console.error('Error submitting answer:', error);
     }
 }
 
@@ -125,9 +120,10 @@ function getOperatorSign(selectedOperation) {
     }
 }
 
-async function populteAttemptsTable(userId) {
-    const apiUrl = `http://localhost:8080/attempts?userId=${userId}`;
+async function populateAttemptsTable(userId) {
+    console.log("About to populate attempts table.");
 
+    const apiUrl = ATTEMPT_API + '?userId=' + userId;
     try {
         const response = await fetch(apiUrl);
 
@@ -150,10 +146,10 @@ async function populteAttemptsTable(userId) {
             });
         } else {
             const errorData = await response.json();
-            console.error('Getting challenge error:', errorData);
+            console.error('Error getting attempts history:', errorData);
         }
 
     } catch (error) {
-        console.warn('There was an error getting challenge', error);
+        console.warn('Error getting attempts history:', error);
     }
 }

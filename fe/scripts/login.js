@@ -1,4 +1,5 @@
 const ERROR_MSG = "Something went wrong. Please try again.";
+const USER_DETAILS_API = 'http://localhost:8081/users';
 
 async function login() {
     const alias = document.getElementById('alias').value;
@@ -8,7 +9,7 @@ async function login() {
         return;
     }
 
-    const apiUrl = `http://localhost:8081/users/alias/${alias}`;
+    const apiUrl = USER_DETAILS_API + '/alias/' + alias;
 
     try {
         const response = await fetch(apiUrl);
@@ -21,11 +22,11 @@ async function login() {
         } else {
             const errorData = await response.json();
             alert(ERROR_MSG);
-            console.error('Getting user details error:', errorData);
+            console.error('Error getting user details:', errorData);
         }
     } catch (error) {
         alert(ERROR_MSG);
-        console.error('There was an error getting user details', error);
+        console.error('Error getting user details:', error);
     }
     window.location.href = "challenges.html";
 }
