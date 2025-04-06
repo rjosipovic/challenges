@@ -18,6 +18,7 @@ async function login() {
             const data = await response.json();
             console.log('User details:', data);
             localStorage.setItem('alias', JSON.stringify(data));
+            window.location.href = "challenges.html";
 
         } else {
             const errorData = await response.json();
@@ -28,5 +29,4 @@ async function login() {
         alert(ERROR_MSG);
         console.error('Error getting user details:', error);
     }
-    window.location.href = "challenges.html";
 }
