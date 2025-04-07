@@ -33,7 +33,7 @@ class UserServiceImplTest {
         var uuid = UUID.randomUUID();
         var createUserRequest = new CreateUserDTO(alias, email, null, null);
         when(userRepository.findByAlias(alias)).thenReturn(Optional.empty());
-        when(userRepository.save(any(UserEntity.class))).thenReturn(UserEntity.builder().alias(alias).email(email).build());
+        when(userRepository.save(any(UserEntity.class))).thenReturn(UserEntity.builder().alias(alias).id(uuid).email(email).build());
         //when
         var savedUser = userService.createUser(createUserRequest);
         //then
@@ -49,7 +49,7 @@ class UserServiceImplTest {
         //given
         var alias = "test-user";
         var uuid = UUID.randomUUID();
-        when(userRepository.findByAlias(alias)).thenReturn(Optional.of(UserEntity.builder().alias(alias).build()));
+        when(userRepository.findByAlias(alias)).thenReturn(Optional.of(UserEntity.builder().alias(alias).id(uuid).build()));
         //when
         var user = userService.getUserByAlias(alias);
         //then
