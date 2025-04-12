@@ -2,8 +2,8 @@ spring:
   application:
     name: challenge-manager
   datasource:
-    url: jdbc:postgresql://localhost:5432/multiplication-db
-    username: multiplication-user
+    url: ${DATASOURCE_URL:jdbc:postgresql://localhost:5432/challenge-manager-db}
+    username: challenge-manager-user
     password: secret
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml

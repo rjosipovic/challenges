@@ -2,7 +2,7 @@ spring:
   application:
     name: user-manager
   datasource:
-    url: jdbc:postgresql://localhost:5432/user-manager-db
+    url: ${DATASOURCE_URL:jdbc:postgresql://localhost:5432/user-manager-db}
     username: user-manager-user
     password: secret
   liquibase:
