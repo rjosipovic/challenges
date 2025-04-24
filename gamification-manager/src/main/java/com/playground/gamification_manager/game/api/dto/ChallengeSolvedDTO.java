@@ -1,6 +1,6 @@
-package com.playground.challenge_manager.challenge.api.dto;
+package com.playground.gamification_manager.game.api.dto;
 
-import com.playground.challenge_manager.challenge.api.validation.SameDigitCount;
+import com.playground.gamification_manager.game.api.validation.SameDigitCount;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Value;
@@ -9,19 +9,16 @@ import org.hibernate.validator.constraints.UUID;
 
 @Value
 @SameDigitCount
-public class ChallengeAttemptDTO {
+public class ChallengeSolvedDTO {
 
-    @NotNull
-    @UUID
+    @UUID @NotNull
     String userId;
-    @NotNull
-    @Range(min = 1, max = 9999)
+    @NotNull @Range(min = 1, max = 9999)
     Integer firstNumber;
-    @NotNull
-    @Range(min = 1, max = 9999)
+    @NotNull @Range(min = 1, max = 9999)
     Integer secondNumber;
     @NotNull
-    Integer guess;
+    boolean correct;
     @NotNull @Pattern(regexp = "addition|subtraction|multiplication|division")
     String game;
 }

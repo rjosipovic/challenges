@@ -247,4 +247,28 @@ class AttemptControllerTest {
                 () -> assertEquals(400, response.getStatus())
         );
     }
+
+    @Test
+    void whenNumbersHaveDifferentDigitCount_thenReturnBadRequest() throws Exception {
+        // given
+        var userId = UUID.randomUUID();
+        var firstNumber = 12;    // 2 digits
+        var secondNumber = 345;  // 3 digits
+        var guess = 357;
+        var game = "addition";
+        var attempt = new ChallengeAttemptDTO(userId.toString(), firstNumber, secondNumber, guess, game);
+
+        // when
+        var response = mockMvc.perform(post("/attempts")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonChallengeAttempt.write(attempt).getJson()))
+                .andReturn().getResponse();
+
+        // then
+        assertAll(
+                () -> assertEquals(400, response.getStatus()),
+                () -> assertEquals(MediaType.APPLICATION_JSON.toString(), response.getContentType()),
+                () -> assertEquals("Numbers must have the same digit count", response.getContentAsString())
+        );
+    }
 }

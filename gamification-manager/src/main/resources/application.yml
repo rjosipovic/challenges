@@ -1,0 +1,41 @@
+spring:
+  application:
+      name: gamification-manager
+  datasource:
+    url: jdbc:h2:mem:gamification_db;DB_CLOSE_ON_EXIT=FALSE
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+app:
+  difficulty-levels:
+    - level: easy
+      digits: 1
+      score: 10
+    - level: medium
+      digits: 2
+      score: 20
+    - level: hard
+      digits: 3
+      score: 30
+    - level: expert
+      digits: 4
+      score: 40
+  badges:
+    - badge-type: FIRST_WON
+    - badge-type: BRONZE
+      score_threshold: 100
+    - badge-type: SILVER
+      score_threshold: 250
+    - badge-type: GOLD
+      score_threshold: 500
+    - badge-type: LUCKY_NUMBER
+      lucky_number: 42
