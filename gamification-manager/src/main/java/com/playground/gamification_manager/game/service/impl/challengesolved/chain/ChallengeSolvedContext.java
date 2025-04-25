@@ -16,6 +16,7 @@ import java.util.Set;
 public class ChallengeSolvedContext {
 
     private final String userId;
+    private final String challengeAttemptId;
     private final int firstNumber;
     private final int secondNumber;
     private final boolean correct;
@@ -30,6 +31,7 @@ public class ChallengeSolvedContext {
 
     public ChallengeSolvedContext(ChallengeSolvedDTO challengeSolved) {
         this.userId = challengeSolved.getUserId();
+        this.challengeAttemptId = challengeSolved.getChallengeAttemptId();
         this.firstNumber = challengeSolved.getFirstNumber();
         this.secondNumber = challengeSolved.getSecondNumber();
         this.correct = challengeSolved.isCorrect();

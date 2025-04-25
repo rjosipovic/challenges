@@ -28,11 +28,12 @@ class GameServiceImplTest {
     void shouldProcessSolvedAttempt() {
         //given
         var userId = UUID.randomUUID().toString();
+        var challengeAttemptId = UUID.randomUUID().toString();
         var firstNumber = 1;
         var secondNumber = 2;
         var correct = true;
         var game = "multiplication";
-        var challengeSolved = new ChallengeSolvedDTO(userId, firstNumber, secondNumber, correct, game);
+        var challengeSolved = new ChallengeSolvedDTO(userId, challengeAttemptId, firstNumber, secondNumber, correct, game);
 
         var ctx = new ChallengeSolvedContext(challengeSolved);
 

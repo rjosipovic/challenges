@@ -22,6 +22,9 @@ public class ScoreEntity {
     @Column(name = "user_id")
     private UUID userId;
 
+    @Column(name = "challenge_attempt_id")
+    private UUID challengeAttemptId;
+
     @Column(name = "score")
     private int score;
 

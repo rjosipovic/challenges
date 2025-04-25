@@ -55,11 +55,14 @@ class SaveScoreHandlerTest {
     void shouldSaveScore() {
         //given
         var userId = UUID.randomUUID().toString();
+        var challengeAttemptId = UUID.randomUUID().toString();
         when(ctx.getUserId()).thenReturn(userId);
         when(ctx.getScore()).thenReturn(20);
+        when(ctx.getChallengeAttemptId()).thenReturn(challengeAttemptId);
 
         var scoreEntity = new ScoreEntity();
         scoreEntity.setUserId(UUID.fromString(userId));
+        scoreEntity.setChallengeAttemptId(UUID.fromString(challengeAttemptId));
         scoreEntity.setScore(20);
 
         //when
@@ -70,6 +73,7 @@ class SaveScoreHandlerTest {
 
         assertAll(
                 () -> assertEquals(userId, captor.getValue().getUserId().toString()),
+                () -> assertEquals(challengeAttemptId, captor.getValue().getChallengeAttemptId().toString()),
                 () -> assertEquals(20, captor.getValue().getScore())
         );
     }
