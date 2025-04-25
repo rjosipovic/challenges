@@ -6,6 +6,7 @@ import com.playground.gamification_manager.game.dataaccess.repositories.BadgeRep
 import com.playground.gamification_manager.game.service.impl.challengesolved.chain.ChallengeSolvedContext;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -14,6 +15,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
@@ -60,11 +63,17 @@ class SaveBadgesHandlerTest {
         var badgeEntity = new BadgeEntity();
         badgeEntity.setUserId(UUID.fromString(userId));
         badgeEntity.setBadgeType(BadgeType.FIRST_WON);
-        when(badgeRepository.saveAll(List.of(badgeEntity))).thenReturn(List.of(badgeEntity));
         //when
         saveBadgesHandler.handle(ctx);
         //then
-        verify(badgeRepository).saveAll(List.of(badgeEntity));
-    }
+        ArgumentCaptor<List<BadgeEntity>> capture = ArgumentCaptor.forClass(List.class);
+        verify(badgeRepository).saveAll(capture.capture());
 
+        List<BadgeEntity> savedBadges = capture.getValue();
+        assertAll(
+                () -> assertEquals(1, savedBadges.size()),
+                () -> assertEquals(userId, savedBadges.get(0).getUserId().toString()),
+                () -> assertEquals(BadgeType.FIRST_WON, savedBadges.get(0).getBadgeType())
+        );
+    }
 }

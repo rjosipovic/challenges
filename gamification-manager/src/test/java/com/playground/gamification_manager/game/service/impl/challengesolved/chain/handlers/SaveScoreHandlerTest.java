@@ -5,12 +5,15 @@ import com.playground.gamification_manager.game.dataaccess.repositories.ScoreRep
 import com.playground.gamification_manager.game.service.impl.challengesolved.chain.ChallengeSolvedContext;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
@@ -59,12 +62,15 @@ class SaveScoreHandlerTest {
         scoreEntity.setUserId(UUID.fromString(userId));
         scoreEntity.setScore(20);
 
-        when(scoreRepository.save(scoreEntity)).thenReturn(scoreEntity);
-
         //when
         saveScoreHandler.handle(ctx);
         //then
-        verify(scoreRepository).save(scoreEntity);
-    }
+        ArgumentCaptor<ScoreEntity> captor = ArgumentCaptor.forClass(ScoreEntity.class);
+        verify(scoreRepository).save(captor.capture());
 
+        assertAll(
+                () -> assertEquals(userId, captor.getValue().getUserId().toString()),
+                () -> assertEquals(20, captor.getValue().getScore())
+        );
+    }
 }

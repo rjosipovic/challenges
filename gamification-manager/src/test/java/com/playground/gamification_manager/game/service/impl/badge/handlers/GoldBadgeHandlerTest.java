@@ -9,6 +9,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Set;
+
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
@@ -24,6 +26,18 @@ class GoldBadgeHandlerTest {
 
     @InjectMocks
     private GoldBadgeHandler handler;
+
+    @Test
+    void conditionNotMet_whenThresholdReachedAndBadgeAlreadyAwarded() {
+        //given
+        when(ctx.getCurrentBadges()).thenReturn(Set.of(BadgeType.GOLD));
+
+        //when
+        var result  = handler.conditionMet(ctx);
+
+        //then
+        assertFalse(result);
+    }
 
     @Test
     void conditionMet_whenThresholdReached() {
