@@ -34,7 +34,7 @@ public class ChallengeSolvedContext {
         this.challengeAttemptId = challengeSolved.getChallengeAttemptId();
         this.firstNumber = challengeSolved.getFirstNumber();
         this.secondNumber = challengeSolved.getSecondNumber();
-        this.correct = challengeSolved.isCorrect();
+        this.correct = challengeSolved.getCorrect();
         this.game = challengeSolved.getGame();
         this.difficulty = null;
         this.score = 0;

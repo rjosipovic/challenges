@@ -1,13 +1,17 @@
 package com.playground.gamification_manager.game.service.model;
 
 import com.playground.gamification_manager.game.dataaccess.domain.BadgeType;
+import lombok.Getter;
+import lombok.Value;
 
 import java.util.Set;
 import java.util.UUID;
 
+@Value
+@Getter
 public class LeaderBoardItem {
 
-    private UUID userId;
-    private int totalScore;
-    private Set<BadgeType> badges;
+    UUID userId;
+    long totalScore;
+    Set<BadgeType> badges;
 }

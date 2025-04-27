@@ -28,8 +28,8 @@ public class BadgeEntity {
     private BadgeType badgeType;
 
     @CreationTimestamp
-    @Column(name = "score_at")
-    private ZonedDateTime scoreAt;
+    @Column(name = "badge_at")
+    private ZonedDateTime badgeAt;
 
     public BadgeEntity() {
         this.id = UUID.randomUUID();

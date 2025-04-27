@@ -24,7 +24,7 @@ public class ChallengeSolvedDTO {
     Integer secondNumber;
 
     @NotNull
-    boolean correct;
+    Boolean correct;
 
     @NotNull @Pattern(regexp = "addition|subtraction|multiplication|division")
     String game;
