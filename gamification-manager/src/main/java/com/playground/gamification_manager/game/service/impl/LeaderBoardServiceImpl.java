@@ -6,12 +6,9 @@ import com.playground.gamification_manager.game.dataaccess.repositories.ScoreRep
 import com.playground.gamification_manager.game.service.interfaces.LeaderBoardService;
 import com.playground.gamification_manager.game.service.model.LeaderBoardItem;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,8 +22,7 @@ public class LeaderBoardServiceImpl implements LeaderBoardService {
 
     @Override
     public List<LeaderBoardItem> getLeaderBoard() {
-        Pageable pageable = PageRequest.of(0, MAX_LEADERS);
-        var leaders = scoreRepository.sumScoresGroupedByUser(pageable);
+        var leaders = scoreRepository.findFirst10();
         return leaders.stream()
                 .map(leader -> {
                     var userId = leader.getUserId();

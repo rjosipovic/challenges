@@ -2,7 +2,6 @@ package com.playground.gamification_manager.game.dataaccess.repositories;
 
 import com.playground.gamification_manager.game.dataaccess.domain.ScoreEntity;
 import com.playground.gamification_manager.game.dataaccess.domain.UserScore;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -18,6 +17,8 @@ public interface ScoreRepository extends CrudRepository<ScoreEntity, UUID> {
     Integer totalScoreByUserId(@Param("userId") UUID userId);
 
     @Query("SELECT new com.playground.gamification_manager.game.dataaccess.domain.UserScore(s.userId, SUM(s.score)) " +
-            "FROM scores s GROUP BY s.userId ORDER BY SUM(s.score) DESC")
-    List<UserScore> sumScoresGroupedByUser(Pageable pageable);
+            "FROM scores s " +
+            "GROUP BY s.userId " +
+            "ORDER BY SUM(s.score) DESC")
+    List<UserScore> findFirst10();
 }
