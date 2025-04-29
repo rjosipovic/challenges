@@ -38,6 +38,7 @@ services:
         PGPASSWORD=${POSTGRES_PASSWORD} psql -h postgres -U postgres -v ON_ERROR_STOP=1 \
         -c "SET my.user_manager_password=\"${POSTGRES_USER_MANAGER_PASSWORD}\"" \
         -c "SET my.challenge_manager_password=\"${POSTGRES_CHALLENGE_MANAGER_PASSWORD}\"" \
+        -c "SET my.gamification_manager_password=\"${POSTGRES_GAMIFICATION_MANAGER_PASSWORD}\"" \
         -f "$$file"
       done'
     environment:

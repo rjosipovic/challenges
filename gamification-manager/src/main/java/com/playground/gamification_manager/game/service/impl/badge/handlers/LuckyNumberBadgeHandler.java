@@ -15,6 +15,9 @@ public class LuckyNumberBadgeHandler implements BadgeHandler {
 
     @Override
     public boolean conditionMet(BadgesContext ctx) {
+        var currentBadges = ctx.getCurrentBadges();
+        if (currentBadges.contains(supports())) return false;
+
         var firstNumber = ctx.getFirstNumber();
         var secondNumber = ctx.getSecondNumber();
 

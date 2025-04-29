@@ -10,6 +10,9 @@ public class FirstWonBadgeHandler implements BadgeHandler {
 
     @Override
     public boolean conditionMet(BadgesContext ctx) {
+        var currentBadges = ctx.getCurrentBadges();
+        if (currentBadges.contains(supports())) return false;
+
         var currentScore = ctx.getCurrentScore();
         return currentScore == 0;
     }
