@@ -21,7 +21,7 @@ public class CheckResultHandler implements AttemptHandler {
 
         var isCorrect = isCorrect(guess, MathUtil.calculateResult(firstNumber, secondNumber, game));
 
-        var challengeAttempt = new ChallengeAttempt(userId, firstNumber, secondNumber, guess, isCorrect, game);
+        var challengeAttempt = new ChallengeAttempt(null, userId, firstNumber, secondNumber, guess, isCorrect, game);
         ctx.setChallengeAttempt(challengeAttempt);
     }
 

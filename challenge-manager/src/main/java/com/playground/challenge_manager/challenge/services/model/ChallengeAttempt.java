@@ -13,10 +13,15 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ChallengeAttempt {
 
+    private UUID challengeAttemptId;
     private UUID userId;
     private int firstNumber;
     private int secondNumber;
     private int resultAttempt;
     private boolean correct;
     private String game;
+
+    public ChallengeAttempt withChallengeAttemptId(UUID challengeAttemptId) {
+        return new ChallengeAttempt(challengeAttemptId, userId, firstNumber, secondNumber, resultAttempt, correct, game);
+    }
 }

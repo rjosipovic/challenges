@@ -35,7 +35,7 @@ class SaveAttemptHandlerTest {
         var game = "multiplication";
         var attempt = new ChallengeAttemptDTO(userId.toString(), firstNumber, secondNumber, guess, game);
         var ctx = new AttemptVerifierContext(attempt);
-        var challengeAttempt = new ChallengeAttempt(userId, firstNumber, secondNumber, guess, false, game);
+        var challengeAttempt = new ChallengeAttempt(null, userId, firstNumber, secondNumber, guess, false, game);
         ctx.setChallengeAttempt(challengeAttempt);
 
         var entity = new ChallengeAttemptEntity(null, userId, firstNumber, secondNumber, guess, false, game, null);

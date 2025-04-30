@@ -6,6 +6,7 @@ import lombok.Value;
 public class ChallengeSolvedDTO {
 
     String userId;
+    String challengeAttemptId;
     int firstNumber;
     int secondNumber;
     boolean correct;

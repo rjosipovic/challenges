@@ -3,6 +3,7 @@ package com.playground.challenge_manager.challenge.services.impl.challengeservic
 import com.playground.challenge_manager.challenge.services.impl.challengeservice.chain.AttemptVerifierChain;
 import com.playground.challenge_manager.challenge.services.impl.challengeservice.chain.handlers.AttemptResultHandler;
 import com.playground.challenge_manager.challenge.services.impl.challengeservice.chain.handlers.CheckResultHandler;
+import com.playground.challenge_manager.challenge.services.impl.challengeservice.chain.handlers.PublishAttemptHandler;
 import com.playground.challenge_manager.challenge.services.impl.challengeservice.chain.handlers.SaveAttemptHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -13,12 +14,14 @@ import org.springframework.context.annotation.Configuration;
 public class AttemptVerifierConfig {
 
     private final SaveAttemptHandler saveAttemptHandler;
+    private final PublishAttemptHandler publishAttemptHandler;
 
     @Bean
     public AttemptVerifierChain attemptVerifierChain() {
         var chain = new AttemptVerifierChain();
         chain.addHandler(new CheckResultHandler());
         chain.addHandler(saveAttemptHandler);
+        chain.addHandler(publishAttemptHandler);
         chain.addHandler(new AttemptResultHandler());
         return chain;
     }

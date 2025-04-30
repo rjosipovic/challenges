@@ -17,10 +17,11 @@ public class SaveAttemptHandler implements AttemptHandler {
     @Override
     public void handle(AttemptVerifierContext ctx) {
         var challengeAttempt = ctx.getChallengeAttempt();
-        saveAttempt(challengeAttempt);
+        var savedAttempt = saveAttempt(challengeAttempt);
+        ctx.setChallengeAttempt(savedAttempt);
     }
 
-    private void saveAttempt(ChallengeAttempt challengeAttempt) {
+    private ChallengeAttempt saveAttempt(ChallengeAttempt challengeAttempt) {
         var challengeAttemptEntity = new ChallengeAttemptEntity(
                 null,
                 challengeAttempt.getUserId(),
@@ -31,6 +32,8 @@ public class SaveAttemptHandler implements AttemptHandler {
                 challengeAttempt.getGame(),
                 null
         );
-        challengeAttemptRepository.save(challengeAttemptEntity);
+        var savedAttempt = challengeAttemptRepository.save(challengeAttemptEntity);
+        var challengeAttemptId = savedAttempt.getId();
+        return challengeAttempt.withChallengeAttemptId(challengeAttemptId);
     }
 }
