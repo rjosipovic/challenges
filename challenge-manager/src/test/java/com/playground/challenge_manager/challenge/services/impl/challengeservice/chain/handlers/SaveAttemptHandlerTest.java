@@ -15,6 +15,7 @@ import java.util.UUID;
 
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class SaveAttemptHandlerTest {
@@ -29,6 +30,7 @@ class SaveAttemptHandlerTest {
     void shouldSaveAttempt() {
         //given
         var userId = UUID.randomUUID();
+        var challengeAttemptId = UUID.randomUUID();
         var firstNumber = 12;
         var secondNumber = 23;
         var guess = 2764;
@@ -39,6 +41,8 @@ class SaveAttemptHandlerTest {
         ctx.setChallengeAttempt(challengeAttempt);
 
         var entity = new ChallengeAttemptEntity(null, userId, firstNumber, secondNumber, guess, false, game, null);
+        var saved = new ChallengeAttemptEntity(challengeAttemptId, userId, firstNumber, secondNumber, guess, false, game, null);
+        when(challengeAttemptRepository.save(entity)).thenReturn(saved);
 
         //when
         saveAttemptHandler.handle(ctx);

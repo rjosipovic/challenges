@@ -26,6 +26,10 @@ public class PublishAttemptHandler implements AttemptHandler {
         var isCorrect = challengeAttempt.isCorrect();
         var game = challengeAttempt.getGame();
         var challengeSolved = new ChallengeSolvedDTO(userId, attemptId, firstNumber, secondNumber, isCorrect, game);
-        gamificationClient.publishChallengeSolved(challengeSolved);
+        try {
+            gamificationClient.publishChallengeSolved(challengeSolved);
+        } catch (Exception e) {
+            log.error("Error publishing attempt: {}", challengeAttempt, e);
+        }
     }
 }

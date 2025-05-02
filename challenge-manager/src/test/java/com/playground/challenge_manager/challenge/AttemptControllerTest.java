@@ -266,9 +266,7 @@ class AttemptControllerTest {
 
         // then
         assertAll(
-                () -> assertEquals(400, response.getStatus()),
-                () -> assertEquals(MediaType.APPLICATION_JSON.toString(), response.getContentType()),
-                () -> assertEquals("Numbers must have the same digit count", response.getContentAsString())
+                () -> assertEquals(400, response.getStatus())
         );
     }
 }

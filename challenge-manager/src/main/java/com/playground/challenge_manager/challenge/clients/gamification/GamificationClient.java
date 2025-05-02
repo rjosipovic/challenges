@@ -2,38 +2,60 @@ package com.playground.challenge_manager.challenge.clients.gamification;
 
 import com.playground.challenge_manager.challenge.clients.dto.ChallengeSolvedDTO;
 import com.playground.challenge_manager.challenge.clients.dto.GameResult;
-import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 @Service
-@RequiredArgsConstructor
+@Slf4j
 public class GamificationClient {
 
-    private static final String GAMIFICATION_PROTOCOL = "http";
-    private static final String GAMIFICATION_HOST = "localhost";
-    private static final String GAMIFICATION_PORT = "8082";
-    private static final String ATTEMPTS_ENDPOINT = "/attempts";
+    private final GamificationClientConfig config;
+    private final WebClient webClient;
 
-    private WebClient webClient;
+    public GamificationClient(GamificationClientConfig config, WebClient.Builder builder) {
+        this.config = config;
+        var protocol = config.getProtocol();
+        var host = config.getHost();
+        var port = config.getPort();
+        var baseURL = String.format("%s://%s:%s", protocol, host, port);
+        webClient = builder
+                .baseUrl(baseURL)
+                .filter(logRequest())
+                .filter(logResponse())
+                .build();
 
-    @PostConstruct
-    private void init() {
-        var baseURL = String.format("%s://%s:%s", GAMIFICATION_PROTOCOL, GAMIFICATION_HOST, GAMIFICATION_PORT);
-        webClient = WebClient.builder().baseUrl(baseURL).build();
     }
 
-    public void publishChallengeSolved(ChallengeSolvedDTO challengeSolved) {
-        post(challengeSolved, GameResult.class).block();
+    public GameResult publishChallengeSolved(ChallengeSolvedDTO challengeSolved) {
+        var endpoint = config.getPublishAttemptPath();
+        return post(challengeSolved, GameResult.class, endpoint).block();
     }
 
-    private <T, R> Mono<R> post(T requestBody, Class<R> responseType) {
+    private <T, R> Mono<R> post(T requestBody, Class<R> responseType, String endpoint) {
         return webClient.post()
-                .uri(ATTEMPTS_ENDPOINT)
+                .uri(endpoint)
                 .bodyValue(requestBody)
                 .retrieve()
                 .bodyToMono(responseType);
+    }
+
+    private static ExchangeFilterFunction logRequest() {
+        return ExchangeFilterFunction.ofRequestProcessor(clientRequest -> {
+            var clientRequestMethod = clientRequest.method();
+            var clientRequestURI = clientRequest.url();
+            log.info("Request: {} {}", clientRequestMethod, clientRequestURI);
+            return Mono.just(clientRequest);
+        });
+    }
+
+    private static ExchangeFilterFunction logResponse() {
+        return ExchangeFilterFunction.ofResponseProcessor(clientResponse -> {
+            var responseStatusCode = clientResponse.statusCode();
+            log.info("Response Status Code: {}", responseStatusCode);
+            return Mono.just(clientResponse);
+        });
     }
 }

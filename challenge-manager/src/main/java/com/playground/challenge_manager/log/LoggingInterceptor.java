@@ -13,14 +13,19 @@ import java.util.UUID;
 @Slf4j
 public class LoggingInterceptor implements HandlerInterceptor {
 
+    private static final String REQUEST_ID_ATTR = "requestId";
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        log.info("Request ID: {}, Method: {}, URI: {}", UUID.randomUUID(), request.getMethod(), request.getRequestURI());
+        var requestId = UUID.randomUUID().toString();
+        request.setAttribute(REQUEST_ID_ATTR, requestId);
+        log.info("Request: {}, Method: {}, URI: {}", requestId, request.getMethod(), request.getRequestURI());
         return true;
     }
 
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
-        log.info("Response ID: {}, Status Code: {}", UUID.randomUUID(), response.getStatus());
+        var requestId = (String) request.getAttribute(REQUEST_ID_ATTR);
+        log.info("Response : {}, Status Code: {}", requestId, response.getStatus());
     }
 }

@@ -47,11 +47,15 @@ class ChallengeServiceImplTest {
     void testVerifyCorrectAttempt() {
         //given
         var userId = UUID.randomUUID();
+        var challengeAttemptId = UUID.randomUUID();
         var firstNumber = 12;
         var secondNumber = 23;
         var guess = firstNumber * secondNumber;
         var game = "multiplication";
         var attemptDto = new ChallengeAttemptDTO(userId.toString(), firstNumber, secondNumber, guess, game);
+        var attemptEntity = new ChallengeAttemptEntity(null, userId, firstNumber, secondNumber, guess, true, game, null);
+        var savedAttemptEntity = new ChallengeAttemptEntity(challengeAttemptId, userId, firstNumber, secondNumber, guess, true, game, null);
+        when(challengeAttemptRepository.save(attemptEntity)).thenReturn(savedAttemptEntity);
 
         //when
         var result = challengeService.verifyAttempt(attemptDto);
@@ -73,15 +77,23 @@ class ChallengeServiceImplTest {
 
     @Test
     void testVerifyIncorrectAttempt() {
+        //given
         var userId = UUID.randomUUID();
+        var challengeAttemptId = UUID.randomUUID();
         var firstNumber = 12;
         var secondNumber = 23;
         var guess = firstNumber * secondNumber + 1;
         var correctResult = firstNumber * secondNumber;
         var game = "multiplication";
         var attempt = new ChallengeAttemptDTO(userId.toString(), firstNumber, secondNumber, guess, game);
+        var attemptEntity = new ChallengeAttemptEntity(null, userId, firstNumber, secondNumber, guess, false, game, null);
+        var savedAttemptEntity = new ChallengeAttemptEntity(challengeAttemptId, userId, firstNumber, secondNumber, guess, false, game, null);
+        when(challengeAttemptRepository.save(attemptEntity)).thenReturn(savedAttemptEntity);
+
+        //when
         var result = challengeService.verifyAttempt(attempt);
 
+        //then
         assertAll(
                 () -> assertNotNull(attempt),
                 () -> assertEquals(firstNumber, attempt.getFirstNumber()),
@@ -91,8 +103,7 @@ class ChallengeServiceImplTest {
                 () -> assertFalse(result.isCorrect())
         );
 
-        verify(challengeAttemptRepository).save(
-                new ChallengeAttemptEntity(null, userId, firstNumber, secondNumber, guess, false, game, null));
+        verify(challengeAttemptRepository).save(attemptEntity);
     }
 
     @Test
