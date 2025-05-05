@@ -1,11 +1,10 @@
-package com.playground.user_manager.errors;
+package com.playground.user_manager.errors.custom;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 @Getter
 public class UserManagerError {
@@ -54,7 +53,6 @@ public class UserManagerError {
     private static final class ErrorBlock {
 
         @JsonIgnore
-        private final UUID uniqueId;
         private final String code;
         private final String message;
         private final List<Error> errors;
@@ -63,21 +61,19 @@ public class UserManagerError {
                           final String reason, final String errorMessage, final String errorReportUri) {
             this.code = code;
             this.message = message;
-            this.uniqueId = UUID.randomUUID();
             this.errors = List.of(
-                    new Error(domain, reason, errorMessage, errorReportUri + "?id=" + uniqueId)
+                    new Error(domain, reason, errorMessage, errorReportUri)
             );
         }
 
-        private ErrorBlock(final UUID uniqueId, final String code, final String message, final List<Error> errors) {
-            this.uniqueId = uniqueId;
+        private ErrorBlock(final String code, final String message, final List<Error> errors) {
             this.code = code;
             this.message = message;
             this.errors = errors;
         }
 
         public static ErrorBlock copyWithMessage(final ErrorBlock s, final String message) {
-            return new ErrorBlock(s.uniqueId, s.code, message, s.errors);
+            return new ErrorBlock(s.code, message, s.errors);
         }
 
     }
@@ -95,6 +91,5 @@ public class UserManagerError {
             this.message = message;
             this.sendReport = sendReport;
         }
-
     }
 }

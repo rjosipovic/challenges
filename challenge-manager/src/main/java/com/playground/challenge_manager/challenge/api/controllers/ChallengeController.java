@@ -19,7 +19,9 @@ public class ChallengeController {
 
     @GetMapping("/random")
     public ResponseEntity<Challenge> get(
-            @RequestParam(name = "difficulty", defaultValue = "medium") @Pattern(regexp = "easy|medium|hard|expert") String difficulty) {
+            @RequestParam(name = "difficulty", defaultValue = "medium")
+            @Pattern(regexp = "easy|medium|hard|expert") String difficulty
+    ) {
         return ResponseEntity.ok(challengeGeneratorService.randomChallenge(difficulty));
     }
 }

@@ -1,7 +1,7 @@
 package com.playground.user_manager.user;
 
-import com.playground.user_manager.errors.ResourceAlreadyExistsException;
-import com.playground.user_manager.errors.ResourceNotFoundException;
+import com.playground.user_manager.errors.exceptions.ResourceAlreadyExistsException;
+import com.playground.user_manager.errors.exceptions.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

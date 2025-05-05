@@ -1,4 +1,4 @@
-package com.playground.user_manager.errors;
+package com.playground.user_manager.errors.exceptions;
 
 public interface ErrorCode {
 

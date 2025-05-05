@@ -1,4 +1,4 @@
-package com.playground.user_manager.errors;
+package com.playground.user_manager.errors.custom;
 
 import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;

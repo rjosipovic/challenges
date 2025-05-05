@@ -1,5 +1,8 @@
-package com.playground.user_manager.errors;
+package com.playground.user_manager.errors.advice;
 
+import com.playground.user_manager.errors.custom.UserManagerError;
+import com.playground.user_manager.errors.exceptions.ResourceAlreadyExistsException;
+import com.playground.user_manager.errors.exceptions.ResourceNotFoundException;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

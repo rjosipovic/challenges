@@ -1,4 +1,4 @@
-package com.playground.user_manager.errors;
+package com.playground.user_manager.errors.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.boot.autoconfigure.web.servlet.error.AbstractErrorController;

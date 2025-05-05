@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.ExchangeFunction;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
@@ -21,6 +22,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -47,7 +49,7 @@ class GamificationClientTest {
     }
 
     @Test
-    void testGamificationClientWithMockedExchangeFunction() throws IOException {
+    void shouldPublishChallengeSolved() throws IOException {
         //given
         var userId = UUID.randomUUID().toString();
         var challengeAttemptId = UUID.randomUUID().toString();
@@ -75,5 +77,59 @@ class GamificationClientTest {
                 () -> assertEquals(score, result.getScore()),
                 () -> assertEquals(badges, result.getBadges())
         );
+    }
+
+    @Test
+    void shouldPublishChallengeSolved_onBadRequest() {
+        //given
+        var userId = UUID.randomUUID().toString();
+        var challengeAttemptId = UUID.randomUUID().toString();
+        var firstNumber = 12;
+        var secondNumber = 23;
+        var correct = Boolean.TRUE;
+        var game = "multiplication";
+
+        var response = ClientResponse.create(HttpStatus.BAD_REQUEST).body("bad request").build();
+        when(config.getPublishAttemptPath()).thenReturn("/gamification");
+        when(exchangeFunction.exchange(any())).thenReturn(Mono.just(response));
+
+        //when
+        assertThrows(WebClientResponseException.class, () -> client.publishChallengeSolved(new ChallengeSolvedDTO(userId, challengeAttemptId, firstNumber, secondNumber, correct, game)));
+    }
+
+    @Test
+    void shouldPublishChallengeSolved_onNotFound() {
+        //given
+        var userId = UUID.randomUUID().toString();
+        var challengeAttemptId = UUID.randomUUID().toString();
+        var firstNumber = 12;
+        var secondNumber = 23;
+        var correct = Boolean.TRUE;
+        var game = "multiplication";
+
+        var response = ClientResponse.create(HttpStatus.NOT_FOUND).body("not found").build();
+        when(config.getPublishAttemptPath()).thenReturn("/gamification");
+        when(exchangeFunction.exchange(any())).thenReturn(Mono.just(response));
+
+        //when
+        assertThrows(WebClientResponseException.class, () -> client.publishChallengeSolved(new ChallengeSolvedDTO(userId, challengeAttemptId, firstNumber, secondNumber, correct, game)));
+    }
+
+    @Test
+    void shouldPublishChallengeSolved_onInternalServerError() {
+        //given
+        var userId = UUID.randomUUID().toString();
+        var challengeAttemptId = UUID.randomUUID().toString();
+        var firstNumber = 12;
+        var secondNumber = 23;
+        var correct = Boolean.TRUE;
+        var game = "multiplication";
+
+        var response = ClientResponse.create(HttpStatus.INTERNAL_SERVER_ERROR).body("internal server error").build();
+        when(config.getPublishAttemptPath()).thenReturn("/gamification");
+        when(exchangeFunction.exchange(any())).thenReturn(Mono.just(response));
+
+        //when
+        assertThrows(WebClientResponseException.class, () -> client.publishChallengeSolved(new ChallengeSolvedDTO(userId, challengeAttemptId, firstNumber, secondNumber, correct, game)));
     }
 }

@@ -1,5 +1,6 @@
-package com.playground.user_manager.errors;
+package com.playground.user_manager.errors.config;
 
+import com.playground.user_manager.errors.custom.UserManagerErrorAttributes;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,9 +1,9 @@
-package com.playground.user_manager.errors;
+package com.playground.user_manager.errors.exceptions;
 
 import lombok.Getter;
 
 @Getter
-public class ResourceAlreadyExistsException extends IllegalArgumentException implements ErrorCode{
+public class ResourceAlreadyExistsException extends IllegalArgumentException implements ErrorCode {
 
     private static final String ERROR_CODE = "NE-002";
 
