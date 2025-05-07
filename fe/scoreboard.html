@@ -63,7 +63,7 @@
                     <div
                         class="container max-w-screen-2xl mx-auto flex px-5 py-24 pt-64 md:flex-row flex-col items-center">
                         <div
-                            class="lg:flex-grow md:w-1/2 lg:pr-24 md:pr-16 flex flex-col md:items-start md:text-left mb-16 md:mb-0 items-center ">
+                            class="lg:flex-grow md:w-1/2 lg:pr-24 md:pr-16 flex flex-col md:items-start md:text-left mb-16 md:mb-0 items-center">
                             <h1 class="title-font sm:text-4xl text-3xl mb-4 font-medium text-blue-100">Top Math Players
                             </h1>
                             <p class="mb-8 leading-relaxed">See how you rank among the best math challengers! Keep
@@ -80,8 +80,20 @@
                     <div class="relative bg-bg-white max-w-screen-2xl m-auto">
                         <div
                             class="relative flex w-full flex-col lg:flex-row items-center justify-center gap-4 lg:gap-12 flex-col lg:flex-row-reverse">
-                            <div class=" w-full lg:w-1/2">
-                                Table
+                            <div class="w-full lg:w-1/2">
+                                <table id="scoreboard-table" class="w-full table-auto text-sm text-left text-gray-500 bg-white rounded-xl shadow-md">
+                                    <caption class="text-blue-500 font-ocean text-lg p-4">Scoreboard</caption>
+                                    <thead class="bg-gray-100">
+                                        <tr>
+                                            <th class="py-3 px-4 font-medium text-gray-500">Rank</th>
+                                            <th class="py-3 px-4 font-medium text-gray-500">Alias</th>
+                                            <th class="py-3 px-4 font-medium text-gray-500">Score</th>
+                                            <th class="py-3 px-4 font-medium text-gray-500">Badges</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
                             </div>
                             <div class=" w-full lg:w-1/2">
                                 <div class="relative w-full">

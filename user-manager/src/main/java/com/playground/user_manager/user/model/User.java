@@ -1,4 +1,4 @@
-package com.playground.user_manager.user;
+package com.playground.user_manager.user.model;
 
 import lombok.*;
 

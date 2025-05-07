@@ -1,11 +1,16 @@
-package com.playground.user_manager.user;
+package com.playground.user_manager.user.service;
 
 import com.playground.user_manager.errors.exceptions.ResourceAlreadyExistsException;
 import com.playground.user_manager.errors.exceptions.ResourceNotFoundException;
+import com.playground.user_manager.user.api.dto.CreateUserDTO;
+import com.playground.user_manager.user.dataaccess.UserEntity;
+import com.playground.user_manager.user.dataaccess.UserRepository;
+import com.playground.user_manager.user.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.StreamSupport;
 
 @Service
@@ -16,6 +21,14 @@ public class UserServiceImpl implements UserService {
 
     public List<User> getAllUsers() {
         return StreamSupport.stream(userRepository.findAll().spliterator(), false)
+                .map(userEntity -> new User(userEntity.getId().toString(), userEntity.getAlias()))
+                .toList();
+    };
+
+    public List<User> getUsersByIds(List<String> ids) {
+        var uuids = ids.stream().map(UUID::fromString).toList();
+        return userRepository.findByIdIn(uuids)
+                .stream()
                 .map(userEntity -> new User(userEntity.getId().toString(), userEntity.getAlias()))
                 .toList();
     };

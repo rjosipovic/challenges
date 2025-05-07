@@ -8,6 +8,10 @@ import com.playground.user_manager.errors.custom.UserManagerError;
 import com.playground.user_manager.errors.custom.UserManagerErrorAttributes;
 import com.playground.user_manager.errors.exceptions.ResourceAlreadyExistsException;
 import com.playground.user_manager.errors.exceptions.ResourceNotFoundException;
+import com.playground.user_manager.user.api.dto.CreateUserDTO;
+import com.playground.user_manager.user.api.controllers.UserController;
+import com.playground.user_manager.user.model.User;
+import com.playground.user_manager.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -256,8 +260,12 @@ class UserControllerTest {
     @Test
     void testGetAllUsers() throws Exception {
         //given
-        var user1 = new User("1", "test-user1");
-        var user2 = new User("2", "test-user2");
+        var userId1 = UUID.randomUUID().toString();
+        var userId2 = UUID.randomUUID().toString();
+        var alias1 = "test-user1";
+        var alias2 = "test-user2";
+        var user1 = new User(userId1, alias1);
+        var user2 = new User(userId2, alias2);
         when(userService.getAllUsers()).thenReturn(List.of(user1, user2));
         //when
         var res = mockMvc.perform(get("/users")).andReturn().getResponse();
@@ -267,6 +275,28 @@ class UserControllerTest {
                 () -> assertEquals("application/json", res.getContentType()),
                 () -> assertEquals("UTF-8", res.getCharacterEncoding()),
                 () -> assertEquals(usersJacksonTester.write(List.of(user1, user2)).getJson(), res.getContentAsString())
+        );
+    }
+
+    @Test
+    void testGetUsersByIds() throws Exception {
+        //given
+        var userId1 = UUID.randomUUID().toString();
+        var userId2 = UUID.randomUUID().toString();
+        var alias1 = "test-user1";
+        var alias2 = "test-user2";
+        var user1 = new User(userId1, alias1);
+        var user2 = new User(userId2, alias2);
+        when(userService.getUsersByIds(List.of(userId1, userId2))).thenReturn(List.of(user1, user2));
+        //when
+        var res = mockMvc.perform(get("/users").param("ids", userId1, userId2)).andReturn().getResponse();
+        //then
+        assertAll(
+                () -> assertEquals(200, res.getStatus()),
+                () -> assertEquals("application/json", res.getContentType()),
+                () -> assertEquals("UTF-8", res.getCharacterEncoding()),
+                () -> assertEquals(usersJacksonTester.write(List.of(user1, user2)).getJson(), res.getContentAsString())
+
         );
     }
 }

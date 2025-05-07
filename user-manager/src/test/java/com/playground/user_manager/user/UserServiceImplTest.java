@@ -1,5 +1,9 @@
 package com.playground.user_manager.user;
 
+import com.playground.user_manager.user.api.dto.CreateUserDTO;
+import com.playground.user_manager.user.dataaccess.UserEntity;
+import com.playground.user_manager.user.dataaccess.UserRepository;
+import com.playground.user_manager.user.service.UserServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

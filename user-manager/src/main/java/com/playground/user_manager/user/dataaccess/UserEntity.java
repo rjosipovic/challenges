@@ -1,4 +1,4 @@
-package com.playground.user_manager.user;
+package com.playground.user_manager.user.dataaccess;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
