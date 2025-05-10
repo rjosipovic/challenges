@@ -10,6 +10,9 @@ spring:
     enabled: true
   jpa:
     show-sql: true
+  redis:
+    host: localhost
+    port: 6379
 server:
   port: 8082
 
@@ -41,3 +44,6 @@ app:
       score_threshold: 500
     - badge-type: LUCKY_NUMBER
       lucky_number: 42
+  leaderboard:
+    key: leaderboard
+    size: 10

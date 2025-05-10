@@ -21,4 +21,7 @@ public interface ScoreRepository extends CrudRepository<ScoreEntity, UUID> {
             "GROUP BY s.userId " +
             "ORDER BY SUM(s.score) DESC")
     List<UserScore> findFirst10();
+
+    @Query("SELECT SUM(s.score) FROM scores s WHERE s.userId = :userId")
+    Long getTotalScoreByUserId(@Param("userId") UUID userId);
 }

@@ -7,6 +7,7 @@ import com.playground.gamification_manager.game.service.impl.challengesolved.cha
 import com.playground.gamification_manager.game.service.impl.challengesolved.chain.handlers.SaveBadgesHandler;
 import com.playground.gamification_manager.game.service.impl.challengesolved.chain.handlers.SaveScoreHandler;
 import com.playground.gamification_manager.game.service.impl.challengesolved.chain.handlers.ScoreHandler;
+import com.playground.gamification_manager.game.service.impl.challengesolved.chain.handlers.TotalScoreHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +21,7 @@ public class ChallengeSolvedChainConfiguration {
     private final BadgesHandler badgesHandler;
     private final SaveScoreHandler saveScoreHandler;
     private final SaveBadgesHandler saveBadgesHandler;
+    private final TotalScoreHandler totalScoreHandler;
     private final ResultHandler resultHandler;
 
     @Bean
@@ -30,6 +32,7 @@ public class ChallengeSolvedChainConfiguration {
         chain.addHandler(badgesHandler);
         chain.addHandler(saveScoreHandler);
         chain.addHandler(saveBadgesHandler);
+        chain.addHandler(totalScoreHandler);
         chain.addHandler(resultHandler);
         return chain;
     }
