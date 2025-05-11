@@ -1,4 +1,4 @@
-package com.playground.challenge_manager.challenge.clients.gamification;
+package com.playground.challenge_manager.challenge.clients.gamification.config;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

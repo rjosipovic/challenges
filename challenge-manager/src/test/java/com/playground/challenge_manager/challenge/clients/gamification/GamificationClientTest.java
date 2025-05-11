@@ -1,8 +1,9 @@
 package com.playground.challenge_manager.challenge.clients.gamification;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.playground.challenge_manager.challenge.clients.dto.ChallengeSolvedDTO;
-import com.playground.challenge_manager.challenge.clients.dto.GameResult;
+import com.playground.challenge_manager.challenge.clients.gamification.config.GamificationClientConfig;
+import com.playground.challenge_manager.challenge.clients.gamification.dto.ChallengeSolvedDTO;
+import com.playground.challenge_manager.challenge.clients.gamification.dto.GameResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

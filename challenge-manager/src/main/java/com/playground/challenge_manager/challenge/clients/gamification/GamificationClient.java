@@ -1,7 +1,8 @@
 package com.playground.challenge_manager.challenge.clients.gamification;
 
-import com.playground.challenge_manager.challenge.clients.dto.ChallengeSolvedDTO;
-import com.playground.challenge_manager.challenge.clients.dto.GameResult;
+import com.playground.challenge_manager.challenge.clients.gamification.config.GamificationClientConfig;
+import com.playground.challenge_manager.challenge.clients.gamification.dto.ChallengeSolvedDTO;
+import com.playground.challenge_manager.challenge.clients.gamification.dto.GameResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;

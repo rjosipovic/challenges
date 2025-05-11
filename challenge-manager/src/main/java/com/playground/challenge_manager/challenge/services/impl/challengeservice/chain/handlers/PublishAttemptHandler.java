@@ -1,6 +1,6 @@
 package com.playground.challenge_manager.challenge.services.impl.challengeservice.chain.handlers;
 
-import com.playground.challenge_manager.challenge.clients.dto.ChallengeSolvedDTO;
+import com.playground.challenge_manager.challenge.clients.gamification.dto.ChallengeSolvedDTO;
 import com.playground.challenge_manager.challenge.clients.gamification.GamificationClient;
 import com.playground.challenge_manager.challenge.services.impl.challengeservice.chain.AttemptHandler;
 import com.playground.challenge_manager.challenge.services.impl.challengeservice.chain.AttemptVerifierContext;

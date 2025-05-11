@@ -1,4 +1,4 @@
-package com.playground.challenge_manager.challenge.clients.dto;
+package com.playground.challenge_manager.challenge.clients.gamification.dto;
 
 import lombok.Value;
 
