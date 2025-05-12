@@ -6,8 +6,10 @@ import com.playground.user_manager.user.api.dto.CreateUserDTO;
 import com.playground.user_manager.user.dataaccess.UserEntity;
 import com.playground.user_manager.user.dataaccess.UserRepository;
 import com.playground.user_manager.user.model.User;
+import com.playground.user_manager.user.producers.UserMessageProducer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -18,6 +20,7 @@ import java.util.stream.StreamSupport;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final UserMessageProducer userMessageProducer;
 
     public List<User> getAllUsers() {
         return StreamSupport.stream(userRepository.findAll().spliterator(), false)
@@ -43,6 +46,7 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
+    @Transactional
     public User createUser(CreateUserDTO createUserDTO) {
         var alias = createUserDTO.getAlias();
         if (userRepository.findByAlias(alias).isPresent()) {
@@ -58,6 +62,12 @@ public class UserServiceImpl implements UserService {
                 .gender(gender)
                 .build();
         var savedUserEntity = userRepository.save(userEntity);
-        return new User(savedUserEntity.getId().toString(), savedUserEntity.getAlias());
+        var user = new User(savedUserEntity.getId().toString(), savedUserEntity.getAlias());
+        publishUserCreatedMessage(user);
+        return user;
+    }
+
+    private void publishUserCreatedMessage(User user) {
+        userMessageProducer.sendUserCreatedMessage(user);
     }
 }
