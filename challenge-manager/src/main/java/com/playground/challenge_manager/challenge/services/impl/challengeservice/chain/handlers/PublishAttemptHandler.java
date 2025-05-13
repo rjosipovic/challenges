@@ -2,6 +2,7 @@ package com.playground.challenge_manager.challenge.services.impl.challengeservic
 
 import com.playground.challenge_manager.challenge.clients.gamification.dto.ChallengeSolvedDTO;
 import com.playground.challenge_manager.challenge.clients.gamification.GamificationClient;
+import com.playground.challenge_manager.challenge.messaging.producers.ChallengeSolvedProducer;
 import com.playground.challenge_manager.challenge.services.impl.challengeservice.chain.AttemptHandler;
 import com.playground.challenge_manager.challenge.services.impl.challengeservice.chain.AttemptVerifierContext;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 public class PublishAttemptHandler implements AttemptHandler {
 
     private final GamificationClient gamificationClient;
+    private final ChallengeSolvedProducer challengeSolvedProducer;
 
     @Override
     public void handle(AttemptVerifierContext ctx) {
@@ -31,5 +33,7 @@ public class PublishAttemptHandler implements AttemptHandler {
         } catch (Exception e) {
             log.error("Error publishing attempt: {}", challengeAttempt, e);
         }
+
+        challengeSolvedProducer.publishChallengeSolvedMessage(challengeSolved);
     }
 }

@@ -3,6 +3,7 @@ package com.playground.user_manager.user;
 import com.playground.user_manager.user.api.dto.CreateUserDTO;
 import com.playground.user_manager.user.dataaccess.UserEntity;
 import com.playground.user_manager.user.dataaccess.UserRepository;
+import com.playground.user_manager.user.producers.UserMessageProducer;
 import com.playground.user_manager.user.service.UserServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -25,12 +27,14 @@ class UserServiceImplTest {
 
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private UserMessageProducer userMessageProducer;
 
     @InjectMocks
     private UserServiceImpl userService;
 
     @Test
-    void testSaveUser() {
+    void testCreateUser() {
         //given
         var alias = "test-user";
         var email = "someemail@gmail.com";
@@ -46,6 +50,10 @@ class UserServiceImplTest {
                 () -> assertEquals(uuid.toString(), savedUser.getId()),
                 () -> assertEquals(alias, savedUser.getAlias())
         );
+        verify(userRepository).findByAlias(alias);
+        verify(userRepository).save(any(UserEntity.class));
+        verify(userMessageProducer).sendUserCreatedMessage(savedUser);
+
     }
 
     @Test

@@ -10,6 +10,11 @@ spring:
     enabled: true
   jpa:
     show-sql: true
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USER:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
 server:
   error:
     include-message: always
@@ -40,3 +45,8 @@ app:
       host: ${GAMIFICATION_HOST:localhost}
       port: ${GAMIFICATION_PORT:8082}
       publish-attempt-path: /attempts
+  messaging:
+    challenge:
+      exchange: challenge-exchange
+      challenge-correct-routing-key: ${spring.application.name}.challenge-solved.correct
+      challenge-failed-routing-key: ${spring.application.name}.challenge-solved.incorrect

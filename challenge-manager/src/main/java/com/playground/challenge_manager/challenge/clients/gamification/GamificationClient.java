@@ -16,7 +16,10 @@ public class GamificationClient {
     private final GamificationClientConfig config;
     private final WebClient webClient;
 
-    public GamificationClient(GamificationClientConfig config, WebClient.Builder builder) {
+    public GamificationClient(
+            GamificationClientConfig config,
+            WebClient.Builder builder
+    ) {
         this.config = config;
         var protocol = config.getProtocol();
         var host = config.getHost();
