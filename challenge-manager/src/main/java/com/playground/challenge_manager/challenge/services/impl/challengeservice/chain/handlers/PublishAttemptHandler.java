@@ -1,7 +1,6 @@
 package com.playground.challenge_manager.challenge.services.impl.challengeservice.chain.handlers;
 
-import com.playground.challenge_manager.challenge.clients.gamification.dto.ChallengeSolvedDTO;
-import com.playground.challenge_manager.challenge.clients.gamification.GamificationClient;
+import com.playground.challenge_manager.challenge.messaging.events.ChallengeSolvedEvent;
 import com.playground.challenge_manager.challenge.messaging.producers.ChallengeSolvedProducer;
 import com.playground.challenge_manager.challenge.services.impl.challengeservice.chain.AttemptHandler;
 import com.playground.challenge_manager.challenge.services.impl.challengeservice.chain.AttemptVerifierContext;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class PublishAttemptHandler implements AttemptHandler {
 
-    private final GamificationClient gamificationClient;
     private final ChallengeSolvedProducer challengeSolvedProducer;
 
     @Override
@@ -27,12 +25,7 @@ public class PublishAttemptHandler implements AttemptHandler {
         var secondNumber = challengeAttempt.getSecondNumber();
         var isCorrect = challengeAttempt.isCorrect();
         var game = challengeAttempt.getGame();
-        var challengeSolved = new ChallengeSolvedDTO(userId, attemptId, firstNumber, secondNumber, isCorrect, game);
-        try {
-            gamificationClient.publishChallengeSolved(challengeSolved);
-        } catch (Exception e) {
-            log.error("Error publishing attempt: {}", challengeAttempt, e);
-        }
+        var challengeSolved = new ChallengeSolvedEvent(userId, attemptId, firstNumber, secondNumber, isCorrect, game);
 
         challengeSolvedProducer.publishChallengeSolvedMessage(challengeSolved);
     }

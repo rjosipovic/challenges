@@ -39,14 +39,8 @@ app:
       - level: expert
         min: 1001
         max: 9999
-  clients:
-    gamification:
-      protocol: ${GAMIFICATION_PROTOCOL:http}
-      host: ${GAMIFICATION_HOST:localhost}
-      port: ${GAMIFICATION_PORT:8082}
-      publish-attempt-path: /attempts
   messaging:
     challenge:
       exchange: challenge-exchange
-      challenge-correct-routing-key: ${spring.application.name}.challenge-solved.correct
-      challenge-failed-routing-key: ${spring.application.name}.challenge-solved.incorrect
+      challenge-correct-routing-key: challenge-solved.correct
+      challenge-failed-routing-key: challenge-solved.incorrect

@@ -1,0 +1,57 @@
+package com.playground.challenge_manager.challenge.services.impl.challengeservice.chain.handlers;
+
+import com.playground.challenge_manager.challenge.messaging.events.ChallengeSolvedEvent;
+import com.playground.challenge_manager.challenge.messaging.producers.ChallengeSolvedProducer;
+import com.playground.challenge_manager.challenge.services.impl.challengeservice.chain.AttemptVerifierContext;
+import com.playground.challenge_manager.challenge.services.model.ChallengeAttempt;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.UUID;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+class PublishAttemptHandlerTest {
+
+    @Mock
+    private ChallengeSolvedProducer challengeSolvedProducer;
+
+    @InjectMocks
+    private PublishAttemptHandler handler;
+
+    @Test
+    void shouldPublishChallengeSolvedEvent() {
+        // given
+        var userId = UUID.randomUUID();
+        var attemptId = UUID.randomUUID();
+        var firstNumber = 3;
+        var secondNumber = 4;
+        var isCorrect = true;
+        var game = "addition";
+
+        // Mock AttemptVerifierContext and ChallengeAttempt
+        var challengeAttempt = mock(ChallengeAttempt.class);
+        when(challengeAttempt.getUserId()).thenReturn(userId);
+        when(challengeAttempt.getChallengeAttemptId()).thenReturn(attemptId);
+        when(challengeAttempt.getFirstNumber()).thenReturn(firstNumber);
+        when(challengeAttempt.getSecondNumber()).thenReturn(secondNumber);
+        when(challengeAttempt.isCorrect()).thenReturn(isCorrect);
+        when(challengeAttempt.getGame()).thenReturn(game);
+
+        var ctx = mock(AttemptVerifierContext.class);
+        when(ctx.getChallengeAttempt()).thenReturn(challengeAttempt);
+
+        // when
+        handler.handle(ctx);
+
+        // then
+        var expectedEvent = new ChallengeSolvedEvent(userId.toString(), attemptId.toString(), firstNumber, secondNumber, isCorrect, game);
+        verify(challengeSolvedProducer).publishChallengeSolvedMessage(expectedEvent);
+    }
+}

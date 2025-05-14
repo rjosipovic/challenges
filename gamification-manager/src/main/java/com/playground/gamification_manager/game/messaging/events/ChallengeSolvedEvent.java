@@ -1,6 +1,5 @@
-package com.playground.gamification_manager.game.api.dto;
+package com.playground.gamification_manager.game.messaging.events;
 
-import com.playground.gamification_manager.game.api.validation.SameDigitCount;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Value;
@@ -8,8 +7,7 @@ import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.constraints.UUID;
 
 @Value
-@SameDigitCount
-public class ChallengeSolvedDTO {
+public class ChallengeSolvedEvent {
 
     @UUID @NotNull
     String userId;

@@ -3,7 +3,6 @@ package com.playground.gamification_manager.game.service.impl.challengesolved.ch
 import com.playground.gamification_manager.game.service.impl.challengesolved.chain.ChallengeSolvedChain;
 import com.playground.gamification_manager.game.service.impl.challengesolved.chain.handlers.BadgesHandler;
 import com.playground.gamification_manager.game.service.impl.challengesolved.chain.handlers.DifficultyHandler;
-import com.playground.gamification_manager.game.service.impl.challengesolved.chain.handlers.ResultHandler;
 import com.playground.gamification_manager.game.service.impl.challengesolved.chain.handlers.SaveBadgesHandler;
 import com.playground.gamification_manager.game.service.impl.challengesolved.chain.handlers.SaveScoreHandler;
 import com.playground.gamification_manager.game.service.impl.challengesolved.chain.handlers.ScoreHandler;
@@ -22,7 +21,6 @@ public class ChallengeSolvedChainConfiguration {
     private final SaveScoreHandler saveScoreHandler;
     private final SaveBadgesHandler saveBadgesHandler;
     private final TotalScoreHandler totalScoreHandler;
-    private final ResultHandler resultHandler;
 
     @Bean
     public ChallengeSolvedChain challengeSolvedChain() {
@@ -33,7 +31,6 @@ public class ChallengeSolvedChainConfiguration {
         chain.addHandler(saveScoreHandler);
         chain.addHandler(saveBadgesHandler);
         chain.addHandler(totalScoreHandler);
-        chain.addHandler(resultHandler);
         return chain;
     }
 }

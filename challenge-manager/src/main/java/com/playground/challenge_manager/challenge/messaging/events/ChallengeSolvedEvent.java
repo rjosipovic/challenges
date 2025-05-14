@@ -1,9 +1,9 @@
-package com.playground.challenge_manager.challenge.clients.gamification.dto;
+package com.playground.challenge_manager.challenge.messaging.events;
 
 import lombok.Value;
 
 @Value
-public class ChallengeSolvedDTO {
+public class ChallengeSolvedEvent {
 
     String userId;
     String challengeAttemptId;

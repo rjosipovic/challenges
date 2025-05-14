@@ -1,7 +1,7 @@
 package com.playground.gamification_manager.game.service;
 
 
-import com.playground.gamification_manager.game.api.dto.ChallengeSolvedDTO;
+import com.playground.gamification_manager.game.messaging.events.ChallengeSolvedEvent;
 import com.playground.gamification_manager.game.service.impl.GameServiceImpl;
 import com.playground.gamification_manager.game.service.impl.challengesolved.chain.ChallengeSolvedChain;
 import com.playground.gamification_manager.game.service.impl.challengesolved.chain.ChallengeSolvedContext;
@@ -33,7 +33,7 @@ class GameServiceImplTest {
         var secondNumber = 2;
         var correct = true;
         var game = "multiplication";
-        var challengeSolved = new ChallengeSolvedDTO(userId, challengeAttemptId, firstNumber, secondNumber, correct, game);
+        var challengeSolved = new ChallengeSolvedEvent(userId, challengeAttemptId, firstNumber, secondNumber, correct, game);
 
         var ctx = new ChallengeSolvedContext(challengeSolved);
 

@@ -1,8 +1,7 @@
 package com.playground.gamification_manager.game.service.impl.challengesolved.chain;
 
-import com.playground.gamification_manager.game.api.dto.ChallengeSolvedDTO;
+import com.playground.gamification_manager.game.messaging.events.ChallengeSolvedEvent;
 import com.playground.gamification_manager.game.dataaccess.domain.BadgeType;
-import com.playground.gamification_manager.game.service.model.GameResult;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,10 +25,8 @@ public class ChallengeSolvedContext {
     @Setter
     private int score;
     private final Set<BadgeType> badges;
-    @Setter
-    private GameResult result;
 
-    public ChallengeSolvedContext(ChallengeSolvedDTO challengeSolved) {
+    public ChallengeSolvedContext(ChallengeSolvedEvent challengeSolved) {
         this.userId = challengeSolved.getUserId();
         this.challengeAttemptId = challengeSolved.getChallengeAttemptId();
         this.firstNumber = challengeSolved.getFirstNumber();

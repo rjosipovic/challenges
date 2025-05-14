@@ -1,6 +1,6 @@
 package com.playground.challenge_manager.challenge.messaging.producers;
 
-import com.playground.challenge_manager.challenge.clients.gamification.dto.ChallengeSolvedDTO;
+import com.playground.challenge_manager.challenge.messaging.events.ChallengeSolvedEvent;
 import com.playground.challenge_manager.challenge.messaging.MessagingConfiguration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,7 +41,7 @@ class ChallengeSolvedProducerTest {
     @Test
     void shouldSendToCorrectRoutingKeyWhenCorrect() {
         // given
-        var dto = mock(ChallengeSolvedDTO.class);
+        var dto = mock(ChallengeSolvedEvent.class);
         when(dto.isCorrect()).thenReturn(true);
 
         // when
@@ -55,7 +55,7 @@ class ChallengeSolvedProducerTest {
     @Test
     void shouldSendToFailedRoutingKeyWhenIncorrect() {
         // given
-        var dto = mock(ChallengeSolvedDTO.class);
+        var dto = mock(ChallengeSolvedEvent.class);
         when(dto.isCorrect()).thenReturn(false);
 
         // when

@@ -1,4 +1,4 @@
-package com.playground.challenge_manager.challenge.messaging;
+package com.playground.gamification_manager.game.messaging;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,6 +18,6 @@ public class MessagingConfiguration {
     public static class ChallengeConfiguration {
         private String exchange;
         private String challengeCorrectRoutingKey;
-        private String challengeFailedRoutingKey;
+        private String queue;
     }
 }

@@ -1,9 +1,8 @@
 package com.playground.gamification_manager.game.service.interfaces;
 
-import com.playground.gamification_manager.game.api.dto.ChallengeSolvedDTO;
-import com.playground.gamification_manager.game.service.model.GameResult;
+import com.playground.gamification_manager.game.messaging.events.ChallengeSolvedEvent;
 
 public interface GameService {
 
-    GameResult process(ChallengeSolvedDTO challengeSolved);
+    void process(ChallengeSolvedEvent challengeSolved);
 }

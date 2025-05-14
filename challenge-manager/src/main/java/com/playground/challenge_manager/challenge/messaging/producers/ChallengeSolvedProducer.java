@@ -1,6 +1,6 @@
 package com.playground.challenge_manager.challenge.messaging.producers;
 
-import com.playground.challenge_manager.challenge.clients.gamification.dto.ChallengeSolvedDTO;
+import com.playground.challenge_manager.challenge.messaging.events.ChallengeSolvedEvent;
 import com.playground.challenge_manager.challenge.messaging.MessagingConfiguration;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -13,7 +13,7 @@ public class ChallengeSolvedProducer {
     private final RabbitTemplate rabbitTemplate;
     private final MessagingConfiguration messagingConfiguration;
 
-    public void publishChallengeSolvedMessage(ChallengeSolvedDTO challengeSolvedDTO) {
+    public void publishChallengeSolvedMessage(ChallengeSolvedEvent challengeSolvedDTO) {
         var challengeConfiguration = messagingConfiguration.getChallenge();
         var exchange = challengeConfiguration.getExchange();
         var correctRoutingKey = challengeConfiguration.getChallengeCorrectRoutingKey();
@@ -28,7 +28,7 @@ public class ChallengeSolvedProducer {
         }
     }
 
-    private void sendChallengeSolvedMessage(String exchange, String routingKey, ChallengeSolvedDTO challengeSolvedDTO) {
+    private void sendChallengeSolvedMessage(String exchange, String routingKey, ChallengeSolvedEvent challengeSolvedDTO) {
         rabbitTemplate.convertAndSend(exchange, routingKey, challengeSolvedDTO);
     }
 }
