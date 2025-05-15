@@ -1,6 +1,6 @@
 package com.playground.user_manager.config;
 
-import com.playground.user_manager.user.producers.MessagingConfiguration;
+import com.playground.user_manager.user.messaging.MessagingConfiguration;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.core.ExchangeBuilder;
 import org.springframework.amqp.core.TopicExchange;

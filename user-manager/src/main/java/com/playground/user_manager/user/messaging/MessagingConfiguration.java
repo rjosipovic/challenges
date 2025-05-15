@@ -1,4 +1,4 @@
-package com.playground.user_manager.user.producers;
+package com.playground.user_manager.user.messaging;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

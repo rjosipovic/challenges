@@ -9,6 +9,8 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -48,7 +50,16 @@ class ChallengeSolvedProducerTest {
         producer.publishChallengeSolvedMessage(dto);
 
         // then
-        verify(rabbitTemplate).convertAndSend("challenge-exchange", "challenge.correct", dto);
+        var exchangeCaptor = ArgumentCaptor.forClass(String.class);
+        var routingKeyCaptor = ArgumentCaptor.forClass(String.class);
+        var challengeSolvedEventCaptor = ArgumentCaptor.forClass(ChallengeSolvedEvent.class);
+        verify(rabbitTemplate).convertAndSend(exchangeCaptor.capture(), routingKeyCaptor.capture(), challengeSolvedEventCaptor.capture());
+
+        assertAll(
+                () -> assertEquals("challenge-exchange", exchangeCaptor.getValue()),
+                () -> assertEquals("challenge.correct", routingKeyCaptor.getValue()),
+                () -> assertEquals(dto, challengeSolvedEventCaptor.getValue())
+        );
         verify(rabbitTemplate, never()).convertAndSend("challenge-exchange", "challenge.failed", dto);
     }
 
@@ -62,7 +73,16 @@ class ChallengeSolvedProducerTest {
         producer.publishChallengeSolvedMessage(dto);
 
         // then
-        verify(rabbitTemplate).convertAndSend("challenge-exchange", "challenge.failed", dto);
+        var exchangeCaptor = ArgumentCaptor.forClass(String.class);
+        var routingKeyCaptor = ArgumentCaptor.forClass(String.class);
+        var challengeSolvedEventCaptor = ArgumentCaptor.forClass(ChallengeSolvedEvent.class);
+        verify(rabbitTemplate).convertAndSend(exchangeCaptor.capture(), routingKeyCaptor.capture(), challengeSolvedEventCaptor.capture());
+
+        assertAll(
+                () -> assertEquals("challenge-exchange", exchangeCaptor.getValue()),
+                () -> assertEquals("challenge.failed", routingKeyCaptor.getValue()),
+                () -> assertEquals(dto, challengeSolvedEventCaptor.getValue())
+        );
         verify(rabbitTemplate, never()).convertAndSend("challenge-exchange", "challenge.correct", dto);
     }
 }

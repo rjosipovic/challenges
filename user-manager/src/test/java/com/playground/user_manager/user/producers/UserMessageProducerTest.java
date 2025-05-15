@@ -1,13 +1,21 @@
 package com.playground.user_manager.user.producers;
 
+import com.playground.user_manager.user.messaging.MessagingConfiguration;
+import com.playground.user_manager.user.messaging.producers.UserMessageProducer;
 import com.playground.user_manager.user.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -36,12 +44,23 @@ class UserMessageProducerTest {
     @Test
     void shouldSendUserCreatedMessage() {
         // given
-        var user = new User("1", "test-alias");
+        var userId = UUID.randomUUID().toString();
+        var alias = "alias";
+        var user = new User(userId, alias);
 
         // when
         userMessageProducer.sendUserCreatedMessage(user);
 
         // then
-        verify(rabbitTemplate).convertAndSend("user.exchange", "user.created", user);
+        var exchangeCaptor = ArgumentCaptor.forClass(String.class);
+        var routingKeyCaptor = ArgumentCaptor.forClass(String.class);
+        var userCaptor = ArgumentCaptor.forClass(User.class);
+        verify(rabbitTemplate).convertAndSend(exchangeCaptor.capture(), routingKeyCaptor.capture(), userCaptor.capture());
+
+        assertAll(
+                () -> assertEquals("user.exchange", exchangeCaptor.getValue()),
+                () -> assertEquals("user.created", routingKeyCaptor.getValue()),
+                () -> assertEquals(user, userCaptor.getValue())
+        );
     }
 }

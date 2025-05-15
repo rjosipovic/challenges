@@ -1,5 +1,6 @@
-package com.playground.user_manager.user.producers;
+package com.playground.user_manager.user.messaging.producers;
 
+import com.playground.user_manager.user.messaging.MessagingConfiguration;
 import com.playground.user_manager.user.model.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -6,7 +6,7 @@ import com.playground.user_manager.user.api.dto.CreateUserDTO;
 import com.playground.user_manager.user.dataaccess.UserEntity;
 import com.playground.user_manager.user.dataaccess.UserRepository;
 import com.playground.user_manager.user.model.User;
-import com.playground.user_manager.user.producers.UserMessageProducer;
+import com.playground.user_manager.user.messaging.producers.UserMessageProducer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
