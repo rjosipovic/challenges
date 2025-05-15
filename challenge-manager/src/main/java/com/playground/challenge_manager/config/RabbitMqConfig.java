@@ -2,6 +2,7 @@ package com.playground.challenge_manager.config;
 
 import com.playground.challenge_manager.challenge.messaging.MessagingConfiguration;
 import lombok.RequiredArgsConstructor;
+import org.springframework.amqp.core.ExchangeBuilder;
 import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -18,7 +19,7 @@ public class RabbitMqConfig {
     @Bean
     public TopicExchange challengeExchange() {
         var exchangeName = messagingConfiguration.getChallenge().getExchange();
-        return new TopicExchange(exchangeName);
+        return ExchangeBuilder.topicExchange(exchangeName).durable(true).build();
     }
 
     @Bean

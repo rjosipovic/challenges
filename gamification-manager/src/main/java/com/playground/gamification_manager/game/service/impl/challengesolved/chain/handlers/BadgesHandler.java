@@ -3,7 +3,6 @@ package com.playground.gamification_manager.game.service.impl.challengesolved.ch
 import com.playground.gamification_manager.game.dataaccess.domain.BadgeEntity;
 import com.playground.gamification_manager.game.dataaccess.domain.BadgeType;
 import com.playground.gamification_manager.game.dataaccess.repositories.BadgeRepository;
-import com.playground.gamification_manager.game.dataaccess.repositories.ScoreRepository;
 import com.playground.gamification_manager.game.service.impl.badge.BadgesContext;
 import com.playground.gamification_manager.game.service.impl.challengesolved.chain.ChallengeSolvedContext;
 import com.playground.gamification_manager.game.service.impl.challengesolved.chain.ChallengeSolvedHandler;
@@ -11,7 +10,6 @@ import com.playground.gamification_manager.game.service.interfaces.BadgeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -20,7 +18,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BadgesHandler implements ChallengeSolvedHandler {
 
-    private final ScoreRepository scoreRepository;
     private final BadgeRepository badgeRepository;
     private final BadgeService badgeService;
 
@@ -34,7 +31,7 @@ public class BadgesHandler implements ChallengeSolvedHandler {
         var score = ctx.getScore();
         var firstNumber = ctx.getFirstNumber();
         var secondNumber = ctx.getSecondNumber();
-        var currentScore = getCurrentScore(ctx);
+        var currentScore = ctx.getTotalScore();
         var currentBadges = getCurrentBadges(ctx);
 
         var badgesCtx = new BadgesContext(score, currentScore, currentBadges, firstNumber, secondNumber);
@@ -42,12 +39,6 @@ public class BadgesHandler implements ChallengeSolvedHandler {
         var newBadges = badgeService.determineBadges(badgesCtx);
 
         ctx.addBadges(newBadges);
-    }
-
-    private int getCurrentScore(ChallengeSolvedContext ctx) {
-        var userId = ctx.getUserId();
-        return Optional.ofNullable(scoreRepository.totalScoreByUserId(UUID.fromString(userId)))
-                .orElse(0);
     }
 
     private Set<BadgeType> getCurrentBadges(ChallengeSolvedContext ctx) {

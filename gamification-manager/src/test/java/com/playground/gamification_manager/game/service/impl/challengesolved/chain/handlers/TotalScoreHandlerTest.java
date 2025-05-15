@@ -1,6 +1,5 @@
 package com.playground.gamification_manager.game.service.impl.challengesolved.chain.handlers;
 
-import com.playground.gamification_manager.game.dataaccess.repositories.ScoreRepository;
 import com.playground.gamification_manager.game.service.impl.challengesolved.chain.ChallengeSolvedContext;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,9 +19,6 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class TotalScoreHandlerTest {
-
-    @Mock
-    private ScoreRepository scoreRepository;
 
     @Mock
     private RedisTemplate<String, Object> redisTemplate;
@@ -67,14 +63,13 @@ class TotalScoreHandlerTest {
 
         var ctx = mock(ChallengeSolvedContext.class);
         when(ctx.getUserId()).thenReturn(userId);
+        when(ctx.getTotalScore()).thenReturn(totalScore);
         when(redisTemplate.opsForZSet()).thenReturn(zSetOperations);
-        when(scoreRepository.totalScoreByUserId(UUID.fromString(userId))).thenReturn(totalScore);
 
         //when
         totalScoreHandler.handle(ctx);
 
         //then
-        verify(scoreRepository).totalScoreByUserId(UUID.fromString(userId));
         verify(zSetOperations).add("leaderboard", userId, totalScore);
     }
 }

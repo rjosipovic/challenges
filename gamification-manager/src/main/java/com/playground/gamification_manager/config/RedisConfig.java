@@ -4,7 +4,9 @@ import com.playground.gamification_manager.game.messaging.MessagingConfiguration
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.ExchangeBuilder;
 import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.QueueBuilder;
 import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.context.annotation.Bean;
@@ -21,13 +23,13 @@ public class RedisConfig {
     @Bean
     public TopicExchange challengeExchange() {
         var name = messagingConfiguration.getChallenge().getExchange();
-        return new TopicExchange(name);
+        return ExchangeBuilder.topicExchange(name).durable(true).build();
     }
 
     @Bean
     public Queue challengeSolvedCorrectQueue() {
         var name = messagingConfiguration.getChallenge().getQueue();
-        return new Queue(name, true, false, false);
+        return QueueBuilder.durable(name).build();
     }
 
     @Bean

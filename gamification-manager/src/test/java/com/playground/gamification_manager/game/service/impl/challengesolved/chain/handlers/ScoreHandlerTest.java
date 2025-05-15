@@ -1,5 +1,6 @@
 package com.playground.gamification_manager.game.service.impl.challengesolved.chain.handlers;
 
+import com.playground.gamification_manager.game.dataaccess.repositories.ScoreRepository;
 import com.playground.gamification_manager.game.service.impl.challengesolved.chain.ChallengeSolvedContext;
 import com.playground.gamification_manager.game.service.impl.challengesolved.chain.config.DifficultyLevelsConfiguration;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Map;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -22,6 +24,9 @@ class ScoreHandlerTest {
 
     @Mock
     private DifficultyLevelsConfiguration difficultyLevelsConfiguration;
+
+    @Mock
+    private ScoreRepository scoreRepository;
 
     @Mock
     private ChallengeSolvedContext ctx;
@@ -63,40 +68,56 @@ class ScoreHandlerTest {
     @Test
     void shouldSetScoreForEasy() {
         //given
+        var userId = UUID.randomUUID();
         when(ctx.getDifficulty()).thenReturn("easy");
+        when(scoreRepository.totalScoreByUserId(userId)).thenReturn(10);
+        when(ctx.getUserId()).thenReturn(userId.toString());
         //when
         scoreHandler.handle(ctx);
         //then
         verify(ctx).setScore(10);
+        verify(ctx).setTotalScore(10);
     }
 
     @Test
     void shouldSetScoreForMedium() {
         //given
+        var userId = UUID.randomUUID();
         when(ctx.getDifficulty()).thenReturn("medium");
+        when(scoreRepository.totalScoreByUserId(userId)).thenReturn(10);
+        when(ctx.getUserId()).thenReturn(userId.toString());
         //when
         scoreHandler.handle(ctx);
         //then
         verify(ctx).setScore(20);
+        verify(ctx).setTotalScore(10);
     }
 
     @Test
     void shouldSetScoreForHard() {
         //given
+        var userId = UUID.randomUUID();
         when(ctx.getDifficulty()).thenReturn("hard");
+        when(scoreRepository.totalScoreByUserId(userId)).thenReturn(10);
+        when(ctx.getUserId()).thenReturn(userId.toString());
         //when
         scoreHandler.handle(ctx);
         //then
         verify(ctx).setScore(30);
+        verify(ctx).setTotalScore(10);
     }
 
     @Test
     void shouldSetScoreForExpert() {
         //given
+        var userId = UUID.randomUUID();
         when(ctx.getDifficulty()).thenReturn("expert");
+        when(scoreRepository.totalScoreByUserId(userId)).thenReturn(10);
+        when(ctx.getUserId()).thenReturn(userId.toString());
         //when
         scoreHandler.handle(ctx);
         //then
         verify(ctx).setScore(40);
+        verify(ctx).setTotalScore(10);
     }
 }

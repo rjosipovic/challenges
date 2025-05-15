@@ -2,6 +2,7 @@ package com.playground.user_manager.config;
 
 import com.playground.user_manager.user.producers.MessagingConfiguration;
 import lombok.RequiredArgsConstructor;
+import org.springframework.amqp.core.ExchangeBuilder;
 import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -18,7 +19,7 @@ public class RabbitMqConfig {
     @Bean
     public TopicExchange userExchange() {
         var exchangeName = messagingConfiguration.getUser().getExchange();
-        return new TopicExchange(exchangeName);
+        return ExchangeBuilder.topicExchange(exchangeName).durable(true).build();
     }
 
     @Bean

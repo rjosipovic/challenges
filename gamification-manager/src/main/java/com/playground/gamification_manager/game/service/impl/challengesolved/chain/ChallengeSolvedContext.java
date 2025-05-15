@@ -24,6 +24,8 @@ public class ChallengeSolvedContext {
     private String difficulty;
     @Setter
     private int score;
+    @Setter
+    private int totalScore;
     private final Set<BadgeType> badges;
 
     public ChallengeSolvedContext(ChallengeSolvedEvent challengeSolved) {
