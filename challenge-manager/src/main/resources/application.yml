@@ -40,6 +40,10 @@ app:
         min: 1001
         max: 9999
   messaging:
+    dead-letter:
+      exchange: dead-letter-exchange
+      routing-key: dead-letter
+      queue: dead-letter-queue
     challenge:
       exchange: challenge-exchange
       challenge-correct-routing-key: challenge-solved.correct
