@@ -11,7 +11,18 @@ import org.springframework.context.annotation.Configuration;
 public class MessagingConfiguration {
 
     @Getter @Setter
+    private DeadLetterConfiguration deadLetter;
+
+    @Getter @Setter
     private ChallengeConfiguration challenge;
+
+    @NoArgsConstructor
+    @Getter @Setter
+    public static class DeadLetterConfiguration {
+        private String exchange;
+        private String routingKey;
+        private String queue;
+    }
 
     @NoArgsConstructor
     @Getter @Setter

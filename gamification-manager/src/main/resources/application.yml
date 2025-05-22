@@ -18,6 +18,15 @@ spring:
     port: ${RABBITMQ_PORT:5672}
     username: ${RABBITMQ_USER:guest}
     password: ${RABBITMQ_PASSWORD:guest}
+    listener:
+      simple:
+        retry:
+          enabled: true
+          max-attempts: 3
+          initial-interval: 1000
+          multiplier: 2
+          max-interval: 5000
+        default-requeue-rejected: false
 server:
   port: 8082
 
@@ -53,6 +62,10 @@ app:
     key: leaderboard
     size: 10
   messaging:
+    dead-letter:
+      exchange: dead-letter-exchange
+      routing-key: dead-letter
+      queue: dead-letter-queue
     challenge:
       exchange: challenge-exchange
       challenge-correct-routing-key: challenge-solved.correct

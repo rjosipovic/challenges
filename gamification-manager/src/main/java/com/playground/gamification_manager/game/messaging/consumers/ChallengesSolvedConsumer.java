@@ -14,7 +14,7 @@ public class ChallengesSolvedConsumer {
 
     private final GameService gameService;
 
-    @RabbitListener(queues = "#{challengeSolvedCorrectQueue.name}")
+    @RabbitListener(queues = "#{challengeSolvedCorrectQueue.name}", ackMode = "AUTO")
     public void handleChallengeSolved(ChallengeSolvedEvent event) {
         log.info("Received challenge solved event: {}", event);
         gameService.process(event);

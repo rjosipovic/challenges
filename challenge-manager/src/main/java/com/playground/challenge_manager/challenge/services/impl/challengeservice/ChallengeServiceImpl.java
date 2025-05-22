@@ -9,6 +9,7 @@ import com.playground.challenge_manager.challenge.services.impl.challengeservice
 import com.playground.challenge_manager.challenge.services.interfaces.AttemptService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -21,6 +22,7 @@ public class ChallengeServiceImpl implements AttemptService {
     private final ChallengeAttemptRepository challengeAttemptRepository;
 
     @Override
+    @Transactional
     public ChallengeResultDTO verifyAttempt(ChallengeAttemptDTO attempt) {
         var ctx = new AttemptVerifierContext(attempt);
         attemptVerifierChain.handle(ctx);
