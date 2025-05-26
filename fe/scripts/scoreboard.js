@@ -1,8 +1,7 @@
-const SCOREBOARD_API = 'http://localhost:8082/leaders'; // replace with your actual API URL
+const SCOREBOARD_API = 'http://localhost:8082/leaders';
 const USER_DETAILS_API = 'http://localhost:8081/users';
 
 populateScoreboardTable();
-
 
 async function populateScoreboardTable() {
     try {

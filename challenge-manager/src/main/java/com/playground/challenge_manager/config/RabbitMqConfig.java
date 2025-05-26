@@ -10,7 +10,6 @@ import org.springframework.amqp.core.ExchangeBuilder;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.QueueBuilder;
 import org.springframework.amqp.core.TopicExchange;
-import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
@@ -59,12 +58,5 @@ public class RabbitMqConfig {
         template.setMessageConverter(messageConverter);
         template.setConfirmCallback((correlationData, ack, cause) -> callbackManager.processCallback(correlationData, ack));
         return template;
-    }
-
-    @Bean
-    public CachingConnectionFactory rabbitConnectionFactory() {
-        var factory = new CachingConnectionFactory();
-        factory.setPublisherConfirmType(CachingConnectionFactory.ConfirmType.CORRELATED);
-        return factory;
     }
 }

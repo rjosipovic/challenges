@@ -13,6 +13,8 @@ spring:
   redis:
     host: ${REDIS_HOST:localhost}
     port: ${REDIS_PORT:6379}
+    username: ${REDIS_USER:default}
+    password: ${REDIS_PASSWORD}
   rabbitmq:
     host: ${RABBITMQ_HOST:localhost}
     port: ${RABBITMQ_PORT:5672}
@@ -22,10 +24,10 @@ spring:
       simple:
         retry:
           enabled: true
-          max-attempts: 3
+          max-attempts: 10
           initial-interval: 1000
-          multiplier: 2
-          max-interval: 5000
+          multiplier: 4
+          max-interval: 3600000
         default-requeue-rejected: false
 server:
   port: 8082

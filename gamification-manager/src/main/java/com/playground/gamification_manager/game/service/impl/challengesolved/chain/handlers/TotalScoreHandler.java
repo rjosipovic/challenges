@@ -24,7 +24,10 @@ public class TotalScoreHandler implements ChallengeSolvedHandler {
     public void handle(ChallengeSolvedContext ctx) {
         var userId = ctx.getUserId();
         var totalScore = ctx.getTotalScore();
-        updateLeaderboard(userId, totalScore);
+        var score = ctx.getScore();
+        var newTotalScore = totalScore + score;
+        ctx.setTotalScore(newTotalScore);
+        updateLeaderboard(userId, newTotalScore);
     }
 
     private void updateLeaderboard(String userId, long totalScore) {
