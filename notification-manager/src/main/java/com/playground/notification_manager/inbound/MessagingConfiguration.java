@@ -1,4 +1,4 @@
-package com.playground.gamification_manager.game.messaging;
+package com.playground.notification_manager.inbound;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -6,15 +6,13 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-@ConfigurationProperties(prefix = "app.messaging")
 @Configuration
+@ConfigurationProperties(prefix = "app.messaging")
+@Getter @Setter
 public class MessagingConfiguration {
 
-    @Getter @Setter
     private DeadLetterConfiguration deadLetter;
-
-    @Getter @Setter
-    private ChallengeConfiguration challenge;
+    private NotificationConfiguration notifications;
 
     @NoArgsConstructor
     @Getter @Setter
@@ -26,9 +24,9 @@ public class MessagingConfiguration {
 
     @NoArgsConstructor
     @Getter @Setter
-    public static class ChallengeConfiguration {
+    public static class NotificationConfiguration {
         private String exchange;
-        private String challengeCorrectBindingKey;
+        private String notificationsBindingKey;
         private String queue;
     }
 }

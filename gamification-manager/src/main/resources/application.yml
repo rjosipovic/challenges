@@ -66,9 +66,9 @@ app:
   messaging:
     dead-letter:
       exchange: dead-letter-exchange
-      routing-key: dead-letter
+      binding-key: dead-letter
       queue: dead-letter-queue
     challenge:
       exchange: challenge-exchange
-      challenge-correct-routing-key: challenge-solved.correct
+      challenge-correct-binding-key: challenge-solved.correct
       queue: challenge-solved.correct.queue
