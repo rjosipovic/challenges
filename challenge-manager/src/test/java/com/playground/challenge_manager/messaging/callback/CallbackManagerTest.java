@@ -31,6 +31,8 @@ class CallbackManagerTest {
     private ApplicationEventPublisher eventPublisher;
     @Mock
     private MessagingConfiguration messagingConfiguration;
+    @Mock
+    private PendingMessageStore pendingMessageStore;
 
     @InjectMocks
     private CallbackManager callbackManager;
@@ -49,6 +51,7 @@ class CallbackManagerTest {
 
         //then
         verify(eventPublisher, never()).publishEvent(any());
+        verify(pendingMessageStore).delete(correlationId);
     }
 
     @Test
@@ -66,6 +69,7 @@ class CallbackManagerTest {
 
         when(message.getMessageProperties()).thenReturn(messageProperties);
         when(messageProperties.getHeaders()).thenReturn(headers);
+        when(pendingMessageStore.get(correlationId)).thenReturn(message);
 
         //when
         callbackManager.processCallback(correlationData, false);
@@ -98,6 +102,7 @@ class CallbackManagerTest {
 
         when(message.getMessageProperties()).thenReturn(messageProperties);
         when(messageProperties.getHeaders()).thenReturn(headers);
+        when(pendingMessageStore.get(correlationId)).thenReturn(message);
 
         when(messagingConfiguration.getDeadLetter()).thenReturn(dlxConfig);
         when(dlxConfig.getExchange()).thenReturn("dlx-exchange");

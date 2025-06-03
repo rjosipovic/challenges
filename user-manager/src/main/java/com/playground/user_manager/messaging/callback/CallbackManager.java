@@ -1,6 +1,5 @@
-package com.playground.challenge_manager.messaging.callback;
+package com.playground.user_manager.messaging.callback;
 
-import com.playground.challenge_manager.challenge.messaging.MessagingConfiguration;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
@@ -20,7 +19,7 @@ public class CallbackManager {
 
     private final PendingMessageStore pendingMessagesStore;
     private final ApplicationEventPublisher applicationEventPublisher;
-    private final MessagingConfiguration messagingConfiguration;
+    private final DlxMessagingConfiguration dlxMessagingConfiguration;
 
     public void processCallback(CorrelationData correlationData, boolean ack) {
         if (Objects.isNull(correlationData)) {
@@ -88,8 +87,8 @@ public class CallbackManager {
         } else {
             log.error("Message could not be retried for correlationId: {}. RetryCount: {}, Exchange: {}, RoutingKey: {}", correlationId, retryCount, exchange, routingKey);
             log.info("Publishing to dead letter queue");
-            var dlxExchange = messagingConfiguration.getDeadLetter().getExchange();
-            var dlxRoutingKey = messagingConfiguration.getDeadLetter().getRoutingKey();
+            var dlxExchange = dlxMessagingConfiguration.getExchange();
+            var dlxRoutingKey = dlxMessagingConfiguration.getRoutingKey();
             applicationEventPublisher.publishEvent(new MessageRetryEvent(message, dlxExchange, dlxRoutingKey));
             pendingMessagesStore.delete(correlationId);
         }

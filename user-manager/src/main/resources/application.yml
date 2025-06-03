@@ -10,11 +10,17 @@ spring:
     change-log: classpath:db/changelog/db.changelog-master.yaml
   jpa:
     show-sql: true
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    username: ${REDIS_USER:default}
+    password: ${REDIS_PASSWORD}
   rabbitmq:
     host: ${RABBITMQ_HOST:localhost}
     port: ${RABBITMQ_PORT:5672}
     username: ${RABBITMQ_USER:guest}
     password: ${RABBITMQ_PASSWORD:guest}
+    publisher-confirm-type: correlated
 server:
    port: 8081
 
@@ -23,7 +29,19 @@ app:
     allowed-origins: ${ALLOWED_ORIGINS:http://127.0.0.1:3000}
     allowed-methods: GET,POST,PUT,DELETE
     allowed-headers: Authorization,Content-Type,X-Requested-With,Accept,Origin,Access-Control-Request-Method,Access-Control-Request-Headers,Access-Control-Allow-Origin
+  code-generation:
+    subject: "Challenges Access Code"
+    notification-message-template: "Your access code is: %s"
+    key-prefix: "auth_code:"
+    code-expiration-time: "PT10M"
   messaging:
     user:
       exchange: user.exchange
       user-created-routing-key: ${spring.application.name}.user.created
+    auth:
+      exchange: notifications-exchange
+      auth-code-routing-key: notifications
+    dead-letter:
+      exchange: dead-letter-exchange
+      routing-key: dead-letter
+      queue: dead-letter-queue
