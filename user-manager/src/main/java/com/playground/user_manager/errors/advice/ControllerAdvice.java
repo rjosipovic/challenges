@@ -1,5 +1,6 @@
 package com.playground.user_manager.errors.advice;
 
+import com.nimbusds.jose.JOSEException;
 import com.playground.user_manager.errors.custom.UserManagerError;
 import com.playground.user_manager.errors.exceptions.ResourceAlreadyExistsException;
 import com.playground.user_manager.errors.exceptions.ResourceNotFoundException;
@@ -27,6 +28,24 @@ public class ControllerAdvice implements ResponseBodyAdvice<Object> {
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType, Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
         response.getHeaders().add("apiVersion", "1.0");
         return body;
+    }
+
+    @ExceptionHandler(JOSEException.class)
+    public ResponseEntity<UserManagerError> handleJwtException(Exception ex) {
+        var apiVersion = "1.0";
+        var message = "Token generation failed";
+        var errorMessage = ex.getMessage();
+        var errorReportUri = "";
+        var error = new UserManagerError(
+                apiVersion,
+                null,
+                message,
+                null,
+                null,
+                errorMessage,
+                errorReportUri
+        );
+        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)

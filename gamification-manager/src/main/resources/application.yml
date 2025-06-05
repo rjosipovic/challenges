@@ -37,6 +37,9 @@ app:
     allowed-origins: ${ALLOWED_ORIGINS:http://127.0.0.1:3000}
     allowed-methods: GET,POST,PUT,DELETE
     allowed-headers: Authorization,Content-Type,X-Requested-With,Accept,Origin,Access-Control-Request-Method,Access-Control-Request-Headers,Access-Control-Allow-Origin
+  auth:
+    secret: ${AUTH_SECRET:}
+    expiration-time: "PT6H"
   difficulty-levels:
     - level: easy
       digits: 1
