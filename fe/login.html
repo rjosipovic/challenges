@@ -78,12 +78,19 @@
                         <h2 class="mb-4 text-center text-2xl font-bold text-black md:mb-6 lg:text-3xl">Login</h2>
                     </div>
                     <div class="mx-auto grid max-w-screen-md gap-4 sm:grid-cols-2">
-                        <div>
-                            <label for="alias-for" class="mb-2 inline-block text-sm text-gray-500 sm:text-base">Alias</label>
-                            <input id='alias' type="text" class="w-full rounded border bg-white text-gray-500 ring-blue-300 px-3 py-2 outline-none transition duration-100 focus:ring" name="alias-for">
+                        <div id='email-input'>
+                            <label for="email-for" class="mb-2 inline-block text-sm text-gray-500 sm:text-base">Email</label>
+                            <input id='email' type="text" class="w-full rounded border bg-white text-gray-500 ring-blue-300 px-3 py-2 outline-none transition duration-100 focus:ring" name="email-for">
+                            <div class="flex items-center justify-between sm:col-span-2">
+                                <button id="code-button" onclick='getCode()' class="text-white bg-blue-500 hover:bg-blue-600 active:bg-blue-700 disabled:bg-gray-400 inline-block rounded-lg px-8 py-3 text-center text-sm font-semibold outline-none transition duration-100 focus-visible:ring md:text-base">Generate Code</button>
+                            </div>
                         </div>
-                        <div class="flex items-center justify-between sm:col-span-2">
-                            <button id="send-button" onclick='login()' class="text-white bg-blue-500 hover:bg-blue-600 active:bg-blue-700 disabled:bg-gray-400 inline-block rounded-lg px-8 py-3 text-center text-sm font-semibold outline-none transition duration-100 focus-visible:ring md:text-base">Login</button>
+                        <div id='code-input'>
+                            <label for="code-for" class="mb-2 inline-block text-sm text-gray-500 sm:text-base">Code</label>
+                            <input id='code' type="password" class="w-full rounded border bg-white text-gray-500 ring-blue-300 px-3 py-2 outline-none transition duration-100 focus:ring" name="code-for">
+                            <div class="flex items-center justify-between sm:col-span-2">
+                                <button id="login-button" onclick='login()' class="text-white bg-blue-500 hover:bg-blue-600 active:bg-blue-700 disabled:bg-gray-400 inline-block rounded-lg px-8 py-3 text-center text-sm font-semibold outline-none transition duration-100 focus-visible:ring md:text-base">Login</button>
+                            </div>
                         </div>
                         <div>
                             <p class="mb-8 leading-relaxed">Don't have an acount? Register <a href="register.html"><em class="text-blue-500">here</em></a>

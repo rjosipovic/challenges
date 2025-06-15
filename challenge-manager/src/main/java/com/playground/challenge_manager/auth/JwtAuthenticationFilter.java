@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Map;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -38,9 +39,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             try {
                 var signedJwt = SignedJWT.parse(token);
                 var valid = signedJwt.verify(new MACVerifier(secret));
-                if (valid && signedJwt.getJWTClaimsSet().getExpirationTime().after(new Date())) {
-                    var email = signedJwt.getJWTClaimsSet().getSubject();
-                    var authentication = new UsernamePasswordAuthenticationToken(email, null, Collections.emptyList());
+                if (valid && notExpired(signedJwt)) {
+                    var authentication = getUsernamePasswordAuthenticationToken(signedJwt);
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     var securityContext = SecurityContextHolder.getContext();
                     securityContext.setAuthentication(authentication);
@@ -50,5 +50,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
         filterChain.doFilter(request, response);
+    }
+
+    private static boolean notExpired(SignedJWT signedJwt) throws ParseException {
+        return signedJwt.getJWTClaimsSet().getExpirationTime().after(new Date());
+    }
+
+    private static UsernamePasswordAuthenticationToken getUsernamePasswordAuthenticationToken(SignedJWT signedJwt) throws ParseException {
+        var email = signedJwt.getJWTClaimsSet().getSubject();
+        var alias = signedJwt.getJWTClaimsSet().getStringClaim("alias");
+        var userId = signedJwt.getJWTClaimsSet().getStringClaim("userId");
+        var userPrincipal = new JwtUserPrincipal(userId, Map.of("alias", alias, "email", email));
+        return new UsernamePasswordAuthenticationToken(userPrincipal, null, Collections.emptyList());
     }
 }

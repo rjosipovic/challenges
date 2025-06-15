@@ -1,24 +1,81 @@
-const ERROR_MSG = "Something went wrong. Please try again.";
-const USER_DETAILS_API = 'http://localhost:8081/users';
-const USER_NOT_FOUND = 'NE-001';
+const AUTH_API = 'http://localhost:8081/auth';
 
-async function login() {
-    const alias = document.getElementById('alias').value;
+document.getElementById('email-input').style.display = 'block';
+document.getElementById('code-input').style.display = 'none';
 
-    if (alias === "") {
-        alert('Please enter an alias.');
+
+async function getCode() {
+    const email = document.getElementById('email').value;
+
+    if (email === "") {
+        alert('Please enter an email address.');
         return;
     }
 
-    const apiUrl = USER_DETAILS_API + '/alias/' + alias;
+    const codeGenerationRequest = {
+        "email": email
+    };
+
+    const apiUrl = AUTH_API + '/request-code';
 
     try {
-        const response = await fetch(apiUrl);
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(codeGenerationRequest)
+        });
+
+        if (response.ok) {
+            alert('Code generated successfully. Please check your email.');
+            // Toggle visibility of input fields
+            document.getElementById('email-input').style.display = 'none';
+            document.getElementById('code-input').style.display = 'block';
+        } else if (response.status === 404) {
+            window.location.href = "register.html";
+        } else {
+            const errorData = await response.json();
+            alert(ERROR_MSG);
+            console.error('Error generating code:', errorData);
+        }
+    } catch (error) {
+        alert(ERROR_MSG);
+        console.error('Error generating code:', error);
+    }
+}
+
+async function login() {
+    const email = document.getElementById('email').value;
+    const code = document.getElementById('code').value;
+
+    if (email === "") {
+        alert('Something went wrong. Please try again.');
+        return;
+    }
+
+
+    if (code === "") {
+        alert('Please enter code to login.');
+        return;
+    }
+
+    const codeVerificationRequest = {
+        "email": email,
+        "code": code
+    };
+
+    const apiUrl = AUTH_API + '/verify-code'
+
+    try {
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(codeVerificationRequest)
+        });
 
         if (response.ok) {
             const data = await response.json();
-            console.log('User details:', data);
-            localStorage.setItem('alias', JSON.stringify(data));
+            console.log('Token:', data);
+            localStorage.setItem('token', data.token);
             window.location.href = "challenges.html";
         } else if (response.status === 404) {
             const errorData = await response.json();
@@ -28,15 +85,15 @@ async function login() {
                 window.location.href = "register.html";
             } else {
                 alert(ERROR_MSG);
-                console.error('Error getting user details:', errorData);
+                console.error('Login failed:', errorData);
             }
         } else {
             const errorData = await response.json();
             alert(ERROR_MSG);
-            console.error('Error getting user details:', errorData);
+            console.error('Login failed:', errorData);
         }
     } catch (error) {
         alert(ERROR_MSG);
-        console.error('Error getting user details:', error);
+        console.error('Login failed:', error);
     }
 }

@@ -2,7 +2,7 @@ const USER_EXISTS_CODE = 'NE-002';
 const USER_EXISTS_MSG = 'User already exists';
 const UNABLE_TO_RESISTER_MSG = 'Unable to register user. Please try again later.';
 const LOGIN = 'login.html';
-const USER_REGISTRATON_API = 'http://localhost:8081/users';
+const REGISTRATON_API = 'http://localhost:8081/auth/register';
 
 async function register() {
     const email = document.getElementById('email').value;
@@ -31,15 +31,14 @@ async function register() {
     console.log("About to register user:", userData);
 
     try {
-        const response = await fetch(USER_REGISTRATON_API, {
+        const response = await fetch(REGISTRATON_API, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(userData)
         });
 
         if (response.ok) {
-            const data = await response.json();
-            console.log('Registration successful:', data);
+            console.log('Registration successful');
             window.location.href = LOGIN;
         } else {
             const errorData = await response.json();

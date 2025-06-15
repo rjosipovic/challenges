@@ -12,5 +12,7 @@ public interface UserRepository extends CrudRepository<UserEntity, UUID> {
 
     Optional<UserEntity> findByAlias(String alias);
 
+    Optional<UserEntity> findByEmail(String email);
+
     List<UserEntity> findByIdIn(List<UUID> userIds);
 }

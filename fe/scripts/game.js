@@ -29,9 +29,15 @@ async function setQuestion() {
     console.log("Retrieving challenge with difficulty: ", difficulty);
 
     const apiUrl = CHALLENGE_API + '/random?difficulty=' + difficulty;
+    const token = localStorage.getItem("token");
 
     try {
-        const response = await fetch(apiUrl);
+        const response = await fetch(apiUrl, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            }
+        });
 
         if (response.ok) {
             const data = await response.json();
@@ -40,6 +46,9 @@ async function setQuestion() {
             var selectedOperation = localStorage.getItem("selectedOperation");
             document.getElementById("operator").innerHTML = getOperatorSign(selectedOperation);
             document.getElementById("secondNumber").innerHTML = data.secondNumber;
+        } else if (response.status === 403) {
+            alert("Access denied. Please log in to play the game.");
+            window.location.href = "login.html";
         } else {
             const errorData = await response.json();
             alert(ERROR_MSG);
@@ -58,13 +67,13 @@ async function submitAnswer() {
     const guess = document.getElementById("guess").value;
     const user = JSON.parse(localStorage.getItem("alias"));
     const game = localStorage.getItem("selectedOperation");
+    const token = localStorage.getItem("token");
 
     if (guess.trim() === "") {
         alert("Please enter your answer.");
         return;
     }
     const data = {
-        "userId": user.id,
         "firstNumber": parseInt(firstNumber),
         "secondNumber": parseInt(secondNumber),
         "guess": parseInt(guess),
@@ -74,7 +83,10 @@ async function submitAnswer() {
     try {
         const response = await fetch(ATTEMPT_API, {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            },
             body: JSON.stringify(data)
         });
 
@@ -92,6 +104,9 @@ async function submitAnswer() {
             setQuestion();
             clearAnswer();
             populateAttemptsTable(user.id);
+        } else if (response.status === 403) {
+            alert("Access denied. Please log in to play the game.");
+            window.location.href = "login.html";
         } else {
             const errorData = await response.json();
             alert(ERROR_MSG);
@@ -122,10 +137,15 @@ function getOperatorSign(selectedOperation) {
 
 async function populateAttemptsTable(userId) {
     console.log("About to populate attempts table.");
+    const token = localStorage.getItem("token");
 
-    const apiUrl = ATTEMPT_API + '?userId=' + userId;
+    const apiUrl = ATTEMPT_API;
     try {
-        const response = await fetch(apiUrl);
+        const response = await fetch(apiUrl, {
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        });
 
         if (response.ok) {
             const data = await response.json();
@@ -144,6 +164,9 @@ async function populateAttemptsTable(userId) {
                 `;
                 tableBody.appendChild(row);
             });
+        } else if (response.status === 403) {
+            alert("Access denied. Please log in to play the game.");
+            window.location.href = "login.html";
         } else {
             const errorData = await response.json();
             console.error('Error getting attempts history:', errorData);

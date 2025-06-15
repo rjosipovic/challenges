@@ -4,6 +4,7 @@ import com.playground.challenge_manager.challenge.api.validation.SameDigitCount;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Value;
+import lombok.With;
 import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.constraints.UUID;
 
@@ -11,8 +12,8 @@ import org.hibernate.validator.constraints.UUID;
 @SameDigitCount
 public class ChallengeAttemptDTO {
 
-    @NotNull
     @UUID
+    @With
     String userId;
     @NotNull
     @Range(min = 1, max = 9999)

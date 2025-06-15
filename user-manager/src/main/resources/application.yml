@@ -31,7 +31,7 @@ app:
     allowed-headers: Authorization,Content-Type,X-Requested-With,Accept,Origin,Access-Control-Request-Method,Access-Control-Request-Headers,Access-Control-Allow-Origin
   auth:
     secret: ${AUTH_SECRET:}
-    expiration-time: "PT6H"
+    expiration-time: "PT1M"
   code-generation:
     subject: "Challenges Access Code"
     notification-message-template: "Your access code is: %s"

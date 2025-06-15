@@ -93,6 +93,11 @@ services:
       - RABBITMQ_PORT=5672
       - RABBITMQ_USER=${RABBITMQ_USER}
       - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
+      - AUTH_SECRET=${AUTH_SECRET}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_USER=${REDIS_USER}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -119,6 +124,11 @@ services:
       - RABBITMQ_PORT=5672
       - RABBITMQ_USER=${RABBITMQ_USER}
       - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
+      - AUTH_SECRET=${AUTH_SECRET}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_USER=${REDIS_USER}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -143,10 +153,13 @@ services:
       - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - REDIS_USER=${REDIS_USER}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
       - RABBITMQ_HOST=rabbitmq
       - RABBITMQ_PORT=5672
       - RABBITMQ_USER=${RABBITMQ_USER}
       - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
+      - AUTH_SECRET=${AUTH_SECRET}
     depends_on:
       redis:
         condition: service_healthy
@@ -159,6 +172,27 @@ services:
     networks:
       - challenge-network
     restart: unless-stopped
+
+  notification-manager:
+    build:
+      context: ./notification-manager
+      dockerfile: Dockerfile
+    ports:
+      - "8083:8083"
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USER=${RABBITMQ_USER}
+      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
+      - MAIL_HOST=${MAIL_HOST}
+      - MAIL_PORT=${MAIL_PORT}
+      - MAIL_USERNAME=${MAIL_USERNAME}
+      - MAIL_PASSWORD=${MAIL_PASSWORD}
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - challenge-network
 
   frontend:
     build:

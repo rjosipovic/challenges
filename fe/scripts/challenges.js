@@ -28,5 +28,4 @@ function confirmSelection() {
     localStorage.setItem('selectedOperation', selectedOperation);
     localStorage.setItem('difficulty', difficulty);
     window.location.href = "game.html";
-
 }

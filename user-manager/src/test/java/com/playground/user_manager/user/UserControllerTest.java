@@ -6,10 +6,9 @@ import com.playground.user_manager.errors.advice.ControllerAdvice;
 import com.playground.user_manager.errors.controller.ErrorController;
 import com.playground.user_manager.errors.custom.UserManagerError;
 import com.playground.user_manager.errors.custom.UserManagerErrorAttributes;
-import com.playground.user_manager.errors.exceptions.ResourceAlreadyExistsException;
 import com.playground.user_manager.errors.exceptions.ResourceNotFoundException;
-import com.playground.user_manager.user.api.dto.CreateUserDTO;
 import com.playground.user_manager.user.api.controllers.UserController;
+import com.playground.user_manager.user.api.dto.CreateUserDTO;
 import com.playground.user_manager.user.model.User;
 import com.playground.user_manager.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,11 +19,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
 import org.springframework.boot.test.json.JacksonTester;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,7 +30,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @ExtendWith(MockitoExtension.class)
 @AutoConfigureJsonTesters
@@ -114,146 +110,6 @@ class UserControllerTest {
                 () -> assertFalse(res.getContentAsString().isEmpty()),
                 () -> assertEquals("application/json", res.getContentType()),
                 () -> assertEquals(errorJacksonTester.write(error).getJson(), res.getContentAsString())
-        );
-    }
-
-    @Test
-    void testCreateUser_withMandatoryFields() throws Exception {
-        //given
-        var alias = "test-user";
-        var email = "someemail@gmail.com";
-        var userId = UUID.randomUUID().toString();
-        var user = new User(userId, alias);
-        var createUser = new CreateUserDTO(alias, email, null, null);
-
-        when(userService.createUser(createUser)).thenReturn(new User(userId, alias));
-
-        //when
-        var res = mockMvc.perform(post("/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(createUserJacksonTester.write(new CreateUserDTO(alias, email, null, null)).getJson()))
-                .andReturn().getResponse();
-
-        //then
-        assertAll(
-                () -> assertEquals(200, res.getStatus()),
-                () -> assertEquals("application/json", res.getContentType()),
-                () -> assertEquals("UTF-8", res.getCharacterEncoding()),
-                () -> assertEquals(userJacksonTester.write(user).getJson(), res.getContentAsString())
-        );
-    }
-
-    @Test
-    void testCreateUser_failure_alreadyExists() throws Exception {
-        //given
-        var alias = "test-user";
-        var email = "someemail@gmail.com";
-        var apiVersion = "1.0";
-        var code = "NE-001";
-        var message = "Resource already exists";
-        var createUser = new CreateUserDTO(alias, email, null, null);
-        var errorMessage = "User with alias " + alias + " already exists";
-        var domain = "user";
-        var reason = "exists";
-        var errorReportUri = "";
-        var ex = new ResourceAlreadyExistsException(errorMessage, domain);
-
-        when(userService.createUser(createUser)).thenThrow(ex);
-
-        var error = new UserManagerError(apiVersion, code, message, domain, reason, errorMessage, errorReportUri);
-
-        //when
-        var res = mockMvc.perform(post("/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(createUserJacksonTester.write(createUser).getJson()))
-                .andReturn().getResponse();
-
-        //then
-        assertAll(
-                () -> assertEquals(400, res.getStatus()),
-                () -> assertEquals("application/json", res.getContentType()),
-                () -> assertEquals("UTF-8", res.getCharacterEncoding()),
-                () -> assertEquals(errorJacksonTester.write(error).getJson(), res.getContentAsString())
-        );
-    }
-
-    @Test
-    void testCreateUser_failure_missingAlias() throws Exception {
-        //given
-        var email = "someemail@gmail.com";
-        //when
-        var res = mockMvc.perform(post("/users")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(createUserJacksonTester.write(new CreateUserDTO(null, email, null, null)).getJson()))
-                .andReturn().getResponse();
-        //then
-        assertAll(
-                () -> assertEquals(400, res.getStatus())
-        );
-    }
-
-    @Test
-    void testCreateUser_failure_missingEmail() throws Exception {
-        //given
-        var alias = "test-user";
-        //when
-        var res = mockMvc.perform(post("/users")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(createUserJacksonTester.write(new CreateUserDTO(alias, null, null, null)).getJson()))
-                .andReturn().getResponse();
-        //then
-        assertAll(
-                () -> assertEquals(400, res.getStatus())
-        );
-    }
-
-    @Test
-    void testCreateUser_failure_invalidEmail() throws Exception {
-        //given
-        var alias = "test-user";
-        var email = "someemail";
-        //when
-        var res = mockMvc.perform(post("/users")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(createUserJacksonTester.write(new CreateUserDTO(alias, email, null, null)).getJson()))
-                .andReturn().getResponse();
-        //then
-        assertAll(
-                () -> assertEquals(400, res.getStatus())
-        );
-    }
-
-    @Test
-    void testCreateUser_failure_invalidBirthday() throws Exception {
-        //given
-        var alias = "test-user";
-        var email = "someemail@gmail.com";
-        var birthday = LocalDate.now().plusDays(1);
-        //when
-        var res = mockMvc.perform(post("/users")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(createUserJacksonTester.write(new CreateUserDTO(alias, email, birthday, null)).getJson()))
-                .andReturn().getResponse();
-        //then
-        assertAll(
-                () -> assertEquals(400, res.getStatus())
-        );
-    }
-
-    @Test
-    void testCreateUser_failure_invalidGender() throws Exception {
-        //given
-        var alias = "test-user";
-        var email = "someemail@gmail.com";
-        var gender = "invalid";
-        //when
-        var res = mockMvc.perform(post("/users")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(createUserJacksonTester.write(new CreateUserDTO(alias, email, null, gender)).getJson()))
-                .andReturn().getResponse();
-        //then
-        assertAll(
-                () -> assertEquals(400, res.getStatus())
         );
     }
 

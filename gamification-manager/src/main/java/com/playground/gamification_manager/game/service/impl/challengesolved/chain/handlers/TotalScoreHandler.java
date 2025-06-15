@@ -2,6 +2,7 @@ package com.playground.gamification_manager.game.service.impl.challengesolved.ch
 
 import com.playground.gamification_manager.game.service.impl.challengesolved.chain.ChallengeSolvedContext;
 import com.playground.gamification_manager.game.service.impl.challengesolved.chain.ChallengeSolvedHandler;
+import com.playground.gamification_manager.game.service.impl.leaderboard.LeaderBoardConfiguration;
 import com.playground.gamification_manager.game.util.MathUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -11,8 +12,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class TotalScoreHandler implements ChallengeSolvedHandler {
 
-    private static final String LEADERBOARD_KEY = "leaderboard";
-
+    private final LeaderBoardConfiguration leaderBoardConfiguration;
     private final RedisTemplate<String, Object> redisTemplate;
 
     @Override
@@ -32,6 +32,7 @@ public class TotalScoreHandler implements ChallengeSolvedHandler {
 
     private void updateLeaderboard(String userId, long totalScore) {
         var zSetOps = redisTemplate.opsForZSet();
-        zSetOps.add(LEADERBOARD_KEY, userId, totalScore);
+        var key = leaderBoardConfiguration.getKey();
+        zSetOps.add(key, userId, totalScore);
     }
 }

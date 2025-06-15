@@ -6,6 +6,7 @@ import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import com.playground.user_manager.auth.api.dto.RegisteredUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,13 +18,16 @@ public class JwtGenerator {
 
     private final AuthConfig authConfig;
 
-    public String generate(String email) throws JOSEException {
-        var claimSet = createClaimSet(email);
+    public String generate(RegisteredUser registeredUser) throws JOSEException {
+        var email = registeredUser.getEmail();
+        var alias = registeredUser.getAlias();
+        var userId = registeredUser.getUserId();
+        var claimSet = createClaimSet(userId, email, alias);
         var signedJwt = signJwt(claimSet);
         return signedJwt.serialize();
     }
 
-    private JWTClaimsSet createClaimSet(String email) {
+    private JWTClaimsSet createClaimSet(String userId, String email, String alias) {
         var expiration = authConfig.getExpirationTime().toMillis();
         var currentTimeInMillis = System.currentTimeMillis();
 
@@ -32,6 +36,8 @@ public class JwtGenerator {
 
         return new JWTClaimsSet.Builder()
                 .subject(email)
+                .claim("alias", alias)
+                .claim("userId", userId)
                 .issueTime(issueTime)
                 .expirationTime(expirationTime)
                 .build();

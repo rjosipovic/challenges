@@ -1,4 +1,4 @@
-package com.playground.user_manager.user.api.dto;
+package com.playground.user_manager.auth.api.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -9,7 +9,7 @@ import lombok.Value;
 import java.time.LocalDate;
 
 @Value
-public class CreateUserDTO {
+public class RegisterUserDTO {
 
     @NotBlank
     String alias;

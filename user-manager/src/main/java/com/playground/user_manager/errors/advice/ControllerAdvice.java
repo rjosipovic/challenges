@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -28,6 +29,24 @@ public class ControllerAdvice implements ResponseBodyAdvice<Object> {
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType, Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
         response.getHeaders().add("apiVersion", "1.0");
         return body;
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<UserManagerError> handleValidation(MethodArgumentNotValidException ex) {
+        var apiVersion = "1.0";
+        var message = "Validation failed";
+        var errorMessage = ex.getBindingResult().getAllErrors().get(0).getDefaultMessage();
+        var error = new UserManagerError(
+                apiVersion,
+                null,
+                message,
+                null,
+                "invalid",
+                errorMessage,
+                ""
+        );
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(JOSEException.class)
