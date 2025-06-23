@@ -7,6 +7,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -19,6 +20,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 
+@Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final String secret;
@@ -46,7 +48,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     securityContext.setAuthentication(authentication);
                 }
             } catch (ParseException | JOSEException e) {
-                throw new ServletException(e);
+                log.error("Failed to parse JWT token", e);
             }
         }
         filterChain.doFilter(request, response);
@@ -60,7 +62,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         var email = signedJwt.getJWTClaimsSet().getSubject();
         var alias = signedJwt.getJWTClaimsSet().getStringClaim("alias");
         var userId = signedJwt.getJWTClaimsSet().getStringClaim("userId");
-        var userPrincipal = new JwtUserPrincipal(userId, Map.of("alias", alias, "email", email));
+        var userPrincipal = new JwtUserPrincipal(email, Map.of("alias", alias, "userId", userId));
         return new UsernamePasswordAuthenticationToken(userPrincipal, null, Collections.emptyList());
     }
 }

@@ -46,7 +46,7 @@ async function setQuestion() {
             var selectedOperation = localStorage.getItem("selectedOperation");
             document.getElementById("operator").innerHTML = getOperatorSign(selectedOperation);
             document.getElementById("secondNumber").innerHTML = data.secondNumber;
-        } else if (response.status === 403) {
+        } else if (response.status === 401) {
             alert("Access denied. Please log in to play the game.");
             window.location.href = "login.html";
         } else {
@@ -104,7 +104,7 @@ async function submitAnswer() {
             setQuestion();
             clearAnswer();
             populateAttemptsTable(user.id);
-        } else if (response.status === 403) {
+        } else if (response.status === 401) {
             alert("Access denied. Please log in to play the game.");
             window.location.href = "login.html";
         } else {
@@ -164,7 +164,7 @@ async function populateAttemptsTable(userId) {
                 `;
                 tableBody.appendChild(row);
             });
-        } else if (response.status === 403) {
+        } else if (response.status === 401) {
             alert("Access denied. Please log in to play the game.");
             window.location.href = "login.html";
         } else {

@@ -29,7 +29,7 @@ async function populateScoreboardTable() {
                 `;
                 tableBody.innerHTML += rowHtml;
             });
-        } else if (response.status === 403) {
+        } else if (response.status === 401) {
             alert("Access denied. Please log in to view the scoreboard.");
             window.location.href = "login.html";
         } else {
@@ -54,7 +54,7 @@ async function getUserAliasFromId(ids) {
                 acc[user.id] = user.alias;
                 return acc;
             }, {});
-        } else if (response.status === 403) {
+        } else if (response.status === 401) {
             alert("Access denied. Please log in to view the scoreboard.");
             window.location.href = "login.html";
         } else {
