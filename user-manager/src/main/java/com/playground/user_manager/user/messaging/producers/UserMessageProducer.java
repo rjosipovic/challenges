@@ -1,6 +1,8 @@
 package com.playground.user_manager.user.messaging.producers;
 
 import com.playground.user_manager.messaging.callback.CallbackManager;
+import com.playground.user_manager.user.messaging.LifecycleType;
+import com.playground.user_manager.user.messaging.UserLifecycleEvent;
 import com.playground.user_manager.user.messaging.UserMessagingConfiguration;
 import com.playground.user_manager.user.model.User;
 import lombok.RequiredArgsConstructor;
@@ -27,10 +29,11 @@ public class UserMessageProducer {
         log.info("About to publish user created message: {}", user);
         var exchange = userMessagingConfiguration.getExchange();
         var routingKey = userMessagingConfiguration.getUserCreatedRoutingKey();
-        sendMessage(exchange, routingKey, user);
+        var lifecycleEvent = new UserLifecycleEvent(user, LifecycleType.CREATED);
+        sendMessage(exchange, routingKey, lifecycleEvent);
     }
 
-    private void sendMessage(String exchange, String routingKey, User user) {
+    private void sendMessage(String exchange, String routingKey, UserLifecycleEvent userEvent) {
         var correlationId = UUID.randomUUID().toString();
         var correlationData = new CorrelationData(correlationId);
         var messageProperties = MessagePropertiesBuilder.newInstance()
@@ -38,12 +41,12 @@ public class UserMessageProducer {
                 .setHeader("x-exchange", exchange)
                 .setHeader("x-routing-key", routingKey)
                 .build();
-        var message = buildMessage(user, messageProperties);
+        var message = buildMessage(userEvent, messageProperties);
         callbackManager.put(correlationData.getId(), message);
         rabbitTemplate.convertAndSend(exchange, routingKey, message, correlationData);
     }
 
-    private Message buildMessage(User user, MessageProperties messageProperties) {
-        return rabbitTemplate.getMessageConverter().toMessage(user, messageProperties);
+    private Message buildMessage(UserLifecycleEvent userEvent, MessageProperties messageProperties) {
+        return rabbitTemplate.getMessageConverter().toMessage(userEvent, messageProperties);
     }
 }

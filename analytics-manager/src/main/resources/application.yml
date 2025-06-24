@@ -1,0 +1,31 @@
+spring:
+    application:
+        name: analytics-manager
+    rabbitmq:
+      host: ${RABBITMQ_HOST:localhost}
+      port: ${RABBITMQ_PORT:5672}
+      username: ${RABBITMQ_USER:guest}
+      password: ${RABBITMQ_PASSWORD:guest}
+      listener:
+        simple:
+          retry:
+            enabled: true
+            max-attempts: 10
+            initial-interval: 1000
+            multiplier: 4
+            max-interval: 3600000
+          default-requeue-rejected: false
+app:
+  messaging:
+    dead-letter:
+      exchange: dead-letter-exchange
+      binding-key: dead-letter
+      queue: dead-letter-queue
+    user:
+      exchange: user-exchange
+      binding-key: user.*
+      queue: user-queue
+    challenge:
+      exchange: challenge-exchange
+      binding-key: challenge-solved.*
+      queue: challenges-queue

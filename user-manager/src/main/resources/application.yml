@@ -39,8 +39,8 @@ app:
     code-expiration-time: "PT10M"
   messaging:
     user:
-      exchange: user.exchange
-      user-created-routing-key: ${spring.application.name}.user.created
+      exchange: user-exchange
+      user-created-routing-key: user.created
     auth:
       exchange: notifications-exchange
       auth-code-routing-key: notifications

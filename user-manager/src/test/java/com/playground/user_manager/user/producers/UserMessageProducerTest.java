@@ -1,6 +1,7 @@
 package com.playground.user_manager.user.producers;
 
 import com.playground.user_manager.messaging.callback.CallbackManager;
+import com.playground.user_manager.user.messaging.UserLifecycleEvent;
 import com.playground.user_manager.user.messaging.UserMessagingConfiguration;
 import com.playground.user_manager.user.messaging.producers.UserMessageProducer;
 import com.playground.user_manager.user.model.User;
@@ -21,7 +22,6 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -55,7 +55,7 @@ class UserMessageProducerTest {
 
         var messageConverter = mock(MessageConverter.class);
         when(rabbitTemplate.getMessageConverter()).thenReturn(messageConverter);
-        when(messageConverter.toMessage(eq(user), any(MessageProperties.class))).thenReturn(mock(Message.class));
+        when(messageConverter.toMessage(any(UserLifecycleEvent.class), any(MessageProperties.class))).thenReturn(mock(Message.class));
 
         // when
         userMessageProducer.sendUserCreatedMessage(user);

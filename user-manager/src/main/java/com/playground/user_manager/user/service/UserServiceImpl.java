@@ -2,7 +2,6 @@ package com.playground.user_manager.user.service;
 
 import com.playground.user_manager.errors.exceptions.ResourceNotFoundException;
 import com.playground.user_manager.user.dataaccess.UserRepository;
-import com.playground.user_manager.user.messaging.producers.UserMessageProducer;
 import com.playground.user_manager.user.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,7 +15,6 @@ import java.util.stream.StreamSupport;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final UserMessageProducer userMessageProducer;
 
     public List<User> getAllUsers() {
         return StreamSupport.stream(userRepository.findAll().spliterator(), false)
