@@ -25,7 +25,8 @@ public class PublishAttemptHandler implements AttemptHandler {
         var secondNumber = challengeAttempt.getSecondNumber();
         var isCorrect = challengeAttempt.isCorrect();
         var game = challengeAttempt.getGame();
-        var challengeSolved = new ChallengeSolvedEvent(userId, attemptId, firstNumber, secondNumber, isCorrect, game);
+        var attemptDate = challengeAttempt.getAttemptDate();
+        var challengeSolved = new ChallengeSolvedEvent(userId, attemptId, firstNumber, secondNumber, isCorrect, game, attemptDate);
 
         challengeSolvedProducer.publishChallengeSolvedMessage(challengeSolved);
     }

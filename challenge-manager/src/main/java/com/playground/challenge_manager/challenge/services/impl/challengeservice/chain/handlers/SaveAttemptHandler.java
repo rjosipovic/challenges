@@ -32,8 +32,9 @@ public class SaveAttemptHandler implements AttemptHandler {
                 challengeAttempt.getGame(),
                 null
         );
-        var savedAttempt = challengeAttemptRepository.save(challengeAttemptEntity);
+        var savedAttempt = challengeAttemptRepository.saveAndFlush(challengeAttemptEntity);
         var challengeAttemptId = savedAttempt.getId();
-        return challengeAttempt.withChallengeAttemptId(challengeAttemptId);
+        var attemptDate = savedAttempt.getAttemptDate();
+        return challengeAttempt.withChallengeAttemptIdAndAttemptDate(challengeAttemptId, attemptDate);
     }
 }

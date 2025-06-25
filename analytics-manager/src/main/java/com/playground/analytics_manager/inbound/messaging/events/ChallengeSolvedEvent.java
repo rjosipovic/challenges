@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.time.ZonedDateTime;
+
 @Getter
 @ToString
 public class ChallengeSolvedEvent {
@@ -15,6 +17,7 @@ public class ChallengeSolvedEvent {
     private final int secondNumber;
     private final boolean correct;
     private final String game;
+    private final ZonedDateTime attemptDate;
 
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
     public ChallengeSolvedEvent(
@@ -23,7 +26,8 @@ public class ChallengeSolvedEvent {
             @JsonProperty("firstNumber") int firstNumber,
             @JsonProperty("secondNumber") int secondNumber,
             @JsonProperty("correct") boolean correct,
-            @JsonProperty("game") String game
+            @JsonProperty("game") String game,
+            @JsonProperty("attemptDate") ZonedDateTime attemptDate
     ) {
         this.userId = userId;
         this.challengeAttemptId = challengeAttemptId;
@@ -31,5 +35,6 @@ public class ChallengeSolvedEvent {
         this.secondNumber = secondNumber;
         this.correct = correct;
         this.game = game;
+        this.attemptDate = attemptDate;
     }
 }

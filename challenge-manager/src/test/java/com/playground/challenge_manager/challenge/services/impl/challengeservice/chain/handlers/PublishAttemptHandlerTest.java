@@ -51,7 +51,7 @@ class PublishAttemptHandlerTest {
         handler.handle(ctx);
 
         // then
-        var expectedEvent = new ChallengeSolvedEvent(userId.toString(), attemptId.toString(), firstNumber, secondNumber, isCorrect, game);
+        var expectedEvent = new ChallengeSolvedEvent(userId.toString(), attemptId.toString(), firstNumber, secondNumber, isCorrect, game, null);
         verify(challengeSolvedProducer).publishChallengeSolvedMessage(expectedEvent);
     }
 }

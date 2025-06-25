@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @ToString
@@ -20,8 +21,9 @@ public class ChallengeAttempt {
     private int resultAttempt;
     private boolean correct;
     private String game;
+    private ZonedDateTime attemptDate;
 
-    public ChallengeAttempt withChallengeAttemptId(UUID challengeAttemptId) {
-        return new ChallengeAttempt(challengeAttemptId, userId, firstNumber, secondNumber, resultAttempt, correct, game);
+    public ChallengeAttempt withChallengeAttemptIdAndAttemptDate(UUID challengeAttemptId, ZonedDateTime attemptDate) {
+        return new ChallengeAttempt(challengeAttemptId, userId, firstNumber, secondNumber, resultAttempt, correct, game, attemptDate);
     }
 }
