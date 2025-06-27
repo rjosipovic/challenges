@@ -2,7 +2,9 @@ package com.playground.challenge_manager.challenge.services.config;
 
 import com.playground.challenge_manager.challenge.services.impl.ChallengeGeneratorServiceImpl;
 import com.playground.challenge_manager.challenge.services.interfaces.ChallengeGeneratorService;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -30,6 +32,8 @@ public class ChallengeConfig {
 
     @Setter
     @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class DifficultyLevel {
         private String level;
         private int min;

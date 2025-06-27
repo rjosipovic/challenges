@@ -13,5 +13,6 @@ public class ChallengeSolvedEvent {
     int secondNumber;
     boolean correct;
     String game;
+    String difficulty;
     ZonedDateTime attemptDate;
 }

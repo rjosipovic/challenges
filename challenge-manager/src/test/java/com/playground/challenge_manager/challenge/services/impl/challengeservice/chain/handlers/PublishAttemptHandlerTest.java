@@ -34,6 +34,7 @@ class PublishAttemptHandlerTest {
         var secondNumber = 4;
         var isCorrect = true;
         var game = "addition";
+        var difficulty = "easy";
 
         // Mock AttemptVerifierContext and ChallengeAttempt
         var challengeAttempt = mock(ChallengeAttempt.class);
@@ -43,6 +44,7 @@ class PublishAttemptHandlerTest {
         when(challengeAttempt.getSecondNumber()).thenReturn(secondNumber);
         when(challengeAttempt.isCorrect()).thenReturn(isCorrect);
         when(challengeAttempt.getGame()).thenReturn(game);
+        when(challengeAttempt.getDifficulty()).thenReturn(difficulty);
 
         var ctx = mock(AttemptVerifierContext.class);
         when(ctx.getChallengeAttempt()).thenReturn(challengeAttempt);
@@ -51,7 +53,7 @@ class PublishAttemptHandlerTest {
         handler.handle(ctx);
 
         // then
-        var expectedEvent = new ChallengeSolvedEvent(userId.toString(), attemptId.toString(), firstNumber, secondNumber, isCorrect, game, null);
+        var expectedEvent = new ChallengeSolvedEvent(userId.toString(), attemptId.toString(), firstNumber, secondNumber, isCorrect, game, difficulty, null);
         verify(challengeSolvedProducer).publishChallengeSolvedMessage(expectedEvent);
     }
 }

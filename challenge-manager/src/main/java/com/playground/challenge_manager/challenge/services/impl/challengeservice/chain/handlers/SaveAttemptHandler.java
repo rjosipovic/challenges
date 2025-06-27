@@ -30,6 +30,7 @@ public class SaveAttemptHandler implements AttemptHandler {
                 challengeAttempt.getResultAttempt(),
                 challengeAttempt.isCorrect(),
                 challengeAttempt.getGame(),
+                challengeAttempt.getDifficulty(),
                 null
         );
         var savedAttempt = challengeAttemptRepository.saveAndFlush(challengeAttemptEntity);

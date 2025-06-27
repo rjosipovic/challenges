@@ -26,6 +26,9 @@ public class ChallengeEntity {
     @Property("game")
     private String game;
 
+    @Property("difficulty")
+    private String difficulty;
+
     @Relationship(type = "ATTEMPT", direction = Relationship.Direction.INCOMING)
     private UserAttempt userAttempt;
 }

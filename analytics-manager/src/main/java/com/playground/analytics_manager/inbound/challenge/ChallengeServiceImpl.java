@@ -25,6 +25,7 @@ public class ChallengeServiceImpl implements ChallengeService {
         var secondNumber = event.getSecondNumber();
         var correct = event.isCorrect();
         var game = event.getGame();
+        var difficulty = event.getDifficulty();
         var attemptDate = event.getAttemptDate();
 
         var userEntityOptional = userRepository.findById(UUID.fromString(userId));
@@ -39,12 +40,12 @@ public class ChallengeServiceImpl implements ChallengeService {
                 .correct(correct)
                 .user(userEntity)
                 .build();
-        //TODO add difficulty
         var challengeEntity = ChallengeEntity.builder()
                 .id(UUID.fromString(challengeAttemptId))
                 .firstNumber(firstNumber)
                 .secondNumber(secondNumber)
                 .game(game)
+                .difficulty(difficulty)
                 .userAttempt(userAttempt)
                 .build();
 

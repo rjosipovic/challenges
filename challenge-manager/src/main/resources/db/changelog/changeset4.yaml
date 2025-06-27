@@ -1,0 +1,29 @@
+databaseChangeLog:
+  - changeSet:
+      id: 4
+      author: roman
+      changes:
+        - addColumn:
+            tableName: challenge_attempts
+            columns:
+              - column:
+                  name: difficulty
+                  type: VARCHAR(25)
+        - update:
+            tableName: challenge_attempts
+            columns:
+              - column:
+                  name: difficulty
+                  valueComputed: |
+                    CASE
+                      WHEN LENGTH(ABS(first_number)::text) = 1 AND LENGTH(ABS(second_number)::text) = 1 THEN 'easy'
+                      WHEN LENGTH(ABS(first_number)::text) = 2 AND LENGTH(ABS(second_number)::text) = 2 THEN 'medium'
+                      WHEN LENGTH(ABS(first_number)::text) = 3 AND LENGTH(ABS(second_number)::text) = 3 THEN 'hard'
+                      WHEN LENGTH(ABS(first_number)::text) = 4 AND LENGTH(ABS(second_number)::text) = 4 THEN 'expert'
+                      ELSE 'unknown'
+                    END
+        - addNotNullConstraint:
+            tableName: challenge_attempts
+            columnName: difficulty
+            constraintName: challenge_attempts_difficulty_not_null
+            validate: false

@@ -13,13 +13,14 @@ import org.springframework.context.annotation.Configuration;
 @RequiredArgsConstructor
 public class AttemptVerifierConfig {
 
+    private final CheckResultHandler checkResultHandler;
     private final SaveAttemptHandler saveAttemptHandler;
     private final PublishAttemptHandler publishAttemptHandler;
 
     @Bean
     public AttemptVerifierChain attemptVerifierChain() {
         var chain = new AttemptVerifierChain();
-        chain.addHandler(new CheckResultHandler());
+        chain.addHandler(checkResultHandler);
         chain.addHandler(saveAttemptHandler);
         chain.addHandler(publishAttemptHandler);
         chain.addHandler(new AttemptResultHandler());

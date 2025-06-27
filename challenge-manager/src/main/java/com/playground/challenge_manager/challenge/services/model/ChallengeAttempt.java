@@ -21,9 +21,10 @@ public class ChallengeAttempt {
     private int resultAttempt;
     private boolean correct;
     private String game;
+    private String difficulty;
     private ZonedDateTime attemptDate;
 
     public ChallengeAttempt withChallengeAttemptIdAndAttemptDate(UUID challengeAttemptId, ZonedDateTime attemptDate) {
-        return new ChallengeAttempt(challengeAttemptId, userId, firstNumber, secondNumber, resultAttempt, correct, game, attemptDate);
+        return new ChallengeAttempt(challengeAttemptId, userId, firstNumber, secondNumber, resultAttempt, correct, game, difficulty, attemptDate);
     }
 }

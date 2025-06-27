@@ -35,18 +35,19 @@ class SaveAttemptHandlerTest {
         var secondNumber = 23;
         var guess = 2764;
         var game = "multiplication";
+        var difficulty = "easy";
         var attempt = new ChallengeAttemptDTO(userId.toString(), firstNumber, secondNumber, guess, game);
         var ctx = new AttemptVerifierContext(attempt);
-        var challengeAttempt = new ChallengeAttempt(null, userId, firstNumber, secondNumber, guess, false, game, null);
+        var challengeAttempt = new ChallengeAttempt(null, userId, firstNumber, secondNumber, guess, false, game, difficulty, null);
         ctx.setChallengeAttempt(challengeAttempt);
 
-        var entity = new ChallengeAttemptEntity(null, userId, firstNumber, secondNumber, guess, false, game, null);
-        var saved = new ChallengeAttemptEntity(challengeAttemptId, userId, firstNumber, secondNumber, guess, false, game, null);
-        when(challengeAttemptRepository.save(entity)).thenReturn(saved);
+        var entity = new ChallengeAttemptEntity(null, userId, firstNumber, secondNumber, guess, false, game, difficulty, null);
+        var saved = new ChallengeAttemptEntity(challengeAttemptId, userId, firstNumber, secondNumber, guess, false, game, difficulty, null);
+        when(challengeAttemptRepository.saveAndFlush(entity)).thenReturn(saved);
 
         //when
         saveAttemptHandler.handle(ctx);
         //then
-        verify(challengeAttemptRepository, times(1)).save(entity);
+        verify(challengeAttemptRepository, times(1)).saveAndFlush(entity);
     }
 }

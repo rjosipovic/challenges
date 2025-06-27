@@ -3,6 +3,7 @@ package com.playground.challenge_manager.challenge;
 import com.playground.challenge_manager.challenge.api.dto.ChallengeAttemptDTO;
 import com.playground.challenge_manager.challenge.dataaccess.entities.ChallengeAttemptEntity;
 import com.playground.challenge_manager.challenge.dataaccess.repositories.ChallengeAttemptRepository;
+import com.playground.challenge_manager.challenge.services.config.ChallengeConfig;
 import com.playground.challenge_manager.challenge.services.impl.challengeservice.ChallengeServiceImpl;
 import com.playground.challenge_manager.challenge.services.impl.challengeservice.chain.AttemptVerifierChain;
 import com.playground.challenge_manager.challenge.services.impl.challengeservice.chain.handlers.AttemptResultHandler;
@@ -30,14 +31,17 @@ import static org.mockito.Mockito.when;
 class ChallengeServiceImplTest {
 
     @Mock
+    private ChallengeConfig challengeConfig;
+    @Mock
     private ChallengeAttemptRepository challengeAttemptRepository;
     private ChallengeServiceImpl challengeService;
 
     @BeforeEach
     void setUp() {
+        var checkResultHandler = new CheckResultHandler(challengeConfig);
         var saveAttemptHandler = new SaveAttemptHandler(challengeAttemptRepository);
         var chain = new AttemptVerifierChain();
-        chain.addHandler(new CheckResultHandler());
+        chain.addHandler(checkResultHandler);
         chain.addHandler(saveAttemptHandler);
         chain.addHandler(new AttemptResultHandler());
         challengeService = new ChallengeServiceImpl(chain, challengeAttemptRepository);
@@ -52,10 +56,19 @@ class ChallengeServiceImplTest {
         var secondNumber = 23;
         var guess = firstNumber * secondNumber;
         var game = "multiplication";
+        var difficulty = "medium";
         var attemptDto = new ChallengeAttemptDTO(userId.toString(), firstNumber, secondNumber, guess, game);
-        var attemptEntity = new ChallengeAttemptEntity(null, userId, firstNumber, secondNumber, guess, true, game, null);
-        var savedAttemptEntity = new ChallengeAttemptEntity(challengeAttemptId, userId, firstNumber, secondNumber, guess, true, game, null);
-        when(challengeAttemptRepository.save(attemptEntity)).thenReturn(savedAttemptEntity);
+        var attemptEntity = new ChallengeAttemptEntity(null, userId, firstNumber, secondNumber, guess, true, game, difficulty, null);
+        var savedAttemptEntity = new ChallengeAttemptEntity(challengeAttemptId, userId, firstNumber, secondNumber, guess, true, game, null, null);
+        when(challengeAttemptRepository.saveAndFlush(attemptEntity)).thenReturn(savedAttemptEntity);
+        when(challengeConfig.getDifficultyLevels()).thenReturn(
+                List.of(
+                        new ChallengeConfig.DifficultyLevel("easy", 1, 9),
+                        new ChallengeConfig.DifficultyLevel("medium", 10, 99),
+                        new ChallengeConfig.DifficultyLevel("hard", 100, 999),
+                        new ChallengeConfig.DifficultyLevel("expert", 1000, 9999)
+                )
+        );
 
         //when
         var result = challengeService.verifyAttempt(attemptDto);
@@ -70,8 +83,8 @@ class ChallengeServiceImplTest {
                 () -> assertTrue(result.isCorrect())
         );
 
-        verify(challengeAttemptRepository).save(
-                new ChallengeAttemptEntity(null, userId, firstNumber, secondNumber, guess, true, game, null)
+        verify(challengeAttemptRepository).saveAndFlush(
+                new ChallengeAttemptEntity(null, userId, firstNumber, secondNumber, guess, true, game, difficulty, null)
         );
     }
 
@@ -85,10 +98,19 @@ class ChallengeServiceImplTest {
         var guess = firstNumber * secondNumber + 1;
         var correctResult = firstNumber * secondNumber;
         var game = "multiplication";
+        var difficulty = "medium";
         var attempt = new ChallengeAttemptDTO(userId.toString(), firstNumber, secondNumber, guess, game);
-        var attemptEntity = new ChallengeAttemptEntity(null, userId, firstNumber, secondNumber, guess, false, game, null);
-        var savedAttemptEntity = new ChallengeAttemptEntity(challengeAttemptId, userId, firstNumber, secondNumber, guess, false, game, null);
-        when(challengeAttemptRepository.save(attemptEntity)).thenReturn(savedAttemptEntity);
+        var attemptEntity = new ChallengeAttemptEntity(null, userId, firstNumber, secondNumber, guess, false, game, difficulty, null);
+        var savedAttemptEntity = new ChallengeAttemptEntity(challengeAttemptId, userId, firstNumber, secondNumber, guess, false, game, null, null);
+        when(challengeAttemptRepository.saveAndFlush(attemptEntity)).thenReturn(savedAttemptEntity);
+        when(challengeConfig.getDifficultyLevels()).thenReturn(
+                List.of(
+                        new ChallengeConfig.DifficultyLevel("easy", 1, 9),
+                        new ChallengeConfig.DifficultyLevel("medium", 10, 99),
+                        new ChallengeConfig.DifficultyLevel("hard", 100, 999),
+                        new ChallengeConfig.DifficultyLevel("expert", 1000, 9999)
+                )
+        );
 
         //when
         var result = challengeService.verifyAttempt(attempt);
@@ -103,7 +125,7 @@ class ChallengeServiceImplTest {
                 () -> assertFalse(result.isCorrect())
         );
 
-        verify(challengeAttemptRepository).save(attemptEntity);
+        verify(challengeAttemptRepository).saveAndFlush(attemptEntity);
     }
 
     @Test
@@ -127,7 +149,8 @@ class ChallengeServiceImplTest {
         var userId = UUID.randomUUID();
         var attemptId = UUID.randomUUID();
         var game = "multiplication";
-        var attempt = new ChallengeAttemptEntity(attemptId, userId, 1, 2, 3, true, game,  ZonedDateTime.now().minusDays(1));
+        var difficulty = "easy";
+        var attempt = new ChallengeAttemptEntity(attemptId, userId, 1, 2, 3, true, game, difficulty, ZonedDateTime.now().minusDays(1));
         when(challengeAttemptRepository.findLast10AttemptsByUser(userId)).thenReturn(List.of(attempt));
         //when
         var result = challengeService.findLast10AttemptsForUser(userId);

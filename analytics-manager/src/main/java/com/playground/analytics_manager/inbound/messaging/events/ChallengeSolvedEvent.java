@@ -17,6 +17,7 @@ public class ChallengeSolvedEvent {
     private final int secondNumber;
     private final boolean correct;
     private final String game;
+    private final String difficulty;
     private final ZonedDateTime attemptDate;
 
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
@@ -27,6 +28,7 @@ public class ChallengeSolvedEvent {
             @JsonProperty("secondNumber") int secondNumber,
             @JsonProperty("correct") boolean correct,
             @JsonProperty("game") String game,
+            @JsonProperty("difficulty") String difficulty,
             @JsonProperty("attemptDate") ZonedDateTime attemptDate
     ) {
         this.userId = userId;
@@ -35,6 +37,7 @@ public class ChallengeSolvedEvent {
         this.secondNumber = secondNumber;
         this.correct = correct;
         this.game = game;
+        this.difficulty = difficulty;
         this.attemptDate = attemptDate;
     }
 }

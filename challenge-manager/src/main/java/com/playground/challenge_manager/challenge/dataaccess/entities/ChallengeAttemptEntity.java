@@ -34,6 +34,8 @@ public class ChallengeAttemptEntity {
     private boolean correct;
     @Column(name = "game")
     private String game;
+    @Column(name = "difficulty")
+    private String difficulty;
     @CreationTimestamp
     @Column(name = "attempt_date")
     private ZonedDateTime attemptDate;
