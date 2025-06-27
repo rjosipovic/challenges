@@ -1,10 +1,10 @@
 package com.playground.gamification_manager.game.util;
 
-public final class MathUtil {
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
-    private MathUtil() {
-        throw new AssertionError("Utility class can not be instantiated");
-    }
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class MathUtil {
 
     public static int getDigitCount(int number) {
         if (number == 0) return 1;
