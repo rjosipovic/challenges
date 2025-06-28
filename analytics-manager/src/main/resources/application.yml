@@ -21,7 +21,16 @@ spring:
         username: ${NEO4J_USER:neo4j}
         password: ${NEO4J_PASSWORD:neo4jlocal}
       database: ${NEO4J_DATABASE:neo4j}
+server:
+  port: 8084
 app:
+  cors:
+    allowed-origins: ${ALLOWED_ORIGINS:http://127.0.0.1:3000}
+    allowed-methods: GET,POST,PUT,DELETE
+    allowed-headers: Authorization,Content-Type,X-Requested-With,Accept,Origin,Access-Control-Request-Method,Access-Control-Request-Headers,Access-Control-Allow-Origin
+  auth:
+    secret: ${AUTH_SECRET:}
+    expiration-time: "PT6H"
   messaging:
     dead-letter:
       exchange: dead-letter-exchange
