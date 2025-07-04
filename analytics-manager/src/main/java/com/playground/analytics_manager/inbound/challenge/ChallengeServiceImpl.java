@@ -6,7 +6,9 @@ import com.playground.analytics_manager.dataaccess.repository.ChallengeRepositor
 import com.playground.analytics_manager.dataaccess.repository.UserRepository;
 import com.playground.analytics_manager.inbound.messaging.events.ChallengeSolvedEvent;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -16,8 +18,10 @@ public class ChallengeServiceImpl implements ChallengeService {
 
     private final ChallengeRepository challengeRepository;
     private final UserRepository userRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
+    @Transactional
     public void process(ChallengeSolvedEvent event) {
         var userId = event.getUserId();
         var challengeAttemptId = event.getChallengeAttemptId();
@@ -50,5 +54,6 @@ public class ChallengeServiceImpl implements ChallengeService {
                 .build();
 
         challengeRepository.save(challengeEntity);
+        applicationEventPublisher.publishEvent(event);
     }
 }

@@ -1,6 +1,7 @@
 const ERROR_MSG = "Something went wrong. Please try again.";
 const CHALLENGE_API = 'http://localhost:8080/challenges';
 const ATTEMPT_API = 'http://localhost:8080/attempts';
+const STATISTICS_API = 'http://localhost:8084/statistics/user';
 
 setUser();
 
@@ -8,11 +9,14 @@ setGame();
 
 setQuestion();
 
+fetchStatistics();
+
 let selectedOperation = null;
 
 function setUser() {
     var user = JSON.parse(localStorage.getItem("alias"));
     document.getElementById("alias").innerHTML = user.alias;
+    document.getElementById("stat-alias").innerHTML = user.alias;
 }
 
 function setGame() {
@@ -133,6 +137,142 @@ function getOperatorSign(selectedOperation) {
         case "division":
             return "/";
     }
+}
+
+async function fetchStatistics() {
+    const user = JSON.parse(localStorage.getItem("alias"));
+    console.log("About to fetch statistics for user:" + user.alias);
+
+    const apiUrl = STATISTICS_API;
+    const token = localStorage.getItem("token");
+
+    try {
+        const response = await fetch(apiUrl, {
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log('Got statistics:', data);
+            showOverallStatistics(data.overall);
+            showGameStatistics(data.byGame);
+            showByDifficultyStatistics(data.byDifficulty);
+
+        } else if (response.status === 401) {
+            alert("Access denied. Please log in to view the scoreboard.");
+            window.location.href = "login.html";
+        } else {
+            const errorData = await response.json();
+            console.error('Error fetching statistics:', errorData);
+        }
+
+    } catch (error) {
+        console.error('Error fetching statistics:', error);
+    }
+}
+
+function showOverallStatistics(overallStats) {
+    buildStatTable(overallStats, 'overall-stats-table', 'OVERALL', 'overall-head-name');
+}
+
+function showGameStatistics(byGameStats) {
+    const additionStats = byGameStats['addition'];
+    const subtractionStats = byGameStats['subtraction'];
+    const multiplicationStats = byGameStats['multiplication'];
+    const divisionStats = byGameStats['division'];
+
+    if (additionStats != null) {
+        buildStatTable(additionStats, 'addition-stats-table', 'ADDITION', 'addition-head-name');
+    } else {
+        const additionTable = document.getElementById('addition-stats-table');
+        additionTable.classList.add('hidden');
+    }
+    if (subtractionStats != null) {
+        buildStatTable(subtractionStats, 'subtraction-stats-table', 'SUBTRACTION', 'subtraction-head-name');
+    } else {
+        const subtractionTable = document.getElementById('subtraction-stats-table');
+        subtractionTable.classList.add('hidden');
+    }
+    if (multiplicationStats != null) {
+        buildStatTable(multiplicationStats, 'multiplication-stats-table', 'MULTIPLICATION', 'multiplication-head-name');
+    } else {
+        const multiplicationTable = document.getElementById('multiplication-stats-table');
+        multiplicationTable.classList.add('hidden');
+    }
+    if (divisionStats != null) {
+        buildStatTable(divisionStats, 'division-stats-table', 'DIVISION', 'division-head-name');
+    } else {
+        const divisionTable = document.getElementById('division-stats-table');
+        divisionTable.classList.add('hidden');
+    }
+}
+
+function showByDifficultyStatistics(byDifficultyStats) {
+    const easyStats = byDifficultyStats['easy'];
+    const mediumStats = byDifficultyStats['medium'];
+    const hardStats = byDifficultyStats['hard'];
+    const expertStats = byDifficultyStats['expert'];
+
+    if (easyStats != null) {
+        buildStatTable(easyStats, 'easy-stats-table', 'EASY', 'easy-head-name');
+    } else {
+        const easyTable = document.getElementById('easy-stats-table');
+        easyTable.classList.add('hidden');
+    }
+    if (mediumStats != null) {
+        buildStatTable(mediumStats, 'medium-stats-table', 'MEDIUM', 'medium-head-name');
+    } else {
+        const mediumTable = document.getElementById('medium-stats-table');
+        mediumTable.classList.add('hidden');
+    }
+    if (hardStats != null) {
+        buildStatTable(hardStats, 'hard-stats-table', 'HARD', 'hard-head-name');
+    } else {
+        const hardTable = document.getElementById('hard-stats-table');
+        hardTable.classList.add('hidden');
+    }
+    if (expertStats != null) {
+        buildStatTable(expertStats, 'expert-stats-table', 'EXPERT', 'expert-head-name');
+    } else {
+        const expertTable = document.getElementById('expert-stats-table');
+        expertTable.classList.add('hidden');
+    }
+}
+
+function buildStatTable(stat, tableName, headerName, headerId) {
+    const table = document.getElementById(tableName);
+    const overallHeadName = document.getElementById(headerId);
+    overallHeadName.innerHTML = headerName;
+
+    const tableBody = table.querySelector("tbody");
+    tableBody.innerHTML = "";
+    const totalAttempts = stat.totalAttempts;
+    const correctAttempts = stat.correctAttempts;
+    const successRate = correctAttempts / totalAttempts * 100;
+            
+    const totalRow = document.createElement("tr");
+    totalRow.innerHTML = `
+    <td class="border border-gray-300 px-4 py-2">TOTAL</td>
+    <td class="border border-gray-300 px-4 py-2"><span id="total-attempts">${totalAttempts}</span></td>
+    `;
+
+    const correctRow = document.createElement("tr");
+    correctRow.innerHTML = `
+    <td class="border border-gray-300 px-4 py-2">CORRECT</td>
+    <td class="border border-gray-300 px-4 py-2"><span id="total-attempts">${correctAttempts}</span></td>
+    `;
+
+    const successRateRow = document.createElement("tr");
+    successRateRow.innerHTML = `
+    <td class="border border-gray-300 px-4 py-2">RATE</td>
+    <td class="border border-gray-300 px-4 py-2"><span id="total-attempts">${successRate.toFixed(2)}%</span></td>
+    `;
+            
+    tableBody.appendChild(totalRow);
+    tableBody.appendChild(correctRow);
+    tableBody.appendChild(successRateRow);
 }
 
 async function populateAttemptsTable(userId) {
