@@ -35,9 +35,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain
     ) throws ServletException, IOException {
+        String token = null;
         var header = request.getHeader("Authorization");
         if (StringUtils.hasText(header) && header.startsWith("Bearer ")) {
-            var token = header.substring(7);
+            token = header.substring(7);
+        } else {
+            token = request.getParameter("access_token");
+        }
+        if (StringUtils.hasText(token)) {
             try {
                 var signedJwt = SignedJWT.parse(token);
                 var valid = signedJwt.verify(new MACVerifier(secret));

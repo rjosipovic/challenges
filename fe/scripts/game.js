@@ -2,6 +2,7 @@ const ERROR_MSG = "Something went wrong. Please try again.";
 const CHALLENGE_API = 'http://localhost:8080/challenges';
 const ATTEMPT_API = 'http://localhost:8080/attempts';
 const STATISTICS_API = 'http://localhost:8084/statistics/user';
+const STATISTICS_EMITTER_API = 'http://localhost:8084/statistics/user/subscribe';
 
 setUser();
 
@@ -10,6 +11,8 @@ setGame();
 setQuestion();
 
 fetchStatistics();
+
+statsSubscribe()
 
 let selectedOperation = null;
 
@@ -156,9 +159,8 @@ async function fetchStatistics() {
         if (response.ok) {
             const data = await response.json();
             console.log('Got statistics:', data);
-            showOverallStatistics(data.overall);
-            showGameStatistics(data.byGame);
-            showByDifficultyStatistics(data.byDifficulty);
+            localStorage.setItem('statistics', JSON.stringify(data));
+            showStatistics();
 
         } else if (response.status === 401) {
             alert("Access denied. Please log in to view the scoreboard.");
@@ -173,6 +175,13 @@ async function fetchStatistics() {
     }
 }
 
+function showStatistics() {
+    const stats = JSON.parse(localStorage.getItem('statistics'));
+    showOverallStatistics(stats.overall);
+    showGameStatistics(stats.byGame);
+    showByDifficultyStatistics(stats.byDifficulty);
+}
+
 function showOverallStatistics(overallStats) {
     buildStatTable(overallStats, 'overall-stats-table', 'OVERALL', 'overall-head-name');
 }
@@ -184,24 +193,32 @@ function showGameStatistics(byGameStats) {
     const divisionStats = byGameStats['division'];
 
     if (additionStats != null) {
+        const additionTable = document.getElementById('addition-stats-table');
+        additionTable.classList.remove('hidden');
         buildStatTable(additionStats, 'addition-stats-table', 'ADDITION', 'addition-head-name');
     } else {
         const additionTable = document.getElementById('addition-stats-table');
         additionTable.classList.add('hidden');
     }
     if (subtractionStats != null) {
+        const subtractionTable = document.getElementById('subtraction-stats-table');
+        subtractionTable.classList.remove('hidden');
         buildStatTable(subtractionStats, 'subtraction-stats-table', 'SUBTRACTION', 'subtraction-head-name');
     } else {
         const subtractionTable = document.getElementById('subtraction-stats-table');
         subtractionTable.classList.add('hidden');
     }
     if (multiplicationStats != null) {
+        const multiplicationTable = document.getElementById('multiplication-stats-table');
+        multiplicationTable.classList.remove('hidden');
         buildStatTable(multiplicationStats, 'multiplication-stats-table', 'MULTIPLICATION', 'multiplication-head-name');
     } else {
         const multiplicationTable = document.getElementById('multiplication-stats-table');
         multiplicationTable.classList.add('hidden');
     }
     if (divisionStats != null) {
+        const divisionTable = document.getElementById('division-stats-table');
+        divisionTable.classList.remove('hidden');
         buildStatTable(divisionStats, 'division-stats-table', 'DIVISION', 'division-head-name');
     } else {
         const divisionTable = document.getElementById('division-stats-table');
@@ -216,24 +233,32 @@ function showByDifficultyStatistics(byDifficultyStats) {
     const expertStats = byDifficultyStats['expert'];
 
     if (easyStats != null) {
+        const easyTable = document.getElementById('easy-stats-table');
+        easyTable.classList.remove('hidden');
         buildStatTable(easyStats, 'easy-stats-table', 'EASY', 'easy-head-name');
     } else {
         const easyTable = document.getElementById('easy-stats-table');
         easyTable.classList.add('hidden');
     }
     if (mediumStats != null) {
+        const mediumTable = document.getElementById('medium-stats-table');
+        mediumTable.classList.remove('hidden');
         buildStatTable(mediumStats, 'medium-stats-table', 'MEDIUM', 'medium-head-name');
     } else {
         const mediumTable = document.getElementById('medium-stats-table');
         mediumTable.classList.add('hidden');
     }
     if (hardStats != null) {
+        const hardTable = document.getElementById('hard-stats-table');
+        hardTable.classList.remove('hidden');
         buildStatTable(hardStats, 'hard-stats-table', 'HARD', 'hard-head-name');
     } else {
         const hardTable = document.getElementById('hard-stats-table');
         hardTable.classList.add('hidden');
     }
     if (expertStats != null) {
+        const expertTable = document.getElementById('expert-stats-table');
+        expertTable.classList.remove('hidden');
         buildStatTable(expertStats, 'expert-stats-table', 'EXPERT', 'expert-head-name');
     } else {
         const expertTable = document.getElementById('expert-stats-table');
@@ -251,7 +276,7 @@ function buildStatTable(stat, tableName, headerName, headerId) {
     const totalAttempts = stat.totalAttempts;
     const correctAttempts = stat.correctAttempts;
     const successRate = correctAttempts / totalAttempts * 100;
-            
+
     const totalRow = document.createElement("tr");
     totalRow.innerHTML = `
     <td class="border border-gray-300 px-4 py-2">TOTAL</td>
@@ -269,7 +294,7 @@ function buildStatTable(stat, tableName, headerName, headerId) {
     <td class="border border-gray-300 px-4 py-2">RATE</td>
     <td class="border border-gray-300 px-4 py-2"><span id="total-attempts">${successRate.toFixed(2)}%</span></td>
     `;
-            
+
     tableBody.appendChild(totalRow);
     tableBody.appendChild(correctRow);
     tableBody.appendChild(successRateRow);
@@ -316,3 +341,108 @@ async function populateAttemptsTable(userId) {
         console.warn('Error getting attempts history:', error);
     }
 }
+
+function statsSubscribe() {
+    const token = localStorage.getItem("token");
+    const eventSourceUrl = new URL(STATISTICS_EMITTER_API);
+    eventSourceUrl.searchParams.append("access_token", token);
+
+    const eventSource = new EventSource(eventSourceUrl.toString(), { withCredentials: true });
+    eventSource.onmessage = function (event) {
+        const update = JSON.parse(event.data);
+        const stats = JSON.parse(localStorage.getItem('statistics'));
+        console.log('Received update:', update);
+        updateOverallStats(stats, update);
+        updateOnDifficultyStats(stats, update);
+        updateByGameStats(stats, update);
+        localStorage.setItem('statistics', JSON.stringify(stats));
+        showStatistics();
+    }
+    eventSource.onerror = function (err) {
+        console.error("SSE error:", err);
+    }
+}
+function updateOverallStats(stats, update) {
+    stats.overall.totalAttempts += 1;
+    if (update.success) {
+        stats.overall.correctAttempts += 1;
+    }
+}
+
+function updateOnDifficultyStats(stats, update) {
+    var difficulty = update.difficulty;
+    switch (difficulty) {
+        case "easy":
+            var easyStats = stats.byDifficulty['easy'];
+            if (easyStats == null) {
+                stats.byDifficulty['easy'] = {
+                    totalAttempts: 0,
+                    correctAttempts: 0
+                }
+                easyStats = stats.byDifficulty['easy'];
+            }
+            easyStats.totalAttempts += 1;
+            if (update.success) {
+                easyStats.correctAttempts += 1;
+            }
+            break;
+        case "medium":
+            var mediumStats = stats.byDifficulty['medium'];
+            if (mediumStats == null) {
+                stats.byDifficulty['medium'] = {
+                    totalAttempts: 0,
+                    correctAttempts: 0
+                }
+                mediumStats = stats.byDifficulty['medium'];
+            }
+            mediumStats.totalAttempts += 1;
+            if (update.success) {
+                mediumStats.correctAttempts += 1;
+            }
+            break;
+        case "hard":
+            var hardStats = stats.byDifficulty['hard'];
+            if (hardStats == null) {
+                stats.byDifficulty['hard'] = {
+                    totalAttempts: 0,
+                    correctAttempts: 0
+                }
+                hardStats = stats.byDifficulty['hard'];
+            }
+            hardStats.totalAttempts += 1;
+            if (update.success) {
+                hardStats.correctAttempts += 1;
+            }
+            break;
+        case "expert":
+            var expertStats = stats.byDifficulty['expert'];
+            if (expertStats == null) {
+                stats.byDifficulty['expert'] = {
+                    totalAttempts: 0,
+                    correctAttempts: 0
+                }
+                expertStats = stats.byDifficulty['expert'];
+            }
+            expertStats.totalAttempts += 1;
+            if (update.success) {
+                expertStats.correctAttempts += 1;
+            }
+    }
+}
+
+function updateByGameStats(stats, update) {
+    var game = update.game;
+    var gameStats = stats.byGame[game];
+    if (gameStats == null) {
+        stats.byGame[game] = {
+            totalAttempts: 0,
+            correctAttempts: 0
+        }
+        gameStats = stats.byGame[game];
+    }
+    gameStats.totalAttempts += 1;
+    if (update.success) {
+        gameStats.correctAttempts += 1;
+    }
+}
+

@@ -66,7 +66,7 @@ public class SecurityConfig {
         config.setAllowedOrigins(Arrays.stream(allowedOrigins).toList());
         config.setAllowedMethods(Arrays.stream(allowedMethods).toList());
         config.setAllowedHeaders(Arrays.stream(allowedHeaders).toList());
-        config.setAllowCredentials(false);
+        config.setAllowCredentials(true);
 
         var source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);

@@ -76,6 +76,7 @@ async function login() {
             const data = await response.json();
             console.log('Token:', data);
             localStorage.setItem('token', data.token);
+            alert('Login successful.');
             window.location.href = "challenges.html";
         } else if (response.status === 404) {
             const errorData = await response.json();

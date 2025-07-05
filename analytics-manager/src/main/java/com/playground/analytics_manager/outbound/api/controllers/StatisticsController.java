@@ -34,7 +34,7 @@ public class StatisticsController {
         return ResponseEntity.ok(userStatistics);
     }
 
-    @GetMapping("/user/emitter")
+    @GetMapping("/user/subscribe")
     public SseEmitter emmit(Authentication authentication) {
         var principal = (JwtUserPrincipal) authentication.getPrincipal();
         var userId = principal.getClaims().get("userId").toString();
