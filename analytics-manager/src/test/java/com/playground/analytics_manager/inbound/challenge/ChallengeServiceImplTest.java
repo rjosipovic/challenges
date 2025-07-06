@@ -11,6 +11,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.time.ZonedDateTime;
 import java.util.Optional;
@@ -31,6 +32,8 @@ class ChallengeServiceImplTest {
     private ChallengeRepository challengeRepository;
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private ApplicationEventPublisher applicationEventPublisher;
     @InjectMocks
     private ChallengeServiceImpl challengeService;
 
@@ -59,6 +62,7 @@ class ChallengeServiceImplTest {
         //then
         var captor = ArgumentCaptor.forClass(ChallengeEntity.class);
         verify(challengeRepository).save(captor.capture());
+        verify(applicationEventPublisher).publishEvent(event);
         var saved = captor.getValue();
 
         assertAll(
@@ -96,5 +100,6 @@ class ChallengeServiceImplTest {
 
         //then
         verify(challengeRepository, never()).save(any());
+        verify(applicationEventPublisher, never()).publishEvent(any());
     }
 }
