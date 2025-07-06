@@ -76,6 +76,7 @@ async function login() {
             const data = await response.json();
             console.log('Token:', data);
             localStorage.setItem('token', data.token);
+            setUser();
             alert('Login successful.');
             window.location.href = "challenges.html";
         } else if (response.status === 404) {
@@ -97,4 +98,22 @@ async function login() {
         alert(ERROR_MSG);
         console.error('Login failed:', error);
     }
+}
+
+function setUser() {
+    const token = localStorage.getItem("token");
+
+    if (token) {
+        const base64Url = token.split(".")[1];//get the payload part of the JWT
+        const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/"); //convert base64url to base64
+        const payload = atob(base64);
+        const userExtended = JSON.parse(payload);
+        const user = {
+            alias: userExtended.alias,
+            userId: userExtended.userId,
+            email: userExtended.sub
+        };
+        localStorage.setItem("alias", JSON.stringify(user));
+    }
+
 }

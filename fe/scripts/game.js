@@ -370,63 +370,17 @@ function updateOverallStats(stats, update) {
 }
 
 function updateOnDifficultyStats(stats, update) {
-    var difficulty = update.difficulty;
-    switch (difficulty) {
-        case "easy":
-            var easyStats = stats.byDifficulty['easy'];
-            if (easyStats == null) {
-                stats.byDifficulty['easy'] = {
-                    totalAttempts: 0,
-                    correctAttempts: 0
-                }
-                easyStats = stats.byDifficulty['easy'];
-            }
-            easyStats.totalAttempts += 1;
-            if (update.success) {
-                easyStats.correctAttempts += 1;
-            }
-            break;
-        case "medium":
-            var mediumStats = stats.byDifficulty['medium'];
-            if (mediumStats == null) {
-                stats.byDifficulty['medium'] = {
-                    totalAttempts: 0,
-                    correctAttempts: 0
-                }
-                mediumStats = stats.byDifficulty['medium'];
-            }
-            mediumStats.totalAttempts += 1;
-            if (update.success) {
-                mediumStats.correctAttempts += 1;
-            }
-            break;
-        case "hard":
-            var hardStats = stats.byDifficulty['hard'];
-            if (hardStats == null) {
-                stats.byDifficulty['hard'] = {
-                    totalAttempts: 0,
-                    correctAttempts: 0
-                }
-                hardStats = stats.byDifficulty['hard'];
-            }
-            hardStats.totalAttempts += 1;
-            if (update.success) {
-                hardStats.correctAttempts += 1;
-            }
-            break;
-        case "expert":
-            var expertStats = stats.byDifficulty['expert'];
-            if (expertStats == null) {
-                stats.byDifficulty['expert'] = {
-                    totalAttempts: 0,
-                    correctAttempts: 0
-                }
-                expertStats = stats.byDifficulty['expert'];
-            }
-            expertStats.totalAttempts += 1;
-            if (update.success) {
-                expertStats.correctAttempts += 1;
-            }
+    var difficultyStats = stats.byDifficulty[update.difficulty];
+    if (difficultyStats == null) {
+        stats.byDifficulty[update.difficulty] = {
+            totalAttempts: 0,
+            correctAttempts: 0
+        }
+        difficultyStats = stats.byDifficulty[update.difficulty];
+    }
+    difficultyStats.totalAttempts += 1;
+    if (update.success) {
+        difficultyStats.correctAttempts += 1;
     }
 }
 
