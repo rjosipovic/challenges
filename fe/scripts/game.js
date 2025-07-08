@@ -275,7 +275,10 @@ function buildStatTable(stat, tableName, headerName, headerId) {
     tableBody.innerHTML = "";
     const totalAttempts = stat.totalAttempts;
     const correctAttempts = stat.correctAttempts;
-    const successRate = correctAttempts / totalAttempts * 100;
+    let successRate = 0;
+    if (totalAttempts > 0) {
+        successRate = correctAttempts / totalAttempts * 100;
+    }
 
     const totalRow = document.createElement("tr");
     totalRow.innerHTML = `
