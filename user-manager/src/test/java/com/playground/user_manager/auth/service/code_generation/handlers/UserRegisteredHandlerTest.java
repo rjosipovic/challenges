@@ -2,7 +2,7 @@ package com.playground.user_manager.auth.service.code_generation.handlers;
 
 import com.playground.user_manager.auth.service.RegistrationService;
 import com.playground.user_manager.auth.service.code_generation.CodeGenerationContext;
-import com.playground.user_manager.errors.exceptions.ResourceNotFoundException;
+import com.playground.user_manager.errors.exceptions.UserNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -43,6 +43,6 @@ class UserRegisteredHandlerTest {
         when(registrationService.isRegistered(email)).thenReturn(false);
 
         // when/then
-        assertThrows(ResourceNotFoundException.class, () -> handler.handle(ctx));
+        assertThrows(UserNotFoundException.class, () -> handler.handle(ctx));
     }
 }

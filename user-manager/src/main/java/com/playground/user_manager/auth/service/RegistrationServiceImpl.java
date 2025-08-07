@@ -2,7 +2,7 @@ package com.playground.user_manager.auth.service;
 
 import com.playground.user_manager.auth.api.dto.RegisterUserDTO;
 import com.playground.user_manager.auth.api.dto.RegisteredUser;
-import com.playground.user_manager.errors.exceptions.ResourceAlreadyExistsException;
+import com.playground.user_manager.errors.exceptions.UserAlreadyExistsException;
 import com.playground.user_manager.user.dataaccess.UserEntity;
 import com.playground.user_manager.user.dataaccess.UserRepository;
 import com.playground.user_manager.user.messaging.producers.UserMessageProducer;
@@ -24,10 +24,8 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Transactional
     public void register(RegisterUserDTO registerUserDTO) {
         var alias = registerUserDTO.getAlias();
-        if (userRepository.findByAlias(alias).isPresent()) {
-            throw new ResourceAlreadyExistsException("User with alias " + alias + " already exists", "user");
-        }
         var email = registerUserDTO.getEmail();
+        verifyUniqueness(alias, email);
         var birthdate = registerUserDTO.getBirthdate();
         var gender = registerUserDTO.getGender();
         var userEntity = UserEntity.builder()
@@ -39,6 +37,15 @@ public class RegistrationServiceImpl implements RegistrationService {
         var savedUserEntity = userRepository.save(userEntity);
         var user = new User(savedUserEntity.getId().toString(), savedUserEntity.getAlias());
         publishUserCreatedMessage(user);
+    }
+
+    private void verifyUniqueness(String alias, String email) {
+        if (userRepository.findByAlias(alias).isPresent()) {
+            throw new UserAlreadyExistsException(String.format("User with alias: %s already exists", alias));
+        }
+        if (userRepository.findByEmail(email).isPresent()) {
+            throw new UserAlreadyExistsException(String.format("User with email: %s already exists", email));
+        }
     }
 
     @Override

@@ -12,9 +12,9 @@ import org.springframework.context.annotation.Configuration;
 @RequiredArgsConstructor
 public class CodeGenerationChainConfig {
 
+    private final UserRegisteredHandler userRegisteredHandler;
     private final CodeSaverHandler codeSaverHandler;
     private final CodeSenderHandler codeSenderHandler;
-    private final UserRegisteredHandler userRegisteredHandler;
 
     @Bean
     public CodeGenerationChain codeGenerationChain() {

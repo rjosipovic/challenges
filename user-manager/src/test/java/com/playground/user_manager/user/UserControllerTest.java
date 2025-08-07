@@ -3,10 +3,8 @@ package com.playground.user_manager.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.playground.user_manager.errors.advice.ControllerAdvice;
-import com.playground.user_manager.errors.controller.ErrorController;
 import com.playground.user_manager.errors.custom.UserManagerError;
-import com.playground.user_manager.errors.custom.UserManagerErrorAttributes;
-import com.playground.user_manager.errors.exceptions.ResourceNotFoundException;
+import com.playground.user_manager.errors.exceptions.UserNotFoundException;
 import com.playground.user_manager.user.api.controllers.UserController;
 import com.playground.user_manager.user.api.dto.CreateUserDTO;
 import com.playground.user_manager.user.model.User;
@@ -55,7 +53,7 @@ class UserControllerTest {
         JacksonTester.initFields(this, objectMapper);
 
         mockMvc = MockMvcBuilders
-                .standaloneSetup(userController, new ErrorController(new UserManagerErrorAttributes("1.0", "")))
+                .standaloneSetup(userController)
                 .setControllerAdvice(new ControllerAdvice())
                 .build();
     }
@@ -88,17 +86,13 @@ class UserControllerTest {
 
         //given
         var alias = "test-user";
-        var apiVersion = "1.0";
-        var code = "NE-001";
-        var message = "Resource not found";
-        var domain = "user";
-        var reason = "not found";
-        var errorMessage = "User with alias " + alias + " not found";
-        var errorReportUri = "";
-        var ex = new ResourceNotFoundException(errorMessage, domain);
+        var code = "U001";
+        var message = "User not found";
+        var reason = "User with alias " + alias + " not found";
+        var ex = new UserNotFoundException(reason);
         when(userService.getUserByAlias(alias)).thenThrow(ex);
 
-        var error = new UserManagerError(apiVersion, code, message, domain, reason, errorMessage, errorReportUri);
+        var error = new UserManagerError(message, code, reason);
 
         //when
         var res = mockMvc.perform(get(String.format("/users/alias/%s", alias)))

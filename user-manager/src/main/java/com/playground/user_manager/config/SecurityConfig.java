@@ -2,9 +2,7 @@ package com.playground.user_manager.config;
 
 import com.playground.user_manager.auth.filters.JwtAuthenticationFilter;
 import com.playground.user_manager.auth.service.AuthConfig;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,16 +23,10 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    @Value("${app.cors.allowed-origins}")
-    private String[] allowedOrigins;
-
-    @Value("${app.cors.allowed-methods}")
-    private String[] allowedMethods;
-
-    @Value("${app.cors.allowed-headers}")
-    private String[] allowedHeaders;
-
+    private final CorsConfig corsConfig;
     private final AuthConfig authConfig;
+    private final UserManagerAuthenticationEntryPoint userManagerAuthenticationEntryPoint;
+    private final UserManagerAccessDeniedHandler userManagerAccessDeniedHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -43,12 +35,11 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/auth/**", "/error/**").permitAll()
                         .anyRequest().authenticated())
                 .exceptionHandling(e -> e
-                        .authenticationEntryPoint((request, response, authException) -> {
-                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
-                        }))
+                        .authenticationEntryPoint(userManagerAuthenticationEntryPoint)
+                        .accessDeniedHandler(userManagerAccessDeniedHandler))
                 .addFilterBefore(new JwtAuthenticationFilter(authConfig.getSecret()), UsernamePasswordAuthenticationFilter.class)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable);
@@ -65,9 +56,9 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         var config = new CorsConfiguration();
-        config.setAllowedOrigins(Arrays.stream(allowedOrigins).toList());
-        config.setAllowedMethods(Arrays.stream(allowedMethods).toList());
-        config.setAllowedHeaders(Arrays.stream(allowedHeaders).toList());
+        config.setAllowedOrigins(Arrays.stream(corsConfig.getAllowedOrigins()).toList());
+        config.setAllowedMethods(Arrays.stream(corsConfig.getAllowedMethods()).toList());
+        config.setAllowedHeaders(Arrays.stream(corsConfig.getAllowedHeaders()).toList());
         config.setAllowCredentials(false);
 
         var source = new UrlBasedCorsConfigurationSource();

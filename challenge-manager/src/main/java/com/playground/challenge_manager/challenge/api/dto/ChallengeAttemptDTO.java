@@ -9,7 +9,7 @@ import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.constraints.UUID;
 
 @Value
-@SameDigitCount
+@SameDigitCount(message = "Numbers must have the same digit count")
 public class ChallengeAttemptDTO {
 
     @UUID

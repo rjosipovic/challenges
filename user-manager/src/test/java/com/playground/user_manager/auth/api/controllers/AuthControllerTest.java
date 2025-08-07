@@ -11,10 +11,15 @@ import com.playground.user_manager.auth.service.JwtGenerator;
 import com.playground.user_manager.auth.service.RegistrationService;
 import com.playground.user_manager.errors.advice.ControllerAdvice;
 import com.playground.user_manager.errors.custom.UserManagerError;
-import com.playground.user_manager.errors.exceptions.ResourceAlreadyExistsException;
+import com.playground.user_manager.errors.exceptions.UserAlreadyExistsException;
+import com.playground.user_manager.errors.exceptions.UserNotFoundException;
+import com.playground.user_manager.errors.exceptions.enums.ErrorCode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -22,17 +27,14 @@ import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
@@ -64,7 +66,6 @@ class AuthControllerTest {
         JacksonTester.initFields(this, objectMapper);
 
         mockMvc = MockMvcBuilders.standaloneSetup(controller)
-                .setControllerAdvice(new ValidationExceptionHandler())
                 .setControllerAdvice(new ControllerAdvice())
                 .build();
     }
@@ -93,6 +94,7 @@ class AuthControllerTest {
         //given
         var email = "not-an-email";
         var request = new AuthCodeGenerationRequest(email);
+        var errorCode = ErrorCode.VALIDATION_FAILED;
 
         //when
         var result = mockMvc.perform(post("/auth/request-code")
@@ -100,9 +102,37 @@ class AuthControllerTest {
                         .content(authCodeGenerationRequestJacksonTester.write(request).getJson()))
                 .andReturn().getResponse();
 
+        var resContent = new UserManagerError(errorCode.getMessage(), errorCode.getCode(), "email: must be a well-formed email address");
         //then
         assertAll(
-                () -> assertEquals(400, result.getStatus())
+                () -> assertEquals(400, result.getStatus()),
+                () -> assertEquals("application/json", result.getContentType()),
+                () -> assertEquals("UTF-8", result.getCharacterEncoding()),
+                () -> assertEquals(errorJacksonTester.write(resContent).getJson(), result.getContentAsString())
+        );
+    }
+
+    @Test
+    void requestCode_userNotFound_returnsNotFound() throws Exception {
+        //given
+        var email = "user@example.com";
+        var request = new AuthCodeGenerationRequest(email);
+        doThrow(new UserNotFoundException(String.format("User with email %s is not registered", email))).when(authService).generateAuthCode(email);
+        var errorCode = ErrorCode.USER_NOT_FOUND;
+
+        //when
+        var result = mockMvc.perform(post("/auth/request-code")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(authCodeGenerationRequestJacksonTester.write(request).getJson()))
+                .andReturn().getResponse();
+
+        var resContent = new UserManagerError(errorCode.getMessage(), errorCode.getCode(), String.format("User with email %s is not registered", email));
+        //then
+        assertAll(
+                () -> assertEquals(404, result.getStatus()),
+                () -> assertEquals("application/json", result.getContentType()),
+                () -> assertEquals("UTF-8", result.getCharacterEncoding()),
+                () -> assertEquals(errorJacksonTester.write(resContent).getJson(), result.getContentAsString())
         );
     }
 
@@ -136,12 +166,13 @@ class AuthControllerTest {
     }
 
     @Test
-    void verifyCde_unauthorized_returnsUnauthorized() throws Exception {
+    void verifyCode_invalidCode_returnsBadRequest() throws Exception {
         //given
         var email = "user@example.com";
         var code = "123456";
         var request = new AuthCodeVerificationRequest(email, code);
         when(authService.verifyCode(email, code)).thenReturn(false);
+        var errorCode = ErrorCode.INVALID_VERIFICATION_CODE;
 
         //when
         var result = mockMvc.perform(post("/auth/verify-code")
@@ -149,9 +180,13 @@ class AuthControllerTest {
                         .content(authCodeVerificationRequestJacksonTester.write(request).getJson()))
                 .andReturn().getResponse();
 
+        var resContent = new UserManagerError(errorCode.getMessage(), errorCode.getCode(), String.format("Code verification failed for email: %s and code: %s", email, code));
         //then
         assertAll(
-                () -> assertEquals(401, result.getStatus())
+                () -> assertEquals(400, result.getStatus()),
+                () -> assertEquals("application/json", result.getContentType()),
+                () -> assertEquals("UTF-8", result.getCharacterEncoding()),
+                () -> assertEquals(errorJacksonTester.write(resContent).getJson(), result.getContentAsString())
         );
     }
 
@@ -160,6 +195,7 @@ class AuthControllerTest {
         //given
         var email = "user@example.com";
         var request = new AuthCodeVerificationRequest(email, null);
+        var errorCode = ErrorCode.VALIDATION_FAILED;
 
         //when
         var result = mockMvc.perform(post("/auth/verify-code")
@@ -167,9 +203,13 @@ class AuthControllerTest {
                         .content(authCodeVerificationRequestJacksonTester.write(request).getJson()))
                 .andReturn().getResponse();
 
+        var resContent = new UserManagerError(errorCode.getMessage(), errorCode.getCode(), "code: must not be blank");
         //then
         assertAll(
-                () -> assertEquals(400, result.getStatus())
+                () -> assertEquals(400, result.getStatus()),
+                () -> assertEquals("application/json", result.getContentType()),
+                () -> assertEquals("UTF-8", result.getCharacterEncoding()),
+                () -> assertEquals(errorJacksonTester.write(resContent).getJson(), result.getContentAsString())
         );
     }
 
@@ -194,19 +234,14 @@ class AuthControllerTest {
         //given
         var alias = "test-user";
         var email = "someemail@gmail.com";
-        var apiVersion = "1.0";
-        var code = "NE-001";
-        var message = "Resource already exists";
         var registerUser = new RegisterUserDTO(alias, email, null, null);
-        var errorMessage = "User with alias " + alias + " already exists";
-        var domain = "user";
-        var reason = "exists";
-        var errorReportUri = "";
-        var ex = new ResourceAlreadyExistsException(errorMessage, domain);
+        var reason = "User with alias " + alias + " already exists";
+        var ex = new UserAlreadyExistsException(reason);
+        var errorCode = ErrorCode.USER_ALREADY_EXISTS;
 
         doThrow(ex).when(registrationService).register(registerUser);
 
-        var error = new UserManagerError(apiVersion, code, message, domain, reason, errorMessage, errorReportUri);
+        var error = new UserManagerError(errorCode.getMessage(), errorCode.getCode(), reason);
 
         //when
         var res = mockMvc.perform(post("/auth/register")
@@ -223,108 +258,34 @@ class AuthControllerTest {
         );
     }
 
-    @Test
-    void testRegisterUser_failure_missingAlias() throws Exception {
+    @ParameterizedTest
+    @MethodSource("invalidRegisterUserProvider")
+    void testRegisterUser_validationFailure(RegisterUserDTO request, String expectedReason) throws Exception {
         //given
-        var email = "someemail@gmail.com";
-        var message = "Validation failed";
+        var errorCode = ErrorCode.VALIDATION_FAILED;
+        var expectedError = new UserManagerError(errorCode.getMessage(), errorCode.getCode(), expectedReason);
+
         //when
         var res = mockMvc.perform(post("/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(registerUserDTOTester.write(new RegisterUserDTO(null, email, null, null)).getJson()))
+                        .content(registerUserDTOTester.write(request).getJson()))
                 .andReturn().getResponse();
+
         //then
         assertAll(
                 () -> assertEquals(400, res.getStatus()),
                 () -> assertEquals("application/json", res.getContentType()),
-                () -> assertTrue(res.getContentAsString().contains(message))
+                () -> assertEquals(errorJacksonTester.write(expectedError).getJson(), res.getContentAsString())
         );
     }
 
-    @Test
-    void testCreateUser_failure_missingEmail() throws Exception {
-        //given
-        var alias = "test-user";
-        var message = "Validation failed";
-        //when
-        var res = mockMvc.perform(post("/auth/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(registerUserDTOTester.write(new RegisterUserDTO(alias, null, null, null)).getJson()))
-                .andReturn().getResponse();
-        //then
-        assertAll(
-                () -> assertEquals(400, res.getStatus()),
-                () -> assertEquals("application/json", res.getContentType()),
-                () -> assertTrue(res.getContentAsString().contains(message))
+    private static Stream<Arguments> invalidRegisterUserProvider() {
+        return Stream.of(
+                Arguments.of(new RegisterUserDTO(null, "test@test.com", null, null), "alias: must not be blank"),
+                Arguments.of(new RegisterUserDTO("alias", null, null, null), "email: must not be blank"),
+                Arguments.of(new RegisterUserDTO("alias", "invalid-email", null, null), "email: must be a well-formed email address"),
+                Arguments.of(new RegisterUserDTO("alias", "test@test.com", LocalDate.now().plusDays(1), null), "birthdate: must be a past date"),
+                Arguments.of(new RegisterUserDTO("alias", "test@test.com", null, "invalid"), "gender: must match \"male|female\"")
         );
-    }
-
-    @Test
-    void testCreateUser_failure_invalidEmail() throws Exception {
-        //given
-        var alias = "test-user";
-        var email = "someemail";
-        var message = "Validation failed";
-        //when
-        var res = mockMvc.perform(post("/auth/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(registerUserDTOTester.write(new RegisterUserDTO(alias, email, null, null)).getJson()))
-                .andReturn().getResponse();
-        //then
-        assertAll(
-                () -> assertEquals(400, res.getStatus()),
-                () -> assertEquals("application/json", res.getContentType()),
-                () -> assertTrue(res.getContentAsString().contains(message))
-        );
-    }
-
-    @Test
-    void testCreateUser_failure_invalidBirthday() throws Exception {
-        //given
-        var alias = "test-user";
-        var email = "someemail@gmail.com";
-        var message = "Validation failed";
-        var birthday = LocalDate.now().plusDays(1);
-        //when
-        var res = mockMvc.perform(post("/auth/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(registerUserDTOTester.write(new RegisterUserDTO(alias, email, birthday, null)).getJson()))
-                .andReturn().getResponse();
-        //then
-        assertAll(
-                () -> assertEquals(400, res.getStatus()),
-                () -> assertEquals("application/json", res.getContentType()),
-                () -> assertTrue(res.getContentAsString().contains(message))
-        );
-    }
-
-    @Test
-    void testCreateUser_failure_invalidGender() throws Exception {
-        //given
-        var alias = "test-user";
-        var email = "someemail@gmail.com";
-        var gender = "invalid";
-        var message = "Validation failed";
-        //when
-        var res = mockMvc.perform(post("/auth/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(registerUserDTOTester.write(new RegisterUserDTO(alias, email, null, gender)).getJson()))
-                .andReturn().getResponse();
-        //then
-        assertAll(
-                () -> assertEquals(400, res.getStatus()),
-                () -> assertEquals("application/json", res.getContentType()),
-                () -> assertTrue(res.getContentAsString().contains(message))
-        );
-    }
-
-
-    // Simple global exception handler for validation errors
-    @RestControllerAdvice
-    static class ValidationExceptionHandler {
-        @ExceptionHandler(MethodArgumentNotValidException.class)
-        public org.springframework.http.ResponseEntity<String> handleValidation(MethodArgumentNotValidException ex) {
-            return org.springframework.http.ResponseEntity.badRequest().body("Validation failed");
-        }
     }
 }

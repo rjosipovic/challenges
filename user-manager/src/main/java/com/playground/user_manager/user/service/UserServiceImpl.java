@@ -1,6 +1,6 @@
 package com.playground.user_manager.user.service;
 
-import com.playground.user_manager.errors.exceptions.ResourceNotFoundException;
+import com.playground.user_manager.errors.exceptions.UserNotFoundException;
 import com.playground.user_manager.user.dataaccess.UserRepository;
 import com.playground.user_manager.user.model.User;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +35,6 @@ public class UserServiceImpl implements UserService {
         return userRepository
                 .findByAlias(alias)
                 .map(userEntity -> new User(userEntity.getId().toString(), userEntity.getAlias()))
-                .orElseThrow(() -> new ResourceNotFoundException("User with alias " + alias + " not found", "user"));
+                .orElseThrow(() -> new UserNotFoundException(String.format("User with alias %s not found", alias)));
     }
 }

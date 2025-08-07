@@ -24,6 +24,10 @@ spring:
 server:
    port: 8081
 
+logging:
+  level:
+    org.springframework.security.web.FilterChainProxy: DEBUG
+
 app:
   cors:
     allowed-origins: ${ALLOWED_ORIGINS:http://127.0.0.1:3000}
