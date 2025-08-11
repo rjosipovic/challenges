@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
 @Slf4j
@@ -20,6 +21,14 @@ public class ControllerAdvice {
 
         var errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
         var apiError = new ChallengeManagerError(errorCode.getMessage(), errorCode.getCode(), "An error occurred while processing request");
+        return new ResponseEntity<>(apiError, errorCode.getHttpStatus());
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ChallengeManagerError> handleNoResourceFoundException(NoResourceFoundException ex) {
+        var errorCode = ErrorCode.NO_RESOURCE_FOUND;
+        var details = ex.getMessage();
+        var apiError = new ChallengeManagerError(errorCode.getMessage(), errorCode.getCode(), details);
         return new ResponseEntity<>(apiError, errorCode.getHttpStatus());
     }
 

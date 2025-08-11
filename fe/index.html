@@ -1,166 +1,379 @@
+<!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="utf-8">
-  <link rel="stylesheet" href="./styles/index.css" data-precedence="next">
-  <title>Home</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="robots" content="follow, index">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Challenge App</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="styles/style.css">
 </head>
+<body class="min-h-screen bg-gray-900 text-gray-100 flex flex-col">
 
-<body class="loading bg-black">
-  <main class="min-h-screen">
-    <div>
-      <div>
-        <header id="header"
-          class="font-ocean min-h-[60px] flex flex-wrap sm:justify-start sm:flex-nowrap z-50 w-full bg-white text-sm py-3 sm:py-0 border-b-[1px] border-solid border-gray-600">
-          <nav
-            class="relative max-w-screen-2xl w-full mx-auto px-4 sm:flex sm:items-center sm:justify-between sm:px-6 lg:px-8"
-            aria-label="Global">
-            <div class="flex items-center justify-between flex-grow-1"><a
-                class="flex text-xl gap-2 items-center justify-center font-semibold text-black" aria-label="Brand"
-                href="/"><span class="text-[16px] md:text-[20px] leading-none">Math Challenges</span></a>
-              <div class="sm:hidden">
-                <button type="button" class="hs-collapse-toggle size-9 flex justify-center items-center gap-x-2 text-sm font-semibold rounded-lg border border-blue-500 text-blue-500 hover:border-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:focus:outline-none dark:focus:ring-1"
-                  data-hs-collapse="#navbar-collapse-with-animation" aria-controls="navbar-collapse-with-animation"
-                  aria-label="Toggle navigation"><svg class="hs-collapse-open:hidden flex-shrink-0 size-4"
-                    xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="3" x2="21" y1="6" y2="6"></line>
-                    <line x1="3" x2="21" y1="12" y2="12"></line>
-                    <line x1="3" x2="21" y1="18" y2="18"></line>
-                  </svg><svg class="hs-collapse-open:block hidden flex-shrink-0 size-4"
-                    xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M18 6 6 18"></path>
-                    <path d="m6 6 12 12"></path>
-                  </svg></button>
-                </div>
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-green-700 to-emerald-700 p-4 shadow-lg rounded-b-lg mx-2 mt-2">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-3xl font-bold text-white tracking-wide">
+                Math Challenge
+            </h1>
+            <!-- Navigation -->
+            <nav>
+                <ul class="flex space-x-4">
+                    <li>
+                        <a href="#" id="nav-home" class="text-white hover:text-green-200 transition duration-300 ease-in-out">Home</a>
+                    </li>
+                    <li>
+                        <a href="#" id="nav-register" class="text-white hover:text-green-200 transition duration-300 ease-in-out">Register</a>
+                    </li>
+                    <li>
+                        <a href="#" id="nav-login" class="text-white hover:text-green-200 transition duration-300 ease-in-out">Login</a>
+                    </li>
+                    <li>
+                        <a href="#" id="nav-game" class="text-white hover:text-green-200 transition duration-300 ease-in-out">Game</a>
+                    </li>
+                    <li>
+                        <a href="#" id="nav-statistics" class="text-white hover:text-green-200 transition duration-300 ease-in-out">Statistics</a>
+                    </li>
+                    <li>
+                        <a href="#" id="nav-history" class="text-white hover:text-green-200 transition duration-300 ease-in-out">History</a>
+                    </li>
+                    <li>
+                        <a href="#" id="nav-leaderboard" class="text-white hover:text-green-200 transition duration-300 ease-in-out">Leaderboard</a>
+                    </li>
+                    <li>
+                        <a href="#" id="nav-about" class="text-white hover:text-green-200 transition duration-300 ease-in-out">About</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="container mx-auto p-4 flex-grow">
+
+        <!-- Home View -->
+        <section id="home-view" class="view-section active text-center py-16">
+            <h2 class="text-5xl font-extrabold text-white mb-6 animate-fade-in">
+                Welcome to Math Challenge!
+            </h2>
+            <p class="text-xl text-gray-300 mb-8 max-w-2xl mx-auto animate-slide-up">
+                Sharpen your mind with fun and challenging math problems. Pick your operation and difficulty!
+            </p>
+            <img
+                src="https://placehold.co/1200x400/22C55E/FFFFFF?text=Math+Challenge"
+                alt="Math Challenge Background"
+                class="rounded-lg shadow-xl mx-auto w-full max-w-4xl animate-zoom-in"
+                onerror="this.onerror=null;this.src='https://placehold.co/1200x400/6B7280/FFFFFF?text=Image+Error'"
+            />
+            <div class="mt-10 flex flex-wrap justify-center gap-4">
+                <button id="home-to-register" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:-translate-y-1">
+                    Register Now
+                </button>
+                <button id="home-to-login" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:-translate-y-1">
+                    Login
+                </button>
+                <button id="home-to-game" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-6 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:-translate-y-1">
+                    Start Game
+                </button>
             </div>
-            <div id="navbar-collapse-with-animation"
-              class="hs-collapse hidden overflow-hidden transition-all duration-300 sm:block">
-              <div
-                class="flex flex-col gap-y-4 gap-x-0 mt-5 sm:flex-row sm:items-center sm:justify-end sm:gap-y-0 sm:gap-x-7 sm:mt-0 sm:ps-7">
-                <a class="font-medium text-black hover:text-blue-500 sm:py-6" href="index.html">Home</a>
-                <a class="font-medium text-black hover:text-blue-500 sm:py-6" href="challenges.html">Challenges</a>
-                <a class="font-medium text-black hover:text-blue-500 sm:py-6" href="scoreboard.html">Scoreboard</a>
-                <a class="font-medium text-black hover:text-blue-500 sm:py-6" href="register.html">Register</a>
-                <a class="font-medium text-black hover:text-blue-500 sm:py-6" href="login.html">Login</a>
-              </div>
-            </div>
-          </nav>
-        </header>
-      </div>
-      <div>
-        <section id="hero-R6tzYp" class="text-blue-100 font-ocean" style="background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('./images/homepage2.jpeg'); background-size: cover; background-position: center center;">
-          <div class="container max-w-screen-2xl mx-auto flex px-5 py-24 pt-64 md:flex-row flex-col items-center">
-            <div
-              class="lg:flex-grow md:w-1/2 lg:pr-24 md:pr-16 flex flex-col md:items-start md:text-left mb-16 md:mb-0 items-center ">
-              <h1 class="title-font sm:text-4xl text-3xl mb-4 font-medium text-blue-100">Take the Math Challenge!</h1>
-              <p class="mb-8 leading-relaxed">Test your skills in addition, subtraction, multiplication, and division.
-                Compete with others and track your progress!</p>
-              <div class="flex justify-center">
-                <a class="inline-flex text-blue-100 bg-blue-500 hover:bg-blue-600 border-0 py-2 px-6 focus:outline-none rounded text-lg" href="register.html">Start Now</a>
-              </div>
-            </div>
-          </div>
+            <p id="user-status-display" class="text-sm text-gray-500 mt-8">Status: Not Logged In</p>
         </section>
-      </div>
-      <div>
-        <div id="features-z6Fr9j" class="px-4 py-10 sm:px-6 lg:px-8 lg:py-14 mx-auto font-ocean bg-white">
-          <div class="relative bg-bg-white max-w-screen-2xl m-auto">
-            <div
-              class="relative flex w-full flex-col lg:flex-row items-center justify-center gap-4 lg:gap-12 flex-col lg:flex-row-reverse">
-              <div class="mb-10 lg:mb-0 lg:col-span-6 lg:col-start-8 w-full lg:w-1/2 ">
-                <h2 class="text-2xl text-black font-bold sm:text-3xl">How It Works</h2>
-                <nav class="grid lg:gap-10 mt-5 md:mt-10 gap-5" aria-label="Tabs" role="tablist"><button type="button"
-                    class="hover:bg-gray-300 hs-tab-active:shadow-md hs-tab-active:hover:border-transparent text-start p-4 md:p-5 rounded-xl dark:focus:outline-none dark:focus:ring-1 active"
-                    id="tabs-with-card-item-1" data-hs-tab="#tabs-with-card-1" aria-controls="tabs-with-card-1"
-                    role="tab"><span class="flex"><span class="grow"><span
-                          class="block text-lg font-semibold text-black">Solve Challenges</span><span
-                          class="block mt-1 text-gray-500">Pick a math category and start solving
-                          challenges.</span></span></span></button><button type="button"
-                    class="hover:bg-gray-300 hs-tab-active:shadow-md hs-tab-active:hover:border-transparent text-start p-4 md:p-5 rounded-xl dark:focus:outline-none dark:focus:ring-1 active"
-                    id="tabs-with-card-item-1" data-hs-tab="#tabs-with-card-1" aria-controls="tabs-with-card-1"
-                    role="tab"><span class="flex"><span class="grow"><span
-                          class="block text-lg font-semibold text-black">Track Your Progress</span><span
-                          class="block mt-1 text-gray-500">See your past attempts and improve your
-                          skills.</span></span></span></button><button type="button"
-                    class="hover:bg-gray-300 hs-tab-active:shadow-md hs-tab-active:hover:border-transparent text-start p-4 md:p-5 rounded-xl dark:focus:outline-none dark:focus:ring-1 active"
-                    id="tabs-with-card-item-1" data-hs-tab="#tabs-with-card-1" aria-controls="tabs-with-card-1"
-                    role="tab"><span class="flex"><span class="grow"><span
-                          class="block text-lg font-semibold text-black">Compete with Others</span><span
-                          class="block mt-1 text-gray-500">Check the scoreboard and see how you
-                          rank!</span></span></span></button></nav>
-              </div>
-              <div class=" w-full lg:w-1/2">
-                <div class="relative w-full">
-                  <div>
-                    <div id="tabs-with-card-1" class="tabpanel" aria-labelledby="tabs-with-card-item-1"><img
-                        class="shadow-xl shadow-gray-200 max-h-[550px] rounded-xl dark:shadow-gray-900/[.2]"
-                        src="./images/homepage1.jpeg"
-                        alt="Image Description"></div>
-                  </div>
+
+        <!-- Register View -->
+        <section id="register-view" class="view-section justify-center items-center">
+            <div class="bg-gray-800 p-8 rounded-xl shadow-lg w-full max-w-md">
+                <h2 class="text-3xl font-bold text-white mb-6 text-center">Register</h2>
+                <form id="register-form" class="space-y-6">
+                    <div>
+                        <label for="reg-alias" class="block text-gray-300 text-sm font-bold mb-2">Alias:</label>
+                        <input
+                            type="text"
+                            id="reg-alias"
+                            class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 border-gray-600 text-white"
+                            placeholder="Choose an alias"
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label for="reg-email" class="block text-gray-300 text-sm font-bold mb-2">Email:</label>
+                        <input
+                            type="email"
+                            id="reg-email"
+                            class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 border-gray-600 text-white"
+                            placeholder="Enter your email"
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label for="reg-birthdate" class="block text-gray-300 text-sm font-bold mb-2">Birthdate:</label>
+                        <input
+                            type="date"
+                            id="reg-birthdate"
+                            class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 border-gray-600 text-white"
+                        />
+                    </div>
+                    <div>
+                        <label class="block text-gray-300 text-sm font-bold mb-2">Gender:</label>
+                        <div class="flex items-center space-x-4">
+                            <input
+                                type="radio"
+                                id="reg-gender-male"
+                                name="reg-gender"
+                                value="male"
+                                class="form-radio text-green-500 bg-gray-700 border-gray-600 focus:ring-green-500"
+                            />
+                            <label for="reg-gender-male" class="text-gray-300">Male</label>
+
+                            <input
+                                type="radio"
+                                id="reg-gender-female"
+                                name="reg-gender"
+                                value="female"
+                                class="form-radio text-green-500 bg-gray-700 border-gray-600 focus:ring-green-500"
+                            />
+                            <label for="reg-gender-female" class="text-gray-300">Female</label>
+                        </div>
+                    </div>
+                    <button
+                        type="submit"
+                        class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-full focus:outline-none focus:shadow-outline transition duration-300 ease-in-out transform hover:-translate-y-1"
+                    >
+                        Register
+                    </button>
+                </form>
+                <p id="register-message" class="text-center mt-4 text-sm"></p>
+            </div>
+        </section>
+
+        <!-- Login View -->
+        <section id="login-view" class="view-section py-16 justify-center items-center">
+            <div class="bg-gray-800 p-8 rounded-xl shadow-lg w-full max-w-md">
+                <h2 class="text-3xl font-bold text-white mb-6 text-center">Login</h2>
+                <form id="login-form" class="space-y-6">
+                    <!-- Step 1: Email Input -->
+                    <div id="login-step1">
+                        <div>
+                            <label for="login-email" class="block text-gray-300 text-sm font-bold mb-2">Email:</label>
+                            <input
+                                type="email"
+                                id="login-email"
+                                class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 border-gray-600 text-white"
+                                placeholder="Enter your email"
+                                required
+                            />
+                        </div>
+                        <button
+                            type="button" id="generate-code-btn"
+                            class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-full focus:outline-none focus:shadow-outline transition duration-300 ease-in-out transform hover:-translate-y-1 mt-6"
+                        >
+                            Generate Code
+                        </button>
+                    </div>
+
+                    <!-- Step 2: Code Input (hidden by default) -->
+                    <div id="login-step2" class="hidden">
+                        <div>
+                            <label for="login-code" class="block text-gray-300 text-sm font-bold mb-2">Verification Code:</label>
+                            <input
+                                type="text"
+                                id="login-code"
+                                class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 border-gray-600 text-white text-center text-xl"
+                                placeholder="Enter 6-digit code"
+                                maxlength="6"
+                                required
+                            />
+                        </div>
+                        <button
+                            type="button" id="verify-code-btn"
+                            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-full focus:outline-none focus:shadow-outline transition duration-300 ease-in-out transform hover:-translate-y-1 mt-6"
+                        >
+                            Verify Code
+                        </button>
+                        <button
+                            type="button" id="resend-code-btn"
+                            class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline transition duration-300 ease-in-out transform hover:-translate-y-1 mt-3 text-sm"
+                        >
+                            Resend Code
+                        </button>
+                    </div>
+                </form>
+                <p id="login-message" class="text-center mt-4 text-sm"></p>
+            </div>
+        </section>
+
+        <!-- Game View -->
+        <section id="game-view" class="view-section py-16 justify-center items-center">
+            <div class="bg-gray-800 p-8 rounded-xl shadow-lg w-full max-w-md text-center">
+                <h2 class="text-3xl font-bold text-white mb-6" id="game-title">Start Your Challenge!</h2>
+
+                <!-- Game Setup Controls -->
+                <div id="game-setup" class="space-y-6 mb-8">
+                    <div>
+                        <label for="math-operation" class="block text-gray-300 text-lg font-bold mb-2">Select Operation:</label>
+                        <select
+                            id="math-operation"
+                            class="w-full p-3 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                        >
+                            <option value="addition">Addition (+)</option>
+                            <option value="subtraction">Subtraction (-)</option>
+                            <option value="multiplication">Multiplication (x)</option>
+                            <option value="division">Division (÷)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="difficulty" class="block text-gray-300 text-lg font-bold mb-2">Select Difficulty:</label>
+                        <select
+                            id="difficulty"
+                            class="w-full p-3 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                        >
+                            <option value="easy">Easy</option>
+                            <option value="medium">Medium</option>
+                            <option value="hard">Hard</option>
+                            <option value="expert">Expert</option>
+                        </select>
+                    </div>
+
+                    <button
+                        id="start-game-btn"
+                        class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-full focus:outline-none focus:shadow-outline transition duration-300 ease-in-out transform hover:-translate-y-1"
+                    >
+                        Start Game
+                    </button>
                 </div>
-              </div>
+
+                <!-- Game Play Area -->
+                <div id="game-play-area" class="hidden space-y-6">
+                    <p class="text-5xl font-extrabold text-white mb-4" id="problem-display">?</p>
+                    <div>
+                        <label for="answer-input" class="sr-only">Your Answer:</label>
+                        <input
+                            type="number"
+                            id="answer-input"
+                            class="w-full p-3 rounded-lg bg-gray-700 text-white text-center text-2xl focus:outline-none focus:ring-2 focus:ring-green-500"
+                            placeholder="Enter your answer"
+                            required
+                        />
+                    </div>
+                    <button
+                        id="submit-answer-btn"
+                        class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-full focus:outline-none focus:shadow-outline transition duration-300 ease-in-out transform hover:-translate-y-1"
+                    >
+                        Submit Answer
+                    </button>
+                    <p id="feedback-message" class="text-lg mt-4"></p>
+                    <button
+                        id="next-problem-btn"
+                        class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-4 rounded-full focus:outline-none focus:shadow-outline transition duration-300 ease-in-out transform hover:-translate-y-1 hidden"
+                    >
+                        Next Problem
+                    </button>
+                    <button
+                        id="end-game-btn"
+                        class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-full focus:outline-none focus:shadow-outline transition duration-300 ease-in-out transform hover:-translate-y-1 mt-4"
+                    >
+                        End Game
+                    </button>
+                </div>
             </div>
-          </div>
-        </div>
-      </div>
-      <div>
-        <div id="faq-v7schV" class="bg-white font-ocean px-4 py-10 sm:px-6 lg:px-8 lg:py-14 mx-auto">
-          <div class="max-w-2xl mx-auto text-center mb-10 lg:mb-14">
-            <h2 class="text-2xl font-bold md:text-3xl md:leading-tight text-black">Frequently Asked Questions</h2>
-          </div>
-          <div class="max-w-5xl mx-auto">
-            <div class="grid sm:grid-cols-2 gap-6 md:gap-12">
-              <div class="bg-white text-white">
-                <h3 class="text-lg font-semibold text-gray-500">Is this free?</h3>
-                <p class="mt-2 text-gray-500 dark:text-gray-400">Yes! Math Challenges is completely free to play.</p>
-              </div>
-              <div class="bg-white text-white">
-                <h3 class="text-lg font-semibold text-gray-500">Do I need an account?</h3>
-                <p class="mt-2 text-gray-500 dark:text-gray-400">Yes, you need to register to track your progress and
-                  see the scoreboard.</p>
-              </div>
-              <div class="bg-white text-white">
-                <h3 class="text-lg font-semibold text-gray-500">Can I compete with friends?</h3>
-                <p class="mt-2 text-gray-500 dark:text-gray-400">Absolutely! Invite your friends and compare scores on
-                  the leaderboard.</p>
-              </div>
+        </section>
+
+        <!-- Statistics View -->
+        <section id="statistics-view" class="view-section py-16 justify-center items-center">
+            <div class="bg-gray-800 p-8 rounded-xl shadow-lg w-full max-w-2xl text-center">
+                <h2 class="text-3xl font-bold text-white mb-6">Your Statistics</h2>
+
+                <!-- Overall Statistics -->
+                <div class="mb-8 p-4 bg-gray-700 rounded-lg shadow-md">
+                    <h3 class="text-2xl font-semibold text-white mb-4">Overall Performance</h3>
+                    <div class="space-y-3 text-left">
+                        <p class="text-lg text-gray-300">Total Attempts: <span id="stat-total">0</span></p>
+                        <p class="text-lg text-gray-300">Correct Answers: <span id="stat-correct">0</span></p>
+                        <p class="text-lg text-gray-300">Incorrect Answers: <span id="stat-incorrect">0</span></p>
+                        <p class="text-lg text-gray-300">Accuracy: <span id="stat-accuracy">0%</span></p>
+                    </div>
+                </div>
+
+                <!-- Statistics by Operation -->
+                <div class="mb-8 p-4 bg-gray-700 rounded-lg shadow-md">
+                    <h3 class="text-2xl font-semibold text-white mb-4">By Operation</h3>
+                    <div id="stats-by-operation" class="space-y-3 text-left">
+                        <!-- Operation stats will be dynamically inserted here -->
+                        <p class="text-gray-400">No operation data yet. Play some games!</p>
+                    </div>
+                </div>
+
+                <!-- Statistics by Difficulty -->
+                <div class="p-4 bg-gray-700 rounded-lg shadow-md">
+                    <h3 class="text-2xl font-semibold text-white mb-4">By Difficulty</h3>
+                    <div id="stats-by-difficulty" class="space-y-3 text-left">
+                        <!-- Difficulty stats will be dynamically inserted here -->
+                        <p class="text-gray-400">No difficulty data yet. Play some games!</p>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-      </div>
-      <div>
-        <div id="footer" class="bg-white font-ocean p-4 sm:pt-10 lg:p-12 border-t-[1px] border-solid border-gray-600">
-          <footer class="mx-auto max-w-screen-2xl px-4 md:px-8">
-            <div class="mb-16 flex flex-col md:flex-row md:gap-12 gap-4 pt-10 lg:gap-8 lg:pt-12">
-              <div class="col-span-full lg:col-span-2">
-                <div class="mb-4 lg:-mt-2"><a
-                    class="text-black inline-flex items-center gap-2 text-xl font-bold md:text-2xl" aria-label="logo"
-                    href="/">
-                    <p class="max-w-[700px]">Math Challenges</p>
-                  </a></div>
-                <p class="text-gray-500 max-w-[500px] mb-6 sm:pr-8">Challenge yourself with fun math problems and
-                  improve your skills!</p>
-              </div>
-              <div>
-                <div class="text-gray-500 mb-4 font-bold tracking-widest">Navigation</div>
-                <nav class="flex flex-col gap-4">
-                  <div><a class="text-gray-500 hover:text-blue-500 active:text-blue-600 transition duration-100" href="index.html">Home</a></div>
-                  <div><a class="text-gray-500 hover:text-blue-500 active:text-blue-600 transition duration-100" href="challenges.html">Challenges</a></div>
-                  <div><a class="text-gray-500 hover:text-blue-500 active:text-blue-600 transition duration-100" href="scoreboard.html">Scoreboard</a></div>
-                  <div><a class="text-gray-500 hover:text-blue-500 active:text-blue-600 transition duration-100" href="register.html">Register</a></div>
-                  <div><a class="text-gray-500 hover:text-blue-500 active:text-blue-600 transition duration-100" href="login.html">Login</a></div>
-                </nav>
-              </div>
+        </section>
+
+        <!-- History View -->
+        <section id="history-view" class="view-section py-16 justify-center items-center">
+            <div class="bg-gray-800 p-8 rounded-xl shadow-lg w-full max-w-2xl">
+                <h2 class="text-3xl font-bold text-white mb-6 text-center">Previous Attempts</h2>
+                <div id="history-list" class="space-y-4 overflow-y-auto max-h-96">
+                    <!-- History items will be injected here by JavaScript -->
+                    <p class="text-center text-gray-400" id="no-history-message">No history available yet. Play a game to see your attempts!</p>
+                </div>
             </div>
-          </footer>
-        </div>
-      </div>
-    </div>
-  </main>
-  <script src="scripts/index.js"></script>
+        </section>
+
+        <!-- About View -->
+        <section id="about-view" class="view-section text-center py-16">
+            <h2 class="text-4xl font-extrabold text-white mb-6">
+                About Math Challenge
+            </h2>
+            <p class="text-lg text-gray-300 mb-4 max-w-3xl mx-auto">
+                Math Challenge is designed to help you improve your math skills with fun and engaging challenges. Whether you're a beginner or an expert, you can choose your preferred operation and difficulty level to test your abilities.
+            </p>
+            <p class="text-lg text-gray-300 mb-8 max-w-3xl mx-auto">
+                Track your progress with detailed statistics and review your past attempts to see how you're improving. Get ready to sharpen your mind and become a math master!
+            </p>
+            <p class="text-xl font-semibold text-white mb-4">
+                Contact Us:
+            </p>
+            <p class="text-lg text-blue-400 hover:text-blue-300 transition duration-300">
+                <a href="mailto:support@mathchallenge.com">support@mathchallenge.com</a>
+            </p>
+        </section>
+
+        <!-- Leaderboard View -->
+        <section id="leaderboard-view" class="view-section py-16 justify-center items-center">
+            <div class="bg-gray-800 p-8 rounded-xl shadow-lg w-full max-w-3xl">
+                <h2 class="text-3xl font-bold text-white mb-6 text-center">Leaderboard</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-left text-sm font-light text-white">
+                        <thead class="border-b font-medium border-gray-600">
+                            <tr>
+                                <th scope="col" class="px-6 py-4">Rank</th>
+                                <th scope="col" class="px-6 py-4">Alias</th>
+                                <th scope="col" class="px-6 py-4 text-center">Score</th>
+                                <th scope="col" class="px-6 py-4 text-center">Badges</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboard-body">
+                            <!-- Leaderboard rows will be injected here by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 p-4 text-center text-gray-400 rounded-t-lg mx-2 mb-2">
+        <p>&copy; <span id="current-year"></span> Math Challenge App. All rights reserved.</p>
+    </footer>
+
+    <!-- Link to external JavaScript file -->
+    <script src="scripts/script.js"></script>
 </body>
 </html>

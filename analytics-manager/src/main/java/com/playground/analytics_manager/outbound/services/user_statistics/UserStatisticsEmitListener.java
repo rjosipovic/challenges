@@ -1,4 +1,4 @@
-package com.playground.analytics_manager.outbound.services;
+package com.playground.analytics_manager.outbound.services.user_statistics;
 
 import com.playground.analytics_manager.inbound.messaging.events.ChallengeSolvedEvent;
 import com.playground.analytics_manager.outbound.api.controllers.StatisticsController;

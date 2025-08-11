@@ -47,7 +47,7 @@ public class ControllerAdvice {
         if (errorCode.getHttpStatus().is5xxServerError()) {
             log.error("UserManagerError occurred: {}", ex.getDetail(), ex);
         } else {
-            log.warn("UserManagerError occurred: {}", ex.getDetail(), ex);
+            log.warn("UserManagerError occurred: {}", ex.getDetail());
         }
 
         var apiError = new UserManagerError(errorCode.getMessage(), errorCode.getCode(), ex.getDetail());

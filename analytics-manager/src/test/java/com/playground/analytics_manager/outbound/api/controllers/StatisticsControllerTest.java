@@ -5,7 +5,7 @@ import com.playground.analytics_manager.outbound.api.dto.UserSuccessRate;
 import com.playground.analytics_manager.outbound.auth.AuthConfig;
 import com.playground.analytics_manager.outbound.auth.JwtUserPrincipal;
 import com.playground.analytics_manager.outbound.errors.exceptions.UserNotFoundException;
-import com.playground.analytics_manager.outbound.services.UserStatisticsService;
+import com.playground.analytics_manager.outbound.services.user_statistics.UserStatisticsService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;

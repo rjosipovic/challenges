@@ -3,7 +3,7 @@ package com.playground.analytics_manager.outbound.api.controllers;
 import com.playground.analytics_manager.outbound.api.dto.StatisticsUpdate;
 import com.playground.analytics_manager.outbound.api.dto.UserSuccessRate;
 import com.playground.analytics_manager.outbound.auth.JwtUserPrincipal;
-import com.playground.analytics_manager.outbound.services.UserStatisticsService;
+import com.playground.analytics_manager.outbound.services.user_statistics.UserStatisticsService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;

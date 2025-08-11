@@ -24,11 +24,11 @@ public class ChallengeAttemptEntity {
     private UUID id;
     @Column(name = "user_id")
     private UUID userId;
-    @Column(name = "first_number", length = 2)
+    @Column(name = "first_number")
     private int firstNumber;
-    @Column(name = "second_number", length = 2)
+    @Column(name = "second_number")
     private int secondNumber;
-    @Column(name = "result_attempt", length = 4)
+    @Column(name = "result_attempt")
     private int resultAttempt;
     @Column(name = "correct")
     private boolean correct;

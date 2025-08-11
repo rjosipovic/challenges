@@ -21,7 +21,6 @@ public class UserRegisteredHandler implements CodeGenerationHandler {
         var email = ctx.getEmail();
         if (notRegistered(email)) {
             var msg = String.format("User with email: %s is not registered.", email);
-            log.info(msg);
             throw new UserNotFoundException(msg);
         }
     }

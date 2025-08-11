@@ -1,4 +1,4 @@
-package com.playground.analytics_manager.outbound.services;
+package com.playground.analytics_manager.outbound.services.user_statistics;
 
 import com.playground.analytics_manager.dataaccess.entity.UserEntity;
 import com.playground.analytics_manager.dataaccess.repository.ChallengeRepository;
