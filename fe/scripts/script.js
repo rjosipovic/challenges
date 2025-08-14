@@ -3,19 +3,19 @@ const USER_EXISTS_CODE = 'U002';
 const INVALID_VERIFICATION_CODE = 'A001';
 
 // challenge-manager
-const CHALLENGE_API = 'http://localhost:8080/challenges';
-const ATTEMPT_API = 'http://localhost:8080/attempts';
+const CHALLENGE_API = CHALLENGE_MANAGER + 'challenges';
+const ATTEMPT_API = CHALLENGE_MANAGER + 'attempts';
 
 // user-manager
-const AUTH_API = 'http://localhost:8081/auth';
-const USERS_API = 'http://localhost:8081/users';
+const AUTH_API = USER_MANAGER + 'auth';
+const USERS_API = USER_MANAGER + 'users';
 
 //gamification-manager
-const LEADERBOARD_API = 'http://localhost:8082/leaders';
+const LEADERBOARD_API = GAMIFICATION_MANAGER + 'leaders';
 
 //analitics-manager
-const STATS_API = 'http://localhost:8084/statistics/user';
-const HISTORY_API = 'http://localhost:8084/attempts';
+const STATS_API = ANALYTICS_MANAGER + 'statistics/user';
+const HISTORY_API = ANALYTICS_MANAGER + 'attempts';
 
 
 // Get the current year for the footer
@@ -92,35 +92,55 @@ const leaderboardBody = document.getElementById('leaderboard-body');
 // Store the generated code for the current login attempt (client-side only)
 let currentLoginCode = '';
 let currentLoginEmailAttempt = ''; // To remember which email the code was sent to
-
-let userStats = {
-    overall: {
-        totalAttempts: 0,
-        correctAttempts: 0
-    },
-    byGame: {
-        addition: { totalAttempts: 0, correctAttempts: 0 },
-        subtraction: { totalAttempts: 0, correctAttempts: 0 },
-        multiplication: { totalAttempts: 0, correctAttempts: 0 },
-        division: { totalAttempts: 0, correctAttempts: 0, }
-    },
-    byDifficulty: {
-        easy: { totalAttempts: 0, correctAttempts: 0 },
-        medium: { totalAttempts: 0, correctAttempts: 0 },
-        hard: { totalAttempts: 0, correctAttempts: 0 },
-        expert: { totalAttempts: 0, correctAttempts: 0 }
-    }
-};
-
 let currentUser = null;
-let gameHistory = [];
-
 let currentProblem = '';
 let num1 = 0;
 let num2 = 0;
 let selectedOperation = 'addition';
 let selectedDifficulty = 'easy';
 let gameActive = false;
+
+async function callApi(apiUrl, method, body = null, token = null) {
+    let headers = {
+        'Content-Type': 'application/json'
+    };
+
+    if (token) {
+        headers['Authorization'] = 'Bearer ' + token;
+    }
+
+    const requestOptions = {
+        method: method,
+        headers: headers,
+        body: body
+    };
+
+    try {
+        const response = await fetch(apiUrl, requestOptions);
+        if (response.ok) {
+            if (response.status === 204) {
+                return null; // No content
+            }
+            // Check if the response has a body before trying to parse it as JSON
+            const responseText = await response.text();
+            return responseText ? JSON.parse(responseText) : null;
+        } else if (response.status === 401) {
+            alertMessage("Please log in to play the game.", "text-red-500");
+            loginReset();
+        } else if (response.status === 403) {
+            alertMessage("You do not have permission to access this resource.", "text-yellow-500");
+        } else {
+            const errorText = await response.text();
+            const errorData = errorText ? JSON.parse(errorText) : { message: `Request failed with status: ${response.status}` };
+            console.error('API Error:', errorData);
+            return Promise.reject(errorData); // Reject the promise with error info
+        }
+    } catch (error) {
+        console.error('Error calling API:', error);
+        alertMessage('A network error occurred. Please try again.');
+        return Promise.reject(error);
+    }
+}
 
 async function generateProblem() {
 
@@ -130,28 +150,13 @@ async function generateProblem() {
     const token = localStorage.getItem("token");
 
     try {
-        const response = await fetch(apiUrl, {
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token
-            }
-        });
-
-        if (response.ok) {
-            const data = await response.json();
-            console.log('Got challenge:', data);
+        const data = await callApi(apiUrl, 'GET', null, token);
+        if (data) {
             num1 = data.firstNumber;
             num2 = data.secondNumber;
-        } else if (response.status === 401) {
-            alertMessage("Please log in to play the game.", "text-red-500");
-            loginReset();
-        } else {
-            const errorData = await response.json();
-            alertMessage('Something went wrong. Please try again.');
-            console.error('Error submitting answer:', errorData);
         }
     } catch (error) {
-        alert(ERROR_MSG);
+        alertMessage('Failed to get a new challenge. Please try again.');
         console.error('Error getting challenge:', error);
     }
 
@@ -201,35 +206,18 @@ function loginReset() {
 
 async function fetchStatistics() {
     const token = localStorage.getItem("token");
-    try {
-        const response = await fetch(STATS_API, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token
-            }
-        });
+    if (!token) return;
 
-        if (response.ok) {
-            const result = await response.json();
-            userStats = result;
-            console.log("Fetched statistics:", userStats);
-            renderStatistics();
-        } else if (response.status === 401) {
-            alertMessage("Please log in to play the game.", "text-red-500");
-            loginReset();
-        } else {
-            const errorData = await response.json();
-            alertMessage('Something went wrong. Please try again.');
-            console.error('Error submitting answer:', errorData);
-        }
+    try {
+        const result = await callApi(STATS_API, 'GET', null, token);
+        if (result) renderStatistics(result);
     } catch (error) {
-        alertMessage('Something went wrong. Please try again.');
-        console.error('Error submitting answer:', error);
+        alertMessage('Could not fetch your statistics.');
+        console.error('Error fetching statistics:', error);
     }
 }
 
-function renderStatistics() {
+function renderStatistics(userStats) {
     document.getElementById('stat-total').textContent = userStats.overall.totalAttempts;
     document.getElementById('stat-correct').textContent = userStats.overall.correctAttempts;
     document.getElementById('stat-incorrect').textContent = userStats.overall.totalAttempts - userStats.overall.correctAttempts;
@@ -280,35 +268,18 @@ async function fetchHistory() {
     if (!currentUser) return;
 
     const apiUrl = HISTORY_API;
-    try {
-        const response = await fetch(apiUrl, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token
-            }
-        });
+    if (!token) return;
 
-        if (response.ok) {
-            const result = await response.json();
-            gameHistory = result;
-            console.log("Fetched history:", gameHistory);
-            renderHistory();
-        } else if (response.status === 401) {
-            alertMessage("Please log in to play the game.", "text-red-500");
-            loginReset();
-        } else {
-            const errorData = await response.json();
-            alertMessage('Something went wrong. Please try again.');
-            console.error('Error submitting answer:', errorData);
-        }
+    try {
+        const result = await callApi(apiUrl, 'GET', null, token);
+        if (result) renderHistory(result);
     } catch (error) {
-        alertMessage('Something went wrong. Please try again.');
-        console.error('Error submitting answer:', error);
+        alertMessage('Could not fetch your game history.');
+        console.error('Error fetching history:', error);
     }
 }
 
-function renderHistory() {
+function renderHistory(gameHistory) {
     historyList.innerHTML = '';
     if (gameHistory.length === 0) {
         historyList.innerHTML = '<p class="text-center text-gray-400" id="no-history-message">No history available yet. Play a game to see your attempts!</p>';
@@ -343,49 +314,24 @@ async function fetchLeaderboard() {
 
     try {
         // Step 1: Fetch the core leaderboard data (scores, badges)
-        const leaderboardResponse = await fetch(LEADERBOARD_API, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token
-            }
-        });
-        if (!leaderboardResponse.ok) {
-            // Handle errors from the first API call
-            if (leaderboardResponse.status === 401) loginReset();
-            console.error('Failed to fetch leaderboard stats:', await leaderboardResponse.text());
-            alertMessage("Could not load leaderboard data.", "text-red-500");
-            return;
-        }
+        const leaderboardStats = await callApi(LEADERBOARD_API, 'GET', null, token);
 
-        const leaderboardStats = await leaderboardResponse.json();
-        if (leaderboardStats.length === 0) {
+        if (!leaderboardStats || leaderboardStats.length === 0) {
             renderLeaderboard([]); // Render an empty board if no data
             return;
         }
 
         // Step 2: Extract user IDs to fetch their aliases
         const userIds = leaderboardStats.map(stat => stat.userId);
-
-        // Step 3: Fetch the aliases from the dedicated endpoint
         const apiUrl = USERS_API + `?userIds=${userIds.join(",")}`;
-        const aliasesResponse = await fetch(apiUrl, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token
-            }
-        });
+        const aliasesArray = await callApi(apiUrl, 'GET', null, token);
 
-        if (!aliasesResponse.ok) {
-            console.error('Failed to fetch user aliases:', await aliasesResponse.text());
+        if (!aliasesArray) {
             alertMessage("Could not load user names for the leaderboard.", "text-red-500");
             // Fallback: render with a placeholder if aliases fail
             renderLeaderboard(leaderboardStats.map(stat => ({ ...stat, alias: 'Unknown' })));
             return;
         }
-
-        const aliasesArray = await aliasesResponse.json(); // Expects an array like [{id: "...", alias: "..."}]
 
         // Convert the array to a map for efficient lookup
         const aliasesMap = aliasesArray.reduce((map, user) => {
@@ -499,30 +445,15 @@ async function submitAnswer() {
     let correctAnswer;
 
     const apiUrl = ATTEMPT_API;
-    try {
-        const response = await fetch(apiUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token
-            },
-            body: JSON.stringify(data)
-        });
+    const body = JSON.stringify(data);
 
-        if (response.ok) {
-            const result = await response.json();
+    try {
+        const result = await callApi(apiUrl, 'POST', body, token);
+        if (result) {
             isCorrect = result.correct;
             correctAnswer = result.correctResult;
-        } else if (response.status === 401) {
-            alertMessage("Please log in to play the game.", "text-red-500");
-            loginReset();
-        } else {
-            const errorData = await response.json();
-            alertMessage('Something went wrong. Please try again.');
-            console.error('Error submitting answer:', errorData);
         }
     } catch (error) {
-        alertMessage('Something went wrong. Please try again.');
         console.error('Error submitting answer:', error);
     }
 
@@ -690,7 +621,7 @@ async function handleRegister(e) {
     e.preventDefault();
     const alias = regAliasInput.value.trim(); // Get alias
     const email = regEmailInput.value.trim(); // Get email
-    const birthdate = regBirthdateInput.value ?? null; // Get birthdate
+    const birthdate = regBirthdateInput.value || null; // Get birthdate, ensure empty string becomes null
 
     // Get selected gender from radio buttons
     let gender = null;
@@ -702,53 +633,29 @@ async function handleRegister(e) {
     }
 
     if (!alias || !email) {
-        registerMessage.textContent = "Please fill in all registration fields.";
+        registerMessage.textContent = "Alias and Email are required fields.";
         registerMessage.className = "text-red-500 mt-4";
         return;
     }
 
-    const user = {
-        alias: alias,
-        email: email,
-        birthdate: birthdate,
-        gender: gender
-    };
-
-    console.log("About to register user:", user);
+    const user = { alias, email, birthdate, gender };
+    const body = JSON.stringify(user);
     const registrationApi = AUTH_API + '/register';
-        try {
-        const response = await fetch(registrationApi, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(user)
-        });
 
-        if (response.ok) {
-            // Create new user object with updated fields
-            const newUser = { alias, email, birthdate, gender };
-            registerMessage.textContent = "Registration successful! Please proceed to login.";
-            registerMessage.className = "text-green-500 mt-4";
-            showBannerMessage("Registration successful! Please login to continue.", "text-green-500");
-            showView(loginView); // Go to login after successful registration
-            console.log("User registered:", newUser);
-        } else {
-            const errorData = await response.json();
-            const message = errorData.message;
-            const code = errorData.code;
-            const reason = errorData.reason;
-            console.log("Unable to register user: {}, reason: {} ", message, reason);
-            if (code === USER_EXISTS_CODE) {
-                registerMessage.textContent = "Registration failed: User with this email/alias already exists.";
-                registerMessage.className = "text-red-500 mt-4";
-            } else {
-                registerMessage.textContent = "Registration failed.";
-                registerMessage.className = "text-red-500 mt-4";
-            }
-        }
+    try {
+        await callApi(registrationApi, 'POST', body);
+        registerMessage.textContent = "Registration successful! Please proceed to login.";
+        registerMessage.className = "text-green-500 mt-4";
+        showBannerMessage("Registration successful! Please login to continue.", "text-green-500");
+        showView(loginView);
     } catch (error) {
-        registerMessage.textContent = "Registration failed.";
+        if (error.code === USER_EXISTS_CODE) {
+            registerMessage.textContent = "Registration failed: User with this email/alias already exists.";
+        } else {
+            registerMessage.textContent = "Registration failed. Please try again.";
+        }
         registerMessage.className = "text-red-500 mt-4";
-        console.log("Registration failed. ", error);
+        console.error("Registration failed: ", error);
     }
 }
 // New function to handle generating the login code
@@ -767,45 +674,28 @@ async function handleGenerateCode() {
         "email": email
     };
 
-    try {
-        const response = await fetch(apiUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(codeGenerationRequest)
-        });
+    const body = JSON.stringify(codeGenerationRequest);
 
-        if (response.ok) {
-            showBannerMessage(`Code sent to ${email}!`, "text-blue-400");
-            //Transition to step 2
-            loginStep1.classList.add('hidden');
-            loginStep2.classList.remove('hidden');
-            loginCodeInput.focus(); // Focus on the code input
-            loginMessage.textContent = `A 6-digit code has been sent to ${email}.`;
-            loginMessage.className = "text-gray-300 mt-4";
-        
-        } else {
-            const errorDate = await response.json();
-            const message = errorDate.message;
-            const code = errorDate.code;
-            const reason = errorDate.reason;
-            console.log("Unable to generate code: {}, reason: {} ", message, reason);
-            if (response .status === 404 && code === USER_NOT_FOUND_CODE) {
-                loginMessage.innerHTML = 'User not found with this email. <a href="#" id="login-to-register-link" class="text-green-400 hover:underline">Please register.</a>';
-                loginMessage.className = "text-red-500 mt-4";
-                // Add event listener to the newly created link
-                document.getElementById('login-to-register-link').addEventListener('click', (e) => {
-                    e.preventDefault();
-                    showView(registerView);
-                });
-            } else {
-                loginMessage.textContent = "Error generating code.";
-                loginMessage.className = "text-red-500 mt-4";
-            }
-        }
+    try {
+        await callApi(apiUrl, 'POST', body);
+        showBannerMessage(`Code sent to ${email}!`, "text-blue-400");
+        loginStep1.classList.add('hidden');
+        loginStep2.classList.remove('hidden');
+        loginCodeInput.focus();
+        loginMessage.textContent = `A 6-digit code has been sent to ${email}.`;
+        loginMessage.className = "text-gray-300 mt-4";
     } catch (error) {
-        loginMessage.textContent = "Error generating code.";
-        loginMessage.className = "text-red-500 mt-4";
-        console.error('Error generating code:', error);
+        if (error.code === USER_NOT_FOUND_CODE) {
+            loginMessage.innerHTML = 'User not found with this email. <a href="#" id="login-to-register-link" class="text-green-400 hover:underline">Please register.</a>';
+            document.getElementById('login-to-register-link').addEventListener('click', (e) => {
+                e.preventDefault();
+                showView(registerView);
+            });
+        } else {
+            loginMessage.textContent = "Error generating code.";
+            loginMessage.className = "text-red-500 mt-4";
+            console.error('Error generating code:', error);
+        }
     }
 }
 
@@ -820,50 +710,32 @@ async function handleVerifyCode() {
         loginMessage.className = "text-yellow-500 mt-4";
         return;
     }
-
-
+    
     const codeVerificationRequest = {
         "email": email,
         "code": enteredCode
     };
 
-    const apiUrl = AUTH_API + '/verify-code'
+    const apiUrl = AUTH_API + '/verify-code';
+    const body = JSON.stringify(codeVerificationRequest);
 
     try {
-        const response = await fetch(apiUrl, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(codeVerificationRequest)
-        });
-
-        if (response.ok) {
-            const data = await response.json();
-            localStorage.setItem('token', data.token);
-            currentUser = extractUserFromToken();
-            userStatusDisplay.textContent = `Status: Logged in as ${currentUser.alias} (${currentUser.email})`;
-            loginMessage.textContent = "Login successful! Welcome back.";
-            loginMessage.className = "text-green-500 mt-4";
-            showBannerMessage("Login successful! Welcome back.", "text-green-500");
-            showView(homeView); // Redirect to home for a better landing experience
-        } else {
-            const errorData = await response.json();
-            const message = errorData.message;
-            const code = errorData.code;
-            const reason = errorData.reason;
-            console.log("Unable to verify code: {}, reason: {} ", message, reason);
-            if (response.status === 404 && code === USER_NOT_FOUND_CODE) {
-                loginMessage.textContent = "Login failed: User data not found after code verification.";
-                loginMessage.className = "text-red-500 mt-4";
-            } else if (response.status === 400 && code === INVALID_VERIFICATION_CODE) {
-                loginMessage.textContent = "Verification failed: Invalid code.";
-                loginMessage.className = "text-red-500 mt-4";
-            } else {
-                loginMessage.textContent = "Verification failed.";
-                loginMessage.className = "text-red-500 mt-4";
-            }
-        }
+        const data = await callApi(apiUrl, 'POST', body);
+        localStorage.setItem('token', data.token);
+        currentUser = extractUserFromToken();
+        userStatusDisplay.textContent = `Status: Logged in as ${currentUser.alias} (${currentUser.email})`;
+        loginMessage.textContent = "Login successful! Welcome back.";
+        loginMessage.className = "text-green-500 mt-4";
+        showBannerMessage("Login successful! Welcome back.", "text-green-500");
+        showView(homeView);
     } catch (error) {
-        loginMessage.textContent = "Verification failed: Invalid code.";
+        if (error.code === USER_NOT_FOUND_CODE) {
+            loginMessage.textContent = "Login failed: User data not found after code verification.";
+        } else if (error.code === INVALID_VERIFICATION_CODE) {
+            loginMessage.textContent = "Verification failed: Invalid code.";
+        } else {
+            loginMessage.textContent = "Verification failed.";
+        }
         loginMessage.className = "text-red-500 mt-4";
         console.error('Login failed:', error);
     }

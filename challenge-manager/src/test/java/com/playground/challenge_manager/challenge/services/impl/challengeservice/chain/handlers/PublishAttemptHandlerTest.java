@@ -32,6 +32,7 @@ class PublishAttemptHandlerTest {
         var attemptId = UUID.randomUUID();
         var firstNumber = 3;
         var secondNumber = 4;
+        var resultAttempt = 7;
         var isCorrect = true;
         var game = "addition";
         var difficulty = "easy";
@@ -42,6 +43,7 @@ class PublishAttemptHandlerTest {
         when(challengeAttempt.getChallengeAttemptId()).thenReturn(attemptId);
         when(challengeAttempt.getFirstNumber()).thenReturn(firstNumber);
         when(challengeAttempt.getSecondNumber()).thenReturn(secondNumber);
+        when(challengeAttempt.getResultAttempt()).thenReturn(resultAttempt);
         when(challengeAttempt.isCorrect()).thenReturn(isCorrect);
         when(challengeAttempt.getGame()).thenReturn(game);
         when(challengeAttempt.getDifficulty()).thenReturn(difficulty);
@@ -53,7 +55,7 @@ class PublishAttemptHandlerTest {
         handler.handle(ctx);
 
         // then
-        var expectedEvent = new ChallengeSolvedEvent(userId.toString(), attemptId.toString(), firstNumber, secondNumber, isCorrect, game, difficulty, null);
+        var expectedEvent = new ChallengeSolvedEvent(userId.toString(), attemptId.toString(), firstNumber, secondNumber, resultAttempt, isCorrect, game, difficulty, null);
         verify(challengeSolvedProducer).publishChallengeSolvedMessage(expectedEvent);
     }
 }
