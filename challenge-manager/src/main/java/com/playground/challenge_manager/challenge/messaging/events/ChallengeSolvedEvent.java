@@ -11,6 +11,7 @@ public class ChallengeSolvedEvent {
     String challengeAttemptId;
     int firstNumber;
     int secondNumber;
+    int resultAttempt;
     boolean correct;
     String game;
     String difficulty;

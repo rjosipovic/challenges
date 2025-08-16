@@ -21,6 +21,10 @@ server:
   port: 8083
 
 app:
+  cors:
+    allowed-origins: ${ALLOWED_ORIGINS:http://127.0.0.1:3000}
+    allowed-methods: GET,POST,PUT,DELETE
+    allowed-headers: Authorization,Content-Type,X-Requested-With,Accept,Origin,Access-Control-Request-Method,Access-Control-Request-Headers,Access-Control-Allow-Origin
   messaging:
     dead-letter:
       exchange: dead-letter-exchange
@@ -28,7 +32,8 @@ app:
       queue: dead-letter-queue
     notifications:
       exchange: notifications-exchange
-      notifications-binding-key: notifications
-      queue: notifications-queue
+      notifications-binding-key: notifications.auth
+      queue: auth-notifications-queue
   email:
-    default-from: ${MAIL_FROM:no-reply@challenges.com}
+    default-from: ${DEFAULT_MAIL_FROM:no-reply@challenges.com}
+    default-to: ${DEFAULT_MAIL_TO}

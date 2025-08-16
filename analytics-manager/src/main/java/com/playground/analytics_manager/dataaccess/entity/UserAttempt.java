@@ -17,6 +17,7 @@ public class UserAttempt {
     private String id;
 
     private ZonedDateTime attemptDate;
+    private Integer resultAttempt;
     private Boolean correct;
 
     @TargetNode

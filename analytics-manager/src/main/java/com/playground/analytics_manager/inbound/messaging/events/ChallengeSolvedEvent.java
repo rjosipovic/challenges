@@ -15,6 +15,7 @@ public class ChallengeSolvedEvent {
     private final String challengeAttemptId;
     private final int firstNumber;
     private final int secondNumber;
+    private final int resultAttempt;
     private final boolean correct;
     private final String game;
     private final String difficulty;
@@ -26,6 +27,7 @@ public class ChallengeSolvedEvent {
             @JsonProperty("challengeAttemptId") String challengeAttemptId,
             @JsonProperty("firstNumber") int firstNumber,
             @JsonProperty("secondNumber") int secondNumber,
+            @JsonProperty("resultAttempt") int resultAttempt,
             @JsonProperty("correct") boolean correct,
             @JsonProperty("game") String game,
             @JsonProperty("difficulty") String difficulty,
@@ -35,6 +37,7 @@ public class ChallengeSolvedEvent {
         this.challengeAttemptId = challengeAttemptId;
         this.firstNumber = firstNumber;
         this.secondNumber = secondNumber;
+        this.resultAttempt = resultAttempt;
         this.correct = correct;
         this.game = game;
         this.difficulty = difficulty;

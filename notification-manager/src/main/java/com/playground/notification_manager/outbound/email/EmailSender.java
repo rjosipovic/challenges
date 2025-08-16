@@ -1,7 +1,5 @@
 package com.playground.notification_manager.outbound.email;
 
-import com.playground.notification_manager.model.Notification;
-import com.playground.notification_manager.outbound.email.config.EmailConfig;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -14,13 +12,12 @@ import java.util.Objects;
 public class EmailSender {
 
     private final JavaMailSender mailSender;
-    private final EmailConfig emailConfig;
 
-    public void sendEmail(Notification notification) {
-        var to = notification.getTo();
-        var from = emailConfig.getDefaultFrom();
-        var subject = notification.getSubject();
-        var body = notification.getBody();
+    public void sendEmail(EmailMessage emailMessage) {
+        var to = emailMessage.getTo();
+        var from = emailMessage.getFrom();
+        var subject = emailMessage.getSubject();
+        var body = emailMessage.getBody();
         var message = buildSimpleMailMessage(to, from, subject, body);
         mailSender.send(message);
     }
