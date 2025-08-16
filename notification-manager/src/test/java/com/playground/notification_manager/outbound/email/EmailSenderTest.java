@@ -1,7 +1,5 @@
 package com.playground.notification_manager.outbound.email;
 
-import com.playground.notification_manager.model.Notification;
-import com.playground.notification_manager.outbound.email.config.EmailConfig;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -16,16 +14,12 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class EmailSenderTest {
 
     @Mock
     private JavaMailSender javaMailSender;
-
-    @Mock
-    private EmailConfig emailConfig;
 
     @InjectMocks
     private EmailSender emailSender;
@@ -37,13 +31,12 @@ class EmailSenderTest {
         var to = "recipient@example.com";
         var subject = "Test Subject";
         var body = "Test Body";
-        when(emailConfig.getDefaultFrom()).thenReturn(defaultFrom);
-        var notification = new Notification(to, subject, body);
+        var emailMessage = new EmailMessage(defaultFrom, to, subject, body);
 
         var captor = ArgumentCaptor.forClass(SimpleMailMessage.class);
 
         //when
-        emailSender.sendEmail(notification);
+        emailSender.sendEmail(emailMessage);
 
         //then
         verify(javaMailSender, times(1)).send(captor.capture());
@@ -60,10 +53,10 @@ class EmailSenderTest {
     @Test
     void sendEmail_throwsException() {
         // given
-        var notification = new Notification(null, null, null);
+        var emailMessage = new EmailMessage(null, null, null, null);
 
         //when
-        var exception = assertThrows(IllegalArgumentException.class, () -> emailSender.sendEmail(notification));
+        var exception = assertThrows(IllegalArgumentException.class, () -> emailSender.sendEmail(emailMessage));
 
         //then
         assertThat(exception.getMessage()).isEqualTo("EmailNotification cannot be null");

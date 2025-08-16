@@ -206,6 +206,9 @@ services:
       - MAIL_PORT=${MAIL_PORT}
       - MAIL_USERNAME=${MAIL_USERNAME}
       - MAIL_PASSWORD=${MAIL_PASSWORD}
+      - DEFAULT_MAIL_TO=${DEFAULT_MAIL_TO}
+      - DEFAULT_MAIL_FROM=${DEFAULT_MAIL_FROM}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
     depends_on:
       rabbitmq:
         condition: service_healthy

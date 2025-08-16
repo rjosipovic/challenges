@@ -13,6 +13,9 @@ const USERS_API = USER_MANAGER + 'users';
 //gamification-manager
 const LEADERBOARD_API = GAMIFICATION_MANAGER + 'leaders';
 
+//notification-manager
+const CONTACT_API = NOTIFICATION_MANAGER + 'notifications';
+
 //analitics-manager
 const STATS_API = ANALYTICS_MANAGER + 'statistics/user';
 const HISTORY_API = ANALYTICS_MANAGER + 'attempts';
@@ -30,6 +33,17 @@ const navStatistics = document.getElementById('nav-statistics');
 const navHistory = document.getElementById('nav-history');
 const navLeaderboard = document.getElementById('nav-leaderboard');
 const navAbout = document.getElementById('nav-about');
+const navContact = document.getElementById('nav-contact');
+const navLogout = document.getElementById('nav-logout');
+
+// Nav LI elements for visibility toggling
+const liNavRegister = document.getElementById('li-nav-register');
+const liNavLogin = document.getElementById('li-nav-login');
+const liNavGame = document.getElementById('li-nav-game');
+const liNavStatistics = document.getElementById('li-nav-statistics');
+const liNavHistory = document.getElementById('li-nav-history');
+const liNavLeaderboard = document.getElementById('li-nav-leaderboard');
+const liNavLogout = document.getElementById('li-nav-logout');
 
 const homeView = document.getElementById('home-view');
 const registerView = document.getElementById('register-view');
@@ -39,6 +53,7 @@ const statisticsView = document.getElementById('statistics-view');
 const historyView = document.getElementById('history-view');
 const leaderboardView = document.getElementById('leaderboard-view');
 const aboutView = document.getElementById('about-view');
+const contactView = document.getElementById('contact-view');
 
 const homeToRegisterBtn = document.getElementById('home-to-register');
 const homeToLoginBtn = document.getElementById('home-to-login');
@@ -88,6 +103,13 @@ const historyList = document.getElementById('history-list');
 
 // Leaderboard elements for dynamic rendering
 const leaderboardBody = document.getElementById('leaderboard-body');
+
+// Contact Form elements
+const contactForm = document.getElementById('contact-form');
+const contactEmailGroup = document.getElementById('contact-email-group');
+const contactEmailInput = document.getElementById('contact-email');
+const contactSubjectInput = document.getElementById('contact-subject');
+const contactContentInput = document.getElementById('contact-content');
 
 // Store the generated code for the current login attempt (client-side only)
 let currentLoginCode = '';
@@ -393,8 +415,6 @@ function renderLeaderboard(leaderboardData) {
     });
 }
 
-
-
 function getOperationFromString(game) {
     switch (game) {
         case 'addition':
@@ -488,7 +508,26 @@ function endGame() {
 }
 
 // --- View Management ---
+
+// New function to update nav link visibility based on login status
+function updateNavVisibility() {
+    const token = localStorage.getItem("token");
+    const loggedInLinks = [liNavGame, liNavStatistics, liNavHistory, liNavLeaderboard, liNavLogout];
+    const loggedOutLinks = [liNavRegister, liNavLogin];
+
+    if (token) {
+        // User is logged in: show protected links, hide auth links
+        loggedInLinks.forEach(link => link.classList.remove('hidden'));
+        loggedOutLinks.forEach(link => link.classList.add('hidden'));
+    } else {
+        // User is logged out: hide protected links, show auth links
+        loggedInLinks.forEach(link => link.classList.add('hidden'));
+        loggedOutLinks.forEach(link => link.classList.remove('hidden'));
+    }
+}
+
 function showView(viewToShow) {
+    updateNavVisibility(); // Update nav on every view change
     // --- Authentication Gate for Protected Views ---
     const token = localStorage.getItem("token");
     const isProtectedView = viewToShow === gameView || viewToShow === statisticsView || viewToShow === historyView || viewToShow === leaderboardView;
@@ -541,7 +580,17 @@ function showView(viewToShow) {
         fetchStatistics();
     } else if (viewToShow === historyView) {
         fetchHistory();
-    } else if (viewToShow === leaderboardView) {
+    } else if (viewToShow === contactView) {
+        // Logic for the new contact form view
+        contactForm.reset();
+        const token = localStorage.getItem("token");
+        if (token) {
+            contactEmailGroup.classList.add('hidden');
+        } else {
+            contactEmailGroup.classList.remove('hidden');
+        }
+    }
+    else if (viewToShow === leaderboardView) {
         fetchLeaderboard();
     } else if (viewToShow === homeView) {
         currentUser = extractUserFromToken();
@@ -557,7 +606,7 @@ function showView(viewToShow) {
 function showBannerMessage(message, colorClass) {
     const bannerBox = document.createElement('div');
     // Styling for the banner, similar to the previous alert implementation
-    bannerBox.className = `fixed top-5 left-1/2 -translate-x-1/2 p-4 text-lg rounded-lg shadow-lg z-50 ${colorClass} text-white font-bold`;
+    bannerBox.className = `fixed top-24 left-1/2 -translate-x-1/2 p-4 text-lg rounded-lg shadow-lg z-50 ${colorClass} text-white font-bold`;
     bannerBox.textContent = message;
     document.body.appendChild(bannerBox);
 
@@ -646,7 +695,7 @@ async function handleRegister(e) {
         await callApi(registrationApi, 'POST', body);
         registerMessage.textContent = "Registration successful! Please proceed to login.";
         registerMessage.className = "text-green-500 mt-4";
-        showBannerMessage("Registration successful! Please login to continue.", "text-green-500");
+        showBannerMessage("Registration successful! Please login to continue.", "bg-green-600");
         showView(loginView);
     } catch (error) {
         if (error.code === USER_EXISTS_CODE) {
@@ -678,7 +727,7 @@ async function handleGenerateCode() {
 
     try {
         await callApi(apiUrl, 'POST', body);
-        showBannerMessage(`Code sent to ${email}!`, "text-blue-400");
+        showBannerMessage(`Code sent to ${email}!`, "bg-blue-600");
         loginStep1.classList.add('hidden');
         loginStep2.classList.remove('hidden');
         loginCodeInput.focus();
@@ -726,7 +775,7 @@ async function handleVerifyCode() {
         userStatusDisplay.textContent = `Status: Logged in as ${currentUser.alias} (${currentUser.email})`;
         loginMessage.textContent = "Login successful! Welcome back.";
         loginMessage.className = "text-green-500 mt-4";
-        showBannerMessage("Login successful! Welcome back.", "text-green-500");
+        showBannerMessage("Login successful! Welcome back.", "bg-green-600");
         showView(homeView);
     } catch (error) {
         if (error.code === USER_NOT_FOUND_CODE) {
@@ -740,6 +789,52 @@ async function handleVerifyCode() {
         console.error('Login failed:', error);
     }
 }
+
+async function handleContactFormSubmit(e) {
+    e.preventDefault();
+    const subject = contactSubjectInput.value.trim();
+    const content = contactContentInput.value.trim();
+    let from;
+
+    const token = localStorage.getItem("token");
+    if (token) {
+        const user = extractUserFromToken();
+        from = user.email;
+    } else {
+        from = contactEmailInput.value.trim();
+        if (!from) {
+            alertMessage("Please provide your email address.", "text-yellow-500");
+            return;
+        }
+    }
+
+    if (!subject || !content) {
+        alertMessage("Subject and Content fields cannot be empty.", "text-yellow-500");
+        return;
+    }
+
+    const body = JSON.stringify({ from, subject, content });
+
+    try {
+        await callApi(CONTACT_API, 'POST', body);
+        showBannerMessage("Your message has been sent successfully!", "bg-green-600");
+        contactForm.reset();
+    } catch (error) {
+        alertMessage("There was an error sending your message. Please try again later.", "text-red-500");
+        console.error("Contact form submission failed:", error);
+    }
+}
+
+function handleLogout(e) {
+    e.preventDefault();
+    localStorage.removeItem("token");
+    currentUser = null;
+    // Use a banner for a less intrusive notification
+    showBannerMessage("You have been successfully logged out.", "bg-blue-600");
+    // Redirect to home view, which will also update nav visibility
+    showView(homeView);
+}
+
 
 function extractUserFromToken() {
     const token = localStorage.getItem("token");
@@ -770,6 +865,8 @@ document.addEventListener('DOMContentLoaded', () => {
     navHistory.addEventListener('click', (e) => { e.preventDefault(); showView(historyView); });
     navLeaderboard.addEventListener('click', (e) => { e.preventDefault(); showView(leaderboardView); });
     navAbout.addEventListener('click', (e) => { e.preventDefault(); showView(aboutView); });
+    navContact.addEventListener('click', (e) => { e.preventDefault(); showView(contactView); });
+    navLogout.addEventListener('click', handleLogout);
 
     homeToRegisterBtn.addEventListener('click', (e) => { e.preventDefault(); showView(registerView); });
     homeToLoginBtn.addEventListener('click', (e) => { e.preventDefault(); showView(loginView); });
@@ -813,4 +910,6 @@ document.addEventListener('DOMContentLoaded', () => {
             nextProblem();
         }
     });
+
+    contactForm.addEventListener('submit', handleContactFormSubmit);
 });

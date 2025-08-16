@@ -14,7 +14,8 @@ public class ControllerAdvice {
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public void handleException() {
+    public void handleException(Exception ex) {
+        log.error("Internal server error", ex);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

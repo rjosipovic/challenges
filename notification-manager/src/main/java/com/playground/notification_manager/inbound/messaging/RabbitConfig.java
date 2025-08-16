@@ -1,4 +1,4 @@
-package com.playground.notification_manager.inbound;
+package com.playground.notification_manager.inbound.messaging;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.core.Binding;

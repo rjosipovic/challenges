@@ -47,7 +47,7 @@ app:
       user-created-routing-key: user.created
     auth:
       exchange: notifications-exchange
-      auth-code-routing-key: notifications
+      auth-code-routing-key: notifications.auth
     dead-letter:
       exchange: dead-letter-exchange
       routing-key: dead-letter
