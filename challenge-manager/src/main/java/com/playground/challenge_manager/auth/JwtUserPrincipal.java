@@ -1,15 +1,20 @@
 package com.playground.challenge_manager.auth;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Singular;
+import lombok.Value;
 
 import java.io.Serializable;
 import java.util.Map;
 
-@RequiredArgsConstructor
-@Getter
+@Value
+@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class JwtUserPrincipal implements Serializable {
 
-    private final String email;
-    private final Map<String, Object> claims;
+    String email;
+    @Singular
+    Map<String, Object> claims;
 }

@@ -10,13 +10,13 @@ import com.playground.challenge_manager.config.SecurityConfig;
 import com.playground.challenge_manager.errors.custom.ChallengeManagerError;
 import com.playground.challenge_manager.errors.exceptions.enums.ErrorCode;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.json.JacksonTester;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,7 +24,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -68,7 +67,9 @@ class AttemptControllerTest {
         var attemptWithUserId = new ChallengeAttemptDTO(userId.toString(), firstNumber, secondNumber, guess, game);
         var result = new ChallengeResultDTO(userId.toString(), firstNumber, secondNumber, guess, correct, true, game);
         when(challengeService.verifyAttempt(attemptWithUserId)).thenReturn(result);
-        var principal = new JwtUserPrincipal(null, Map.of("userId", userId.toString()));
+        var principal = JwtUserPrincipal.builder()
+                .claim("userId", userId.toString())
+                .build();
         var auth = new UsernamePasswordAuthenticationToken(principal, null, List.of());
 
         //when
@@ -99,7 +100,9 @@ class AttemptControllerTest {
         var attemptWithUserId = new ChallengeAttemptDTO(userId.toString(), firstNumber, secondNumber, guess, game);
         var result = new ChallengeResultDTO(userId.toString(), firstNumber, secondNumber, guess, correct, false, game);
         when(challengeService.verifyAttempt(attemptWithUserId)).thenReturn(result);
-        var principal = new JwtUserPrincipal(null, Map.of("userId", userId.toString()));
+        var principal = JwtUserPrincipal.builder()
+                .claim("userId", userId.toString())
+                .build();
         var auth = new UsernamePasswordAuthenticationToken(principal, null, null);
 
         //when
@@ -123,7 +126,9 @@ class AttemptControllerTest {
         //given
         var userId = UUID.randomUUID();
         var attempt = new ChallengeAttemptDTO(null, firstNumber, secondNumber, guess, game);
-        var principal = new JwtUserPrincipal(null, Map.of("userId", userId.toString()));
+        var principal = JwtUserPrincipal.builder()
+                .claim("userId", userId.toString())
+                .build();
         var auth = new UsernamePasswordAuthenticationToken(principal, null, null);
         var errorCode = ErrorCode.VALIDATION_FAILED;
 
