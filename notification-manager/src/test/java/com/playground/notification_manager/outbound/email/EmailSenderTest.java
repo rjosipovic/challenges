@@ -31,8 +31,12 @@ class EmailSenderTest {
         var to = "recipient@example.com";
         var subject = "Test Subject";
         var body = "Test Body";
-        var emailMessage = new EmailMessage(defaultFrom, to, subject, body);
-
+        var emailMessage = EmailMessage.builder()
+                .from(defaultFrom)
+                .to(to)
+                .subject(subject)
+                .body(body)
+                .build();
         var captor = ArgumentCaptor.forClass(SimpleMailMessage.class);
 
         //when
@@ -53,7 +57,7 @@ class EmailSenderTest {
     @Test
     void sendEmail_throwsException() {
         // given
-        var emailMessage = new EmailMessage(null, null, null, null);
+        var emailMessage = EmailMessage.builder().build();
 
         //when
         var exception = assertThrows(IllegalArgumentException.class, () -> emailSender.sendEmail(emailMessage));

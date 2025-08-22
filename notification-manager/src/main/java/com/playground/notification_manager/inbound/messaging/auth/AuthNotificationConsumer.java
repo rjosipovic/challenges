@@ -23,7 +23,12 @@ public class AuthNotificationConsumer {
         var to = notification.getTo();
         var subject = notification.getSubject();
         var body = notification.getBody();
-        var emailMessage = new EmailMessage(from, to, subject, body);
+        var emailMessage = EmailMessage.builder()
+                .from(from)
+                .to(to)
+                .subject(subject)
+                .body(body)
+                .build();
         applicationEventPublisher.publishEvent(emailMessage);
     }
 }

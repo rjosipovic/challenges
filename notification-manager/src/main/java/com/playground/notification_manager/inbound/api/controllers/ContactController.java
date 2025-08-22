@@ -26,8 +26,12 @@ public class ContactController {
         var from = contactMessage.getFrom();
         var subject = contactMessage.getSubject();
         var body = contactMessage.getContent();
-        var emailMessage = new EmailMessage(from, to, subject, body);
-
+        var emailMessage = EmailMessage.builder()
+                .from(from)
+                .to(to)
+                .subject(subject)
+                .body(body)
+                .build();
         applicationEventPublisher.publishEvent(emailMessage);
         return ResponseEntity.accepted().build();
     }
