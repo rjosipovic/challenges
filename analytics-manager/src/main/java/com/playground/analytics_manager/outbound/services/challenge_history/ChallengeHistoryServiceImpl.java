@@ -20,15 +20,16 @@ public class ChallengeHistoryServiceImpl implements ChallengeHistoryService {
         var attemptEntities = challengeRepository.findByUserAttempt_UserId(UUID.fromString(userId));
         if (!attemptEntities.isEmpty()) {
             return attemptEntities.stream()
-                    .map(e -> new ChallengeResult(
-                            e.getUserAttempt().getUser().getAlias(),
-                            e.getFirstNumber(),
-                            e.getSecondNumber(),
-                            e.getUserAttempt().getResultAttempt(),
-                            MathUtil.calculateResult(e.getFirstNumber(), e.getSecondNumber(), e.getGame()),
-                            e.getUserAttempt().getCorrect(),
-                            e.getGame()
-                    )).toList();
+                    .map(e -> ChallengeResult.builder()
+                            .alias(e.getUserAttempt().getUser().getAlias())
+                            .firstNumber(e.getFirstNumber())
+                            .secondNumber(e.getSecondNumber())
+                            .guess(e.getUserAttempt().getResultAttempt())
+                            .correctResult(MathUtil.calculateResult(e.getFirstNumber(), e.getSecondNumber(), e.getGame()))
+                            .correct(e.getUserAttempt().getCorrect())
+                            .game(e.getGame())
+                            .build())
+                    .toList();
         }
         return List.of();
     }

@@ -18,7 +18,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -48,7 +47,9 @@ class StatisticsControllerTest {
         var userId = UUID.randomUUID().toString();
         var userSuccessRate = buildUserSuccessRate();
         when(userStatisticsService.getUserStatistics(userId)).thenReturn(userSuccessRate);
-        var principal = new JwtUserPrincipal(null, Map.of("userId", userId));
+        var principal = JwtUserPrincipal.builder()
+                .claim("userId", userId)
+                .build();
         var auth = new UsernamePasswordAuthenticationToken(principal, null, List.of());
 
         //when
@@ -71,7 +72,9 @@ class StatisticsControllerTest {
         //given
         var userId = UUID.randomUUID().toString();
         when(userStatisticsService.getUserStatistics(userId)).thenThrow(new UserNotFoundException(String.format("User %s not found", userId)));
-        var principal = new JwtUserPrincipal(null, Map.of("userId", userId));
+        var principal = JwtUserPrincipal.builder()
+                .claim("userId", userId)
+                .build();
         var auth = new UsernamePasswordAuthenticationToken(principal, null, List.of());
 
         //when

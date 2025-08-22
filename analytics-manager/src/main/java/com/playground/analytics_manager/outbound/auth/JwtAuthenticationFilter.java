@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Map;
 
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -64,10 +63,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private static UsernamePasswordAuthenticationToken getUsernamePasswordAuthenticationToken(SignedJWT signedJwt) throws ParseException {
-        var email = signedJwt.getJWTClaimsSet().getSubject();
-        var alias = signedJwt.getJWTClaimsSet().getStringClaim("alias");
-        var userId = signedJwt.getJWTClaimsSet().getStringClaim("userId");
-        var userPrincipal = new JwtUserPrincipal(email, Map.of("alias", alias, "userId", userId));
+        var userPrincipal = JwtUserPrincipal.builder()
+                .email(signedJwt.getJWTClaimsSet().getSubject())
+                .claim("alias", signedJwt.getJWTClaimsSet().getStringClaim("alias"))
+                .claim("userId", signedJwt.getJWTClaimsSet().getStringClaim("userId"))
+                .build();
         return new UsernamePasswordAuthenticationToken(userPrincipal, null, Collections.emptyList());
     }
 }

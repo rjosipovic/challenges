@@ -15,11 +15,12 @@ public class UserStatisticsEmitListener {
 
     @EventListener
     public void onProcessedChallengeSolvedEvent(ChallengeSolvedEvent event) {
-        var userId = event.getUserId();
-        var success = event.isCorrect();
-        var game = event.getGame();
-        var difficulty = event.getDifficulty();
-        var statisticsUpdate = new StatisticsUpdate(userId, game, difficulty, success);
+        var statisticsUpdate = StatisticsUpdate.builder()
+                .userId(event.getUserId())
+                .game(event.getGame())
+                .difficulty(event.getDifficulty())
+                .success(event.isCorrect())
+                .build();
         statisticsController.publishStatisticsUpdate(statisticsUpdate);
     }
 }
