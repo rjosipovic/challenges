@@ -44,7 +44,10 @@ class ChallengeControllerTest {
     @Test
     void testGetRandomChallenge() throws Exception {
         //given
-        var challenge = new Challenge(11, 12);
+        var challenge = Challenge.builder()
+                .firstNumber(11)
+                .secondNumber(12)
+                .build();
         var difficulty = "medium";
         when(challengeGeneratorService.randomChallenge(difficulty)).thenReturn(challenge);
 

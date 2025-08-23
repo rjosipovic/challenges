@@ -46,7 +46,7 @@ class ChallengeGeneratorServiceImplTest {
         assertNotNull(challenge);
         assertTrue(challenge.getFirstNumber() >= min && challenge.getFirstNumber() <= max);
         assertTrue(challenge.getSecondNumber() >= min && challenge.getSecondNumber() <= max);
-        assertEquals(new Challenge(1 + 1, 2 + 1), challenge);
+        assertEquals(Challenge.builder().firstNumber(1 + 1).secondNumber(2 + 1).build(), challenge);
     }
 
     @Test
@@ -59,7 +59,7 @@ class ChallengeGeneratorServiceImplTest {
         assertNotNull(challenge);
         assertTrue(challenge.getFirstNumber() >= min && challenge.getFirstNumber() <= max);
         assertTrue(challenge.getSecondNumber() >= min && challenge.getSecondNumber() <= max);
-        assertEquals(new Challenge(11 + 11, 12 + 11), challenge);
+        assertEquals(Challenge.builder().firstNumber(11 + 11).secondNumber(12 + 11).build(), challenge);
     }
 
     @Test
@@ -72,7 +72,7 @@ class ChallengeGeneratorServiceImplTest {
         assertNotNull(challenge);
         assertTrue(challenge.getFirstNumber() >= min && challenge.getFirstNumber() <= max);
         assertTrue(challenge.getSecondNumber() >= min && challenge.getSecondNumber() <= max);
-        assertEquals(new Challenge(101 + 101, 102 + 101), challenge);
+        assertEquals(Challenge.builder().firstNumber(101 + 101).secondNumber(102 + 101).build(), challenge);
     }
 
     @Test
@@ -85,6 +85,6 @@ class ChallengeGeneratorServiceImplTest {
         assertNotNull(challenge);
         assertTrue(challenge.getFirstNumber() >= min && challenge.getFirstNumber() <= max);
         assertTrue(challenge.getSecondNumber() >= min && challenge.getSecondNumber() <= max);
-        assertEquals(new Challenge(1001 + 1001, 1002 + 1001), challenge);
+        assertEquals(Challenge.builder().firstNumber(1001 + 1001).secondNumber(1002 + 1001).build(), challenge);
     }
 }

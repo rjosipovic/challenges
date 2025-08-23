@@ -1,16 +1,15 @@
 package com.playground.challenge_manager.challenge.services.model;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Value;
 
-@RequiredArgsConstructor
-@Getter
-@ToString
-@EqualsAndHashCode
+@Value
+@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Challenge {
 
-    private final int firstNumber;
-    private final int secondNumber;
+    Integer firstNumber;
+    Integer secondNumber;
 }

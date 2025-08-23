@@ -19,9 +19,7 @@ public class ChallengeGeneratorServiceImpl implements ChallengeGeneratorService 
 
     @Override
     public Challenge randomChallenge(String difficulty) {
-        var firstNumber = next(difficulty);
-        var secondNumber = next(difficulty);
-        return new Challenge(firstNumber, secondNumber);
+        return Challenge.builder().firstNumber(next(difficulty)).secondNumber(next(difficulty)).build();
     }
 
     private int next(String difficulty) {

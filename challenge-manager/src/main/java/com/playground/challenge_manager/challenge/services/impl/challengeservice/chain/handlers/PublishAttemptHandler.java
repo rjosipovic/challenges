@@ -19,17 +19,17 @@ public class PublishAttemptHandler implements AttemptHandler {
     public void handle(AttemptVerifierContext ctx) {
         log.info("Publishing attempt: {}", ctx.getChallengeAttempt());
         var challengeAttempt = ctx.getChallengeAttempt();
-        var userId = challengeAttempt.getUserId().toString();
-        var attemptId = challengeAttempt.getChallengeAttemptId().toString();
-        var firstNumber = challengeAttempt.getFirstNumber();
-        var secondNumber = challengeAttempt.getSecondNumber();
-        var resultAttempt = challengeAttempt.getResultAttempt();
-        var isCorrect = challengeAttempt.isCorrect();
-        var game = challengeAttempt.getGame();
-        var difficulty = challengeAttempt.getDifficulty();
-        var attemptDate = challengeAttempt.getAttemptDate();
-        var challengeSolved = new ChallengeSolvedEvent(userId, attemptId, firstNumber, secondNumber, resultAttempt, isCorrect, game, difficulty, attemptDate);
-
+        var challengeSolved = ChallengeSolvedEvent.builder()
+                .userId(challengeAttempt.getUserId().toString())
+                .challengeAttemptId(challengeAttempt.getChallengeAttemptId().toString())
+                .firstNumber(challengeAttempt.getFirstNumber())
+                .secondNumber(challengeAttempt.getSecondNumber())
+                .resultAttempt(challengeAttempt.getResultAttempt())
+                .correct(challengeAttempt.isCorrect())
+                .game(challengeAttempt.getGame())
+                .difficulty(challengeAttempt.getDifficulty())
+                .attemptDate(challengeAttempt.getAttemptDate())
+                .build();
         challengeSolvedProducer.publishChallengeSolvedMessage(challengeSolved);
     }
 }
