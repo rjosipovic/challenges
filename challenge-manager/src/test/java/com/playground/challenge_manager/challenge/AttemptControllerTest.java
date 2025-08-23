@@ -63,8 +63,19 @@ class AttemptControllerTest {
         var guess = 276;
         var correct = 276;
         var game = "multiplication";
-        var attempt = new ChallengeAttemptDTO(null, firstNumber, secondNumber, guess, game);
-        var attemptWithUserId = new ChallengeAttemptDTO(userId.toString(), firstNumber, secondNumber, guess, game);
+        var attempt = ChallengeAttemptDTO.builder()
+                .firstNumber(firstNumber)
+                .secondNumber(secondNumber)
+                .guess(guess)
+                .game(game)
+                .build();
+        var attemptWithUserId = ChallengeAttemptDTO.builder()
+                .userId(userId.toString())
+                .firstNumber(firstNumber)
+                .secondNumber(secondNumber)
+                .guess(guess)
+                .game(game)
+                .build();
         var result = new ChallengeResultDTO(userId.toString(), firstNumber, secondNumber, guess, correct, true, game);
         when(challengeService.verifyAttempt(attemptWithUserId)).thenReturn(result);
         var principal = JwtUserPrincipal.builder()
@@ -96,8 +107,19 @@ class AttemptControllerTest {
         var guess = 6789;
         var correct = 276;
         var game = "multiplication";
-        var attempt = new ChallengeAttemptDTO(null, firstNumber, secondNumber, guess, game);
-        var attemptWithUserId = new ChallengeAttemptDTO(userId.toString(), firstNumber, secondNumber, guess, game);
+        var attempt = ChallengeAttemptDTO.builder()
+                .firstNumber(firstNumber)
+                .secondNumber(secondNumber)
+                .guess(guess)
+                .game(game)
+                .build();
+        var attemptWithUserId = ChallengeAttemptDTO.builder()
+                .userId(userId.toString())
+                .firstNumber(firstNumber)
+                .secondNumber(secondNumber)
+                .guess(guess)
+                .game(game)
+                .build();
         var result = new ChallengeResultDTO(userId.toString(), firstNumber, secondNumber, guess, correct, false, game);
         when(challengeService.verifyAttempt(attemptWithUserId)).thenReturn(result);
         var principal = JwtUserPrincipal.builder()
@@ -125,7 +147,12 @@ class AttemptControllerTest {
     void testMakeAttempt_invalidInput(Integer firstNumber, Integer secondNumber, Integer guess, String game, String expectedReason) throws Exception {
         //given
         var userId = UUID.randomUUID();
-        var attempt = new ChallengeAttemptDTO(null, firstNumber, secondNumber, guess, game);
+        var attempt = ChallengeAttemptDTO.builder()
+                .firstNumber(firstNumber)
+                .secondNumber(secondNumber)
+                .guess(guess)
+                .game(game)
+                .build();
         var principal = JwtUserPrincipal.builder()
                 .claim("userId", userId.toString())
                 .build();

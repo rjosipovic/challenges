@@ -57,7 +57,13 @@ class ChallengeServiceImplTest {
         var guess = firstNumber * secondNumber;
         var game = "multiplication";
         var difficulty = "medium";
-        var attemptDto = new ChallengeAttemptDTO(userId.toString(), firstNumber, secondNumber, guess, game);
+        var attemptDto = ChallengeAttemptDTO.builder()
+                .userId(userId.toString())
+                .firstNumber(firstNumber)
+                .secondNumber(secondNumber)
+                .guess(guess)
+                .game(game)
+                .build();
         var attemptEntity = new ChallengeAttemptEntity(null, userId, firstNumber, secondNumber, guess, true, game, difficulty, null);
         var savedAttemptEntity = new ChallengeAttemptEntity(challengeAttemptId, userId, firstNumber, secondNumber, guess, true, game, null, null);
         when(challengeAttemptRepository.saveAndFlush(attemptEntity)).thenReturn(savedAttemptEntity);
@@ -99,7 +105,13 @@ class ChallengeServiceImplTest {
         var correctResult = firstNumber * secondNumber;
         var game = "multiplication";
         var difficulty = "medium";
-        var attempt = new ChallengeAttemptDTO(userId.toString(), firstNumber, secondNumber, guess, game);
+        var attempt = ChallengeAttemptDTO.builder()
+                .userId(userId.toString())
+                .firstNumber(firstNumber)
+                .secondNumber(secondNumber)
+                .guess(guess)
+                .game(game)
+                .build();
         var attemptEntity = new ChallengeAttemptEntity(null, userId, firstNumber, secondNumber, guess, false, game, difficulty, null);
         var savedAttemptEntity = new ChallengeAttemptEntity(challengeAttemptId, userId, firstNumber, secondNumber, guess, false, game, null, null);
         when(challengeAttemptRepository.saveAndFlush(attemptEntity)).thenReturn(savedAttemptEntity);

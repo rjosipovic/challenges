@@ -36,7 +36,13 @@ class SaveAttemptHandlerTest {
         var guess = 2764;
         var game = "multiplication";
         var difficulty = "easy";
-        var attempt = new ChallengeAttemptDTO(userId.toString(), firstNumber, secondNumber, guess, game);
+        var attempt = ChallengeAttemptDTO.builder()
+                .userId(userId.toString())
+                .firstNumber(firstNumber)
+                .secondNumber(secondNumber)
+                .guess(guess)
+                .game(game)
+                .build();
         var ctx = new AttemptVerifierContext(attempt);
         var challengeAttempt = new ChallengeAttempt(null, userId, firstNumber, secondNumber, guess, false, game, difficulty, null);
         ctx.setChallengeAttempt(challengeAttempt);

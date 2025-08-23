@@ -37,7 +37,13 @@ class AttemptResultHandlerTest {
         var isCorrect = true;
         var game = "multiplication";
         var difficulty = "easy";
-        var attempt = new ChallengeAttemptDTO(userId.toString(), firstNumber, secondNumber, guess, game);
+        var attempt = ChallengeAttemptDTO.builder()
+                .userId(userId.toString())
+                .firstNumber(firstNumber)
+                .secondNumber(secondNumber)
+                .guess(guess)
+                .game(game)
+                .build();
         var challengeAttempt = new ChallengeAttempt(null, userId, firstNumber, secondNumber, guess, isCorrect, game, difficulty, null);
         var ctx = new AttemptVerifierContext(attempt);
         ctx.setChallengeAttempt(challengeAttempt);
@@ -67,7 +73,13 @@ class AttemptResultHandlerTest {
         var guess = 456;
         var game = "multiplication";
         var difficulty = "easy";
-        var attempt = new ChallengeAttemptDTO(userId.toString(), firstNumber, secondNumber, guess, game);
+        var attempt = ChallengeAttemptDTO.builder()
+                .userId(userId.toString())
+                .firstNumber(firstNumber)
+                .secondNumber(secondNumber)
+                .guess(guess)
+                .game(game)
+                .build();
         var challengeAttempt = new ChallengeAttempt(null, userId, firstNumber, secondNumber, guess, false, game, difficulty, null);
         var ctx = new AttemptVerifierContext(attempt);
         ctx.setChallengeAttempt(challengeAttempt);
