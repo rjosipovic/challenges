@@ -44,7 +44,15 @@ class AttemptResultHandlerTest {
                 .guess(guess)
                 .game(game)
                 .build();
-        var challengeAttempt = new ChallengeAttempt(null, userId, firstNumber, secondNumber, guess, isCorrect, game, difficulty, null);
+        var challengeAttempt = ChallengeAttempt.builder()
+                .userId(userId)
+                .firstNumber(firstNumber)
+                .secondNumber(secondNumber)
+                .resultAttempt(guess)
+                .correct(isCorrect)
+                .game(game)
+                .difficulty(difficulty)
+                .build();
         var ctx = new AttemptVerifierContext(attempt);
         ctx.setChallengeAttempt(challengeAttempt);
 
@@ -80,7 +88,15 @@ class AttemptResultHandlerTest {
                 .guess(guess)
                 .game(game)
                 .build();
-        var challengeAttempt = new ChallengeAttempt(null, userId, firstNumber, secondNumber, guess, false, game, difficulty, null);
+        var challengeAttempt = ChallengeAttempt.builder()
+                .userId(userId)
+                .firstNumber(firstNumber)
+                .secondNumber(secondNumber)
+                .resultAttempt(guess)
+                .correct(false)
+                .game(game)
+                .difficulty(difficulty)
+                .build();
         var ctx = new AttemptVerifierContext(attempt);
         ctx.setChallengeAttempt(challengeAttempt);
 

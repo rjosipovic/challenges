@@ -14,7 +14,7 @@ public class AttemptResultHandler implements AttemptHandler {
         var firstNumber = challengeAttempt.getFirstNumber();
         var secondNumber = challengeAttempt.getSecondNumber();
         var guess = challengeAttempt.getResultAttempt();
-        var isCorrect = challengeAttempt.isCorrect();
+        var isCorrect = challengeAttempt.getCorrect();
         var game = challengeAttempt.getGame();
         var correctResult = MathUtil.calculateResult(firstNumber, secondNumber, game);
 

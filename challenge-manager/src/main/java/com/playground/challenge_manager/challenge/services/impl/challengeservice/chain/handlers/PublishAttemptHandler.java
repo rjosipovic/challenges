@@ -25,7 +25,7 @@ public class PublishAttemptHandler implements AttemptHandler {
                 .firstNumber(challengeAttempt.getFirstNumber())
                 .secondNumber(challengeAttempt.getSecondNumber())
                 .resultAttempt(challengeAttempt.getResultAttempt())
-                .correct(challengeAttempt.isCorrect())
+                .correct(challengeAttempt.getCorrect())
                 .game(challengeAttempt.getGame())
                 .difficulty(challengeAttempt.getDifficulty())
                 .attemptDate(challengeAttempt.getAttemptDate())

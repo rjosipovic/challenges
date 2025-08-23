@@ -29,7 +29,7 @@ class MessageRetryListenerTest {
         var exchange = "test-exchange";
         var routingKey = "test-routing-key";
         var message = mock(Message.class);
-        var event = new MessageRetryEvent(message, exchange, routingKey);
+        var event = MessageRetryEvent.builder().message(message).exchange(exchange).routingKey(routingKey).build();
 
         // when
         listener.onMessageRetryEvent(event);

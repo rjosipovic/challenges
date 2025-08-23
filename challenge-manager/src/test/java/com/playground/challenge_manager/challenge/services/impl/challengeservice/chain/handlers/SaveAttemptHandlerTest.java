@@ -44,7 +44,15 @@ class SaveAttemptHandlerTest {
                 .game(game)
                 .build();
         var ctx = new AttemptVerifierContext(attempt);
-        var challengeAttempt = new ChallengeAttempt(null, userId, firstNumber, secondNumber, guess, false, game, difficulty, null);
+        var challengeAttempt = ChallengeAttempt.builder()
+                .userId(userId)
+                .firstNumber(firstNumber)
+                .secondNumber(secondNumber)
+                .resultAttempt(guess)
+                .correct(false)
+                .game(game)
+                .difficulty(difficulty)
+                .build();
         ctx.setChallengeAttempt(challengeAttempt);
 
         var entity = new ChallengeAttemptEntity(null, userId, firstNumber, secondNumber, guess, false, game, difficulty, null);

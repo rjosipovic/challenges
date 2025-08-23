@@ -28,7 +28,15 @@ public class CheckResultHandler implements AttemptHandler {
         var difficulty = determineDifficulty(firstNumber, secondNumber);
         var isCorrect = isCorrect(guess, MathUtil.calculateResult(firstNumber, secondNumber, game));
 
-        var challengeAttempt = new ChallengeAttempt(null, userId, firstNumber, secondNumber, guess, isCorrect, game, difficulty, null);
+        var challengeAttempt = ChallengeAttempt.builder()
+                .userId(userId)
+                .firstNumber(firstNumber)
+                .secondNumber(secondNumber)
+                .resultAttempt(guess)
+                .correct(isCorrect)
+                .game(game)
+                .difficulty(difficulty)
+                .build();
         ctx.setChallengeAttempt(challengeAttempt);
     }
 

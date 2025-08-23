@@ -63,7 +63,7 @@ class CheckResultHandlerTest {
                 () -> assertEquals(firstNumber, challengeAttempt.getFirstNumber()),
                 () -> assertEquals(secondNumber, challengeAttempt.getSecondNumber()),
                 () -> assertEquals(guess, challengeAttempt.getResultAttempt()),
-                () -> assertTrue(challengeAttempt.isCorrect())
+                () -> assertTrue(challengeAttempt.getCorrect())
         );
     }
 
@@ -103,7 +103,7 @@ class CheckResultHandlerTest {
                 () -> assertEquals(firstNumber, challengeAttempt.getFirstNumber()),
                 () -> assertEquals(secondNumber, challengeAttempt.getSecondNumber()),
                 () -> assertEquals(guess, challengeAttempt.getResultAttempt()),
-                () -> assertFalse(challengeAttempt.isCorrect())
+                () -> assertFalse(challengeAttempt.getCorrect())
         );
     }
 }

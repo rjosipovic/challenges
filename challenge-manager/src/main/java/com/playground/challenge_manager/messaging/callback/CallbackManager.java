@@ -82,15 +82,14 @@ public class CallbackManager {
         }
 
         if (retryCount < MAX_RETRY_COUNT) {
-
             message.getMessageProperties().setHeader("x-retry-count", retryCount + 1);
-            applicationEventPublisher.publishEvent(new MessageRetryEvent(message, exchange, routingKey));
+            applicationEventPublisher.publishEvent(MessageRetryEvent.builder().message(message).exchange(exchange).routingKey(routingKey).build());
         } else {
             log.error("Message could not be retried for correlationId: {}. RetryCount: {}, Exchange: {}, RoutingKey: {}", correlationId, retryCount, exchange, routingKey);
             log.info("Publishing to dead letter queue");
             var dlxExchange = messagingConfiguration.getDeadLetter().getExchange();
             var dlxRoutingKey = messagingConfiguration.getDeadLetter().getRoutingKey();
-            applicationEventPublisher.publishEvent(new MessageRetryEvent(message, dlxExchange, dlxRoutingKey));
+            applicationEventPublisher.publishEvent(MessageRetryEvent.builder().message(message).exchange(dlxExchange).routingKey(dlxRoutingKey).build());
             pendingMessagesStore.delete(correlationId);
         }
     }

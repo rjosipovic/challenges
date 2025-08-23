@@ -1,30 +1,26 @@
 package com.playground.challenge_manager.challenge.services.model;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.Builder;
+import lombok.Value;
 
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
-@ToString
-@Getter
-@EqualsAndHashCode
-@AllArgsConstructor
+
+@Value
+@Builder(toBuilder = true)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ChallengeAttempt {
 
-    private UUID challengeAttemptId;
-    private UUID userId;
-    private int firstNumber;
-    private int secondNumber;
-    private int resultAttempt;
-    private boolean correct;
-    private String game;
-    private String difficulty;
-    private ZonedDateTime attemptDate;
-
-    public ChallengeAttempt withChallengeAttemptIdAndAttemptDate(UUID challengeAttemptId, ZonedDateTime attemptDate) {
-        return new ChallengeAttempt(challengeAttemptId, userId, firstNumber, secondNumber, resultAttempt, correct, game, difficulty, attemptDate);
-    }
+    UUID challengeAttemptId;
+    UUID userId;
+    Integer firstNumber;
+    Integer secondNumber;
+    Integer resultAttempt;
+    Boolean correct;
+    String game;
+    String difficulty;
+    ZonedDateTime attemptDate;
 }

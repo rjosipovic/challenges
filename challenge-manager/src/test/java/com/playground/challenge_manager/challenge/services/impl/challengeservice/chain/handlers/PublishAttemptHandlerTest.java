@@ -44,7 +44,7 @@ class PublishAttemptHandlerTest {
         when(challengeAttempt.getFirstNumber()).thenReturn(firstNumber);
         when(challengeAttempt.getSecondNumber()).thenReturn(secondNumber);
         when(challengeAttempt.getResultAttempt()).thenReturn(resultAttempt);
-        when(challengeAttempt.isCorrect()).thenReturn(isCorrect);
+        when(challengeAttempt.getCorrect()).thenReturn(isCorrect);
         when(challengeAttempt.getGame()).thenReturn(game);
         when(challengeAttempt.getDifficulty()).thenReturn(difficulty);
 

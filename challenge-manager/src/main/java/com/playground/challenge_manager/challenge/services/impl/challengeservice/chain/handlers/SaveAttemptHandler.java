@@ -28,7 +28,7 @@ public class SaveAttemptHandler implements AttemptHandler {
                 challengeAttempt.getFirstNumber(),
                 challengeAttempt.getSecondNumber(),
                 challengeAttempt.getResultAttempt(),
-                challengeAttempt.isCorrect(),
+                challengeAttempt.getCorrect(),
                 challengeAttempt.getGame(),
                 challengeAttempt.getDifficulty(),
                 null
@@ -36,6 +36,6 @@ public class SaveAttemptHandler implements AttemptHandler {
         var savedAttempt = challengeAttemptRepository.saveAndFlush(challengeAttemptEntity);
         var challengeAttemptId = savedAttempt.getId();
         var attemptDate = savedAttempt.getAttemptDate();
-        return challengeAttempt.withChallengeAttemptIdAndAttemptDate(challengeAttemptId, attemptDate);
+        return challengeAttempt.toBuilder().challengeAttemptId(challengeAttemptId).attemptDate(attemptDate).build();
     }
 }
