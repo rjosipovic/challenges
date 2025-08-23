@@ -33,14 +33,15 @@ public class ChallengeServiceImpl implements AttemptService {
     public List<ChallengeResultDTO> findLast10AttemptsForUser(UUID userId) {
         return challengeAttemptRepository.findLast10AttemptsByUser(userId)
                 .stream()
-                .map(entity -> new ChallengeResultDTO(
-                        entity.getUserId().toString(),
-                        entity.getFirstNumber(),
-                        entity.getSecondNumber(),
-                        entity.getResultAttempt(),
-                        MathUtil.calculateResult(entity.getFirstNumber(), entity.getSecondNumber(), entity.getGame()),
-                        entity.isCorrect(),
-                        entity.getGame()))
+                .map(e -> ChallengeResultDTO.builder()
+                        .userId(e.getUserId().toString())
+                        .firstNumber(e.getFirstNumber())
+                        .secondNumber(e.getSecondNumber())
+                        .guess(e.getResultAttempt())
+                        .correctResult(MathUtil.calculateResult(e.getFirstNumber(), e.getSecondNumber(), e.getGame()))
+                        .correct(e.isCorrect())
+                        .game(e.getGame())
+                        .build())
                 .toList();
     }
 }

@@ -76,7 +76,15 @@ class AttemptControllerTest {
                 .guess(guess)
                 .game(game)
                 .build();
-        var result = new ChallengeResultDTO(userId.toString(), firstNumber, secondNumber, guess, correct, true, game);
+        var result = ChallengeResultDTO.builder()
+                .userId(userId.toString())
+                .firstNumber(firstNumber)
+                .secondNumber(secondNumber)
+                .guess(guess)
+                .correctResult(correct)
+                .correct(true)
+                .game(game)
+                .build();
         when(challengeService.verifyAttempt(attemptWithUserId)).thenReturn(result);
         var principal = JwtUserPrincipal.builder()
                 .claim("userId", userId.toString())
@@ -120,7 +128,15 @@ class AttemptControllerTest {
                 .guess(guess)
                 .game(game)
                 .build();
-        var result = new ChallengeResultDTO(userId.toString(), firstNumber, secondNumber, guess, correct, false, game);
+        var result = ChallengeResultDTO.builder()
+                .userId(userId.toString())
+                .firstNumber(firstNumber)
+                .secondNumber(secondNumber)
+                .guess(guess)
+                .correctResult(correct)
+                .correct(false)
+                .game(game)
+                .build();
         when(challengeService.verifyAttempt(attemptWithUserId)).thenReturn(result);
         var principal = JwtUserPrincipal.builder()
                 .claim("userId", userId.toString())

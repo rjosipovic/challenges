@@ -18,7 +18,15 @@ public class AttemptResultHandler implements AttemptHandler {
         var game = challengeAttempt.getGame();
         var correctResult = MathUtil.calculateResult(firstNumber, secondNumber, game);
 
-        var result = new ChallengeResultDTO(userId, firstNumber, secondNumber, guess, correctResult, isCorrect, game);
+        var result = ChallengeResultDTO.builder()
+                .userId(userId)
+                .firstNumber(firstNumber)
+                .secondNumber(secondNumber)
+                .guess(guess)
+                .correctResult(correctResult)
+                .correct(isCorrect)
+                .game(game)
+                .build();
         ctx.setChallengeResult(result);
     }
 }
