@@ -64,12 +64,19 @@ class BadgesHandlerTest {
         var secondNumber = 12;
         var currentScore = 90;
         List<BadgeEntity> currentBadges = List.of();
+        var badgesCtx = BadgesContext.builder()
+                .newScore(score)
+                .currentScore(currentScore)
+                .currentBadges(Set.of())
+                .firstNumber(firstNumber)
+                .secondNumber(secondNumber)
+                .build();
         when(badgeRepository.findAllByUserId(userId)).thenReturn(currentBadges);
         when(ctx.getScore()).thenReturn(score);
         when(ctx.getFirstNumber()).thenReturn(firstNumber);
         when(ctx.getSecondNumber()).thenReturn(secondNumber);
         when(ctx.getTotalScore()).thenReturn(currentScore);
-        when(badgeService.determineBadges(new BadgesContext(score, currentScore, Set.of(), firstNumber, secondNumber))).thenReturn(Set.of(BadgeType.BRONZE));
+        when(badgeService.determineBadges(badgesCtx)).thenReturn(Set.of(BadgeType.BRONZE));
         //when
         badgesHandler.handle(ctx);
         //then

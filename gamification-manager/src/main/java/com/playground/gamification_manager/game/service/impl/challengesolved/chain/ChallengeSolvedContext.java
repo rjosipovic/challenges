@@ -40,10 +40,6 @@ public class ChallengeSolvedContext {
         this.badges = new HashSet<>();
     }
 
-    public void addBadge(BadgeType badgeType) {
-        badges.add(badgeType);
-    }
-
     public void addBadges(Set<BadgeType> badges) {
         this.badges.addAll(badges);
     }

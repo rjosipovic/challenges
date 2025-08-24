@@ -37,7 +37,11 @@ public class LeaderBoardServiceImpl implements LeaderBoardService {
                             .stream()
                             .map(BadgeEntity::getBadgeType)
                             .collect(Collectors.toSet());
-                    return new LeaderBoardItem(userId, totalScore.longValue(), badges);
+                    return LeaderBoardItem.builder()
+                            .userId(userId)
+                            .totalScore(totalScore.longValue())
+                            .badges(badges)
+                            .build();
                 })
                 .toList();
     }

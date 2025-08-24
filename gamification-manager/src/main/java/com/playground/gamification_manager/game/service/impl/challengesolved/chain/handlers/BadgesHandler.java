@@ -34,8 +34,13 @@ public class BadgesHandler implements ChallengeSolvedHandler {
         var currentScore = ctx.getTotalScore();
         var currentBadges = getCurrentBadges(ctx);
 
-        var badgesCtx = new BadgesContext(score, currentScore, currentBadges, firstNumber, secondNumber);
-
+        var badgesCtx = BadgesContext.builder()
+                .newScore(score)
+                .currentScore(currentScore)
+                .currentBadges(currentBadges)
+                .firstNumber(firstNumber)
+                .secondNumber(secondNumber)
+                .build();
         var newBadges = badgeService.determineBadges(badgesCtx);
 
         ctx.addBadges(newBadges);

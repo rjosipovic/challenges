@@ -46,10 +46,21 @@ class LeaderBoardControllerTest {
     @Test
     void shouldGetLeaderBoard() throws Exception {
         //given
-        var first = new LeaderBoardItem(UUID.randomUUID(), 750, Set.of(BadgeType.FIRST_WON, BadgeType.BRONZE, BadgeType.SILVER, BadgeType.GOLD));
-        var second = new LeaderBoardItem(UUID.randomUUID(), 500, Set.of(BadgeType.FIRST_WON, BadgeType.BRONZE, BadgeType.SILVER));
-        var third = new LeaderBoardItem(UUID.randomUUID(), 250, Set.of(BadgeType.FIRST_WON, BadgeType.BRONZE));
-
+        var first = LeaderBoardItem.builder()
+                .userId(UUID.randomUUID())
+                .totalScore(750)
+                .badges(Set.of(BadgeType.FIRST_WON, BadgeType.BRONZE, BadgeType.SILVER, BadgeType.GOLD))
+                .build();
+        var second = LeaderBoardItem.builder()
+                .userId(UUID.randomUUID())
+                .totalScore(500)
+                .badges(Set.of(BadgeType.FIRST_WON, BadgeType.BRONZE, BadgeType.SILVER))
+                .build();
+        var third = LeaderBoardItem.builder()
+                .userId(UUID.randomUUID())
+                .totalScore(250)
+                .badges(Set.of(BadgeType.FIRST_WON, BadgeType.BRONZE))
+                .build();
         var leaderBoard = List.of(first, second, third);
         when(leaderBoardService.getLeaderBoard()).thenReturn(leaderBoard);
 

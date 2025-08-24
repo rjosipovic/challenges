@@ -56,10 +56,21 @@ class LeaderBoardServiceImplTest {
         var firstBadges = Set.of(BadgeType.FIRST_WON, BadgeType.BRONZE, BadgeType.SILVER, BadgeType.GOLD);
         var secondBadges = Set.of(BadgeType.FIRST_WON, BadgeType.BRONZE, BadgeType.SILVER);
         var thirdBadges = Set.of(BadgeType.FIRST_WON, BadgeType.BRONZE);
-        var first = new LeaderBoardItem(firstUserId, firstTotalScore, firstBadges);
-        var second = new LeaderBoardItem(secondUserId, secondTotalScore, secondBadges);
-        var third = new LeaderBoardItem(thirdUserId, thirdTotalScore, thirdBadges);
-
+        var first = LeaderBoardItem.builder()
+                .userId(firstUserId)
+                .totalScore(firstTotalScore)
+                .badges(firstBadges)
+                .build();
+        var second = LeaderBoardItem.builder()
+                .userId(secondUserId)
+                .totalScore(secondTotalScore)
+                .badges(secondBadges)
+                .build();
+        var third = LeaderBoardItem.builder()
+                .userId(thirdUserId)
+                .totalScore(thirdTotalScore)
+                .badges(thirdBadges)
+                .build();
         var firstFirstWonBadge = new BadgeEntity(UUID.randomUUID(), firstUserId, BadgeType.FIRST_WON, ZonedDateTime.now());
         var firstBronzeBadge = new BadgeEntity(UUID.randomUUID(), firstUserId, BadgeType.BRONZE, ZonedDateTime.now());
         var firstSilverBadge = new BadgeEntity(UUID.randomUUID(), firstUserId, BadgeType.SILVER, ZonedDateTime.now());
