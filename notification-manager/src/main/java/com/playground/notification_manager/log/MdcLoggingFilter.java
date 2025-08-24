@@ -62,16 +62,6 @@ public class MdcLoggingFilter extends OncePerRequestFilter {
             msg.append('?').append(queryString);
         }
 
-        var headerNames = request.getHeaderNames();
-        var headers = new StringBuilder();
-        while (headerNames.hasMoreElements()) {
-            var headerName = headerNames.nextElement();
-            headers.append(headerName).append(": ").append(request.getHeader(headerName)).append("; ");
-        }
-        if (headers.length() > 0) {
-            msg.append("; headers={").append(headers).append("}");
-        }
-
         var requestBody = getBody(request.getContentAsByteArray(), request.getCharacterEncoding());
         if (StringUtils.hasText(requestBody)) {
             msg.append("; body=").append(requestBody);

@@ -1,4 +1,4 @@
-package com.playground.analytics_manager.log;
+package com.playground.challenge_manager.log;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
