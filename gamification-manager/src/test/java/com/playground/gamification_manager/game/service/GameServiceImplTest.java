@@ -33,8 +33,14 @@ class GameServiceImplTest {
         var secondNumber = 2;
         var correct = true;
         var game = "multiplication";
-        var challengeSolved = new ChallengeSolvedEvent(userId, challengeAttemptId, firstNumber, secondNumber, correct, game);
-
+        var challengeSolved = ChallengeSolvedEvent.builder()
+                .userId(userId)
+                .challengeAttemptId(challengeAttemptId)
+                .firstNumber(firstNumber)
+                .secondNumber(secondNumber)
+                .correct(correct)
+                .game(game)
+                .build();
         var ctx = new ChallengeSolvedContext(challengeSolved);
 
         //when
