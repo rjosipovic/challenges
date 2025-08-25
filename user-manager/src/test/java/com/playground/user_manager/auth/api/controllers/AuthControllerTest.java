@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.playground.user_manager.auth.api.dto.AuthCodeGenerationRequest;
 import com.playground.user_manager.auth.api.dto.AuthCodeVerificationRequest;
-import com.playground.user_manager.auth.api.dto.RegisterUserDTO;
+import com.playground.user_manager.auth.api.dto.RegisterUserRequest;
 import com.playground.user_manager.auth.api.dto.RegisteredUser;
 import com.playground.user_manager.auth.service.AuthService;
 import com.playground.user_manager.auth.service.JwtGenerator;
@@ -56,7 +56,7 @@ class AuthControllerTest {
 
     private JacksonTester<AuthCodeGenerationRequest> authCodeGenerationRequestJacksonTester;
     private JacksonTester<AuthCodeVerificationRequest> authCodeVerificationRequestJacksonTester;
-    private JacksonTester<RegisterUserDTO> registerUserDTOTester;
+    private JacksonTester<RegisterUserRequest> registerUserDTOTester;
     private JacksonTester<UserManagerError> errorJacksonTester;
 
     @BeforeEach
@@ -74,7 +74,7 @@ class AuthControllerTest {
     void requestCode_happyPath_returnsOk() throws Exception {
         //given
         var email = "user@example.com";
-        var request = new AuthCodeGenerationRequest(email);
+        var request = AuthCodeGenerationRequest.builder().email(email).build();
         doNothing().when(authService).generateAuthCode(email);
 
         //when
@@ -93,7 +93,7 @@ class AuthControllerTest {
     void requestCode_invalidEmail_returnsBadRequest() throws Exception {
         //given
         var email = "not-an-email";
-        var request = new AuthCodeGenerationRequest(email);
+        var request = AuthCodeGenerationRequest.builder().email(email).build();
         var errorCode = ErrorCode.VALIDATION_FAILED;
 
         //when
@@ -116,7 +116,7 @@ class AuthControllerTest {
     void requestCode_userNotFound_returnsNotFound() throws Exception {
         //given
         var email = "user@example.com";
-        var request = new AuthCodeGenerationRequest(email);
+        var request = AuthCodeGenerationRequest.builder().email(email).build();
         doThrow(new UserNotFoundException(String.format("User with email %s is not registered", email))).when(authService).generateAuthCode(email);
         var errorCode = ErrorCode.USER_NOT_FOUND;
 
@@ -142,10 +142,14 @@ class AuthControllerTest {
         var email = "user@example.com";
         var alias = "test-alias";
         var userId = UUID.randomUUID().toString();
-        var registeredUser = new RegisteredUser(userId, email, alias);
+        var registeredUser = RegisteredUser.builder()
+                .userId(userId)
+                .email(email)
+                .alias(alias)
+                .build();
         var code = "123456";
         var token = "token";
-        var request = new AuthCodeVerificationRequest(email, code);
+        var request = AuthCodeVerificationRequest.builder().email(email).code(code).build();
         when(authService.verifyCode(email, code)).thenReturn(true);
         when(jwtGenerator.generate(registeredUser)).thenReturn(token);
         when(registrationService.getRegisteredUser(email)).thenReturn(Optional.of(registeredUser));
@@ -170,7 +174,7 @@ class AuthControllerTest {
         //given
         var email = "user@example.com";
         var code = "123456";
-        var request = new AuthCodeVerificationRequest(email, code);
+        var request = AuthCodeVerificationRequest.builder().email(email).code(code).build();
         when(authService.verifyCode(email, code)).thenReturn(false);
         var errorCode = ErrorCode.INVALID_VERIFICATION_CODE;
 
@@ -194,7 +198,7 @@ class AuthControllerTest {
     void verifyCode_missingFields_returnsBadRequest() throws Exception {
         //given
         var email = "user@example.com";
-        var request = new AuthCodeVerificationRequest(email, null);
+        var request = AuthCodeVerificationRequest.builder().email(email).build();
         var errorCode = ErrorCode.VALIDATION_FAILED;
 
         //when
@@ -222,7 +226,7 @@ class AuthControllerTest {
         //when
         var res = mockMvc.perform(post("/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(registerUserDTOTester.write(new RegisterUserDTO(alias, email, null, null)).getJson()))
+                        .content(registerUserDTOTester.write(RegisterUserRequest.builder().alias(alias).email(email).build()).getJson()))
                 .andReturn().getResponse();
 
         //then
@@ -234,7 +238,10 @@ class AuthControllerTest {
         //given
         var alias = "test-user";
         var email = "someemail@gmail.com";
-        var registerUser = new RegisterUserDTO(alias, email, null, null);
+        var registerUser = RegisterUserRequest.builder()
+                .alias(alias)
+                .email(email)
+                .build();
         var reason = "User with alias " + alias + " already exists";
         var ex = new UserAlreadyExistsException(reason);
         var errorCode = ErrorCode.USER_ALREADY_EXISTS;
@@ -260,7 +267,7 @@ class AuthControllerTest {
 
     @ParameterizedTest
     @MethodSource("invalidRegisterUserProvider")
-    void testRegisterUser_validationFailure(RegisterUserDTO request, String expectedReason) throws Exception {
+    void testRegisterUser_validationFailure(RegisterUserRequest request, String expectedReason) throws Exception {
         //given
         var errorCode = ErrorCode.VALIDATION_FAILED;
         var expectedError = new UserManagerError(errorCode.getMessage(), errorCode.getCode(), expectedReason);
@@ -281,11 +288,11 @@ class AuthControllerTest {
 
     private static Stream<Arguments> invalidRegisterUserProvider() {
         return Stream.of(
-                Arguments.of(new RegisterUserDTO(null, "test@test.com", null, null), "alias: must not be blank"),
-                Arguments.of(new RegisterUserDTO("alias", null, null, null), "email: must not be blank"),
-                Arguments.of(new RegisterUserDTO("alias", "invalid-email", null, null), "email: must be a well-formed email address"),
-                Arguments.of(new RegisterUserDTO("alias", "test@test.com", LocalDate.now().plusDays(1), null), "birthdate: must be a past date"),
-                Arguments.of(new RegisterUserDTO("alias", "test@test.com", null, "invalid"), "gender: must match \"male|female\"")
+                Arguments.of(RegisterUserRequest.builder().email("test@test.com").build(), "alias: must not be blank"),
+                Arguments.of(RegisterUserRequest.builder().alias("alias").build(),"email: must not be blank"),
+                Arguments.of(RegisterUserRequest.builder().alias("alias").email("invalid-email").build(), "email: must be a well-formed email address"),
+                Arguments.of(RegisterUserRequest.builder().alias("alias").email("test@test.com").birthdate(LocalDate.now().plusDays(1)).build(), "birthdate: must be a past date"),
+                Arguments.of(RegisterUserRequest.builder().alias("alias").email("test@test.com").gender("invalid").build(), "gender: must match \"male|female\"")
         );
     }
 }

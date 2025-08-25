@@ -4,7 +4,7 @@ import com.nimbusds.jose.JOSEException;
 import com.playground.user_manager.auth.api.dto.AuthCodeGenerationRequest;
 import com.playground.user_manager.auth.api.dto.AuthCodeVerificationRequest;
 import com.playground.user_manager.auth.api.dto.AuthTokenResponse;
-import com.playground.user_manager.auth.api.dto.RegisterUserDTO;
+import com.playground.user_manager.auth.api.dto.RegisterUserRequest;
 import com.playground.user_manager.auth.api.dto.RegisteredUser;
 import com.playground.user_manager.auth.service.AuthService;
 import com.playground.user_manager.auth.service.JwtGenerator;
@@ -32,9 +32,9 @@ public class AuthController {
     private final JwtGenerator jwtGenerator;
 
     @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody @Valid RegisterUserDTO registerUserDTO) {
-        log.info("Received register request: {}", registerUserDTO);
-        registrationService.register(registerUserDTO);
+    public ResponseEntity<User> register(@RequestBody @Valid RegisterUserRequest registerUserRequest) {
+        log.info("Received register request: {}", registerUserRequest);
+        registrationService.register(registerUserRequest);
         return ResponseEntity.ok().build();
     }
 
@@ -55,7 +55,7 @@ public class AuthController {
         verifyCode(email, code);
         var registeredUser = getRegisteredUser(email);
         var token = generateToken(registeredUser);
-        return ResponseEntity.ok(new AuthTokenResponse(token));
+        return ResponseEntity.ok(AuthTokenResponse.builder().token(token).build());
     }
 
     private void verifyCode(String email, String code) {

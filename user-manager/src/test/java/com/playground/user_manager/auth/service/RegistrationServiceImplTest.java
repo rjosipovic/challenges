@@ -1,6 +1,6 @@
 package com.playground.user_manager.auth.service;
 
-import com.playground.user_manager.auth.api.dto.RegisterUserDTO;
+import com.playground.user_manager.auth.api.dto.RegisterUserRequest;
 import com.playground.user_manager.user.dataaccess.UserEntity;
 import com.playground.user_manager.user.dataaccess.UserRepository;
 import com.playground.user_manager.user.messaging.producers.UserMessageProducer;
@@ -38,7 +38,7 @@ class RegistrationServiceImplTest {
         var alias = "test-user";
         var email = "someemail@gmail.com";
         var uuid = UUID.randomUUID();
-        var registerUserRequest = new RegisterUserDTO(alias, email, null, null);
+        var registerUserRequest = RegisterUserRequest.builder().alias(alias).email(email).build();
         when(userRepository.findByAlias(alias)).thenReturn(Optional.empty());
         when(userRepository.save(any(UserEntity.class))).thenReturn(UserEntity.builder().alias(alias).id(uuid).email(email).build());
         //when

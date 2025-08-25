@@ -1,6 +1,6 @@
 package com.playground.user_manager.auth.service;
 
-import com.playground.user_manager.auth.api.dto.RegisterUserDTO;
+import com.playground.user_manager.auth.api.dto.RegisterUserRequest;
 import com.playground.user_manager.auth.api.dto.RegisteredUser;
 import com.playground.user_manager.errors.exceptions.UserAlreadyExistsException;
 import com.playground.user_manager.user.dataaccess.UserEntity;
@@ -22,12 +22,12 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     @Override
     @Transactional
-    public void register(RegisterUserDTO registerUserDTO) {
-        var alias = registerUserDTO.getAlias();
-        var email = registerUserDTO.getEmail();
+    public void register(RegisterUserRequest registerUserRequest) {
+        var alias = registerUserRequest.getAlias();
+        var email = registerUserRequest.getEmail();
         verifyUniqueness(alias, email);
-        var birthdate = registerUserDTO.getBirthdate();
-        var gender = registerUserDTO.getGender();
+        var birthdate = registerUserRequest.getBirthdate();
+        var gender = registerUserRequest.getGender();
         var userEntity = UserEntity.builder()
                 .alias(alias)
                 .email(email)
@@ -56,10 +56,11 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Override
     public Optional<RegisteredUser> getRegisteredUser(String email) {
         return userRepository.findByEmail(email)
-                .map(userEntity -> new RegisteredUser(
-                        userEntity.getId().toString(),
-                        userEntity.getEmail(),
-                        userEntity.getAlias())
+                .map(userEntity -> RegisteredUser.builder()
+                        .userId(userEntity.getId().toString())
+                        .email(userEntity.getEmail())
+                        .alias(userEntity.getAlias())
+                        .build()
                 );
     }
 
