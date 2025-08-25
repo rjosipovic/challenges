@@ -1,15 +1,23 @@
 package com.playground.notification_manager.inbound.messaging.auth;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Builder;
+import lombok.Value;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Value
+@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@JsonDeserialize(builder = AuthNotification.AuthNotificationBuilder.class)
 public class AuthNotification {
 
-    private String to;
-    private String subject;
-    private String body;
+    String to;
+    String subject;
+    String body;
+
+    @JsonPOJOBuilder(withPrefix = "")
+    public static class AuthNotificationBuilder {
+    }
 }
