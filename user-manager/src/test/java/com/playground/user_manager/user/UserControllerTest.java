@@ -6,7 +6,7 @@ import com.playground.user_manager.errors.advice.ControllerAdvice;
 import com.playground.user_manager.errors.custom.UserManagerError;
 import com.playground.user_manager.errors.exceptions.UserNotFoundException;
 import com.playground.user_manager.user.api.controllers.UserController;
-import com.playground.user_manager.user.api.dto.CreateUserDTO;
+import com.playground.user_manager.user.api.dto.CreateUserRequest;
 import com.playground.user_manager.user.model.User;
 import com.playground.user_manager.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,7 +43,7 @@ class UserControllerTest {
 
     private JacksonTester<User> userJacksonTester;
     private JacksonTester<List<User>> usersJacksonTester;
-    private JacksonTester<CreateUserDTO> createUserJacksonTester;
+    private JacksonTester<CreateUserRequest> createUserJacksonTester;
     private JacksonTester<UserManagerError> errorJacksonTester;
 
     @BeforeEach
@@ -64,7 +64,7 @@ class UserControllerTest {
         //given
         var userId = UUID.randomUUID().toString();
         var alias = "test-user";
-        var user = new User(userId, alias);
+        var user = User.builder().id(userId).alias(alias).build();
 
         when(userService.getUserByAlias("test-user")).thenReturn(user);
 
@@ -114,8 +114,8 @@ class UserControllerTest {
         var userId2 = UUID.randomUUID().toString();
         var alias1 = "test-user1";
         var alias2 = "test-user2";
-        var user1 = new User(userId1, alias1);
-        var user2 = new User(userId2, alias2);
+        var user1 = User.builder().id(userId1).alias(alias1).build();
+        var user2 = User.builder().id(userId2).alias(alias2).build();
         when(userService.getAllUsers()).thenReturn(List.of(user1, user2));
         //when
         var res = mockMvc.perform(get("/users")).andReturn().getResponse();
@@ -135,8 +135,8 @@ class UserControllerTest {
         var userId2 = UUID.randomUUID().toString();
         var alias1 = "test-user1";
         var alias2 = "test-user2";
-        var user1 = new User(userId1, alias1);
-        var user2 = new User(userId2, alias2);
+        var user1 = User.builder().id(userId1).alias(alias1).build();
+        var user2 = User.builder().id(userId2).alias(alias2).build();
         when(userService.getUsersByIds(List.of(userId1, userId2))).thenReturn(List.of(user1, user2));
         //when
         var res = mockMvc.perform(get("/users").param("ids", userId1, userId2)).andReturn().getResponse();

@@ -47,7 +47,7 @@ class UserMessageProducerTest {
         // given
         var userId = UUID.randomUUID().toString();
         var alias = "alias";
-        var user = new User(userId, alias);
+        var user = User.builder().id(userId).alias(alias).build();
         var exchange = "user.exchange";
         var routingKey = "user.created";
         when(userMessageConfiguration.getExchange()).thenReturn(exchange);

@@ -35,7 +35,7 @@ public class RegistrationServiceImpl implements RegistrationService {
                 .gender(gender)
                 .build();
         var savedUserEntity = userRepository.save(userEntity);
-        var user = new User(savedUserEntity.getId().toString(), savedUserEntity.getAlias());
+        var user = User.builder().id(savedUserEntity.getId().toString()).alias(savedUserEntity.getAlias()).build();
         publishUserCreatedMessage(user);
     }
 

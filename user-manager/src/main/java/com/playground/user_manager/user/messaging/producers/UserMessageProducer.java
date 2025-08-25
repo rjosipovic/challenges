@@ -29,7 +29,7 @@ public class UserMessageProducer {
         log.info("About to publish user created message: {}", user);
         var exchange = userMessagingConfiguration.getExchange();
         var routingKey = userMessagingConfiguration.getUserCreatedRoutingKey();
-        var lifecycleEvent = new UserLifecycleEvent(user, LifecycleType.CREATED);
+        var lifecycleEvent = UserLifecycleEvent.builder().user(user).lifecycleType(LifecycleType.CREATED).build();
         sendMessage(exchange, routingKey, lifecycleEvent);
     }
 
