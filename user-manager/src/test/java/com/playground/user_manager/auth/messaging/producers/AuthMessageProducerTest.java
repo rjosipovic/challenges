@@ -43,7 +43,7 @@ class AuthMessageProducerTest {
         var to = "user@example.com";
         var subject = "code";
         var body = "123456";
-        var notification = new AuthNotification(to, subject, body);
+        var notification = AuthNotification.builder().to(to).subject(subject).body(body).build();
         var exchange = "notification-exchange";
         var routingKey = "notifications";
         when(authMessagingConfiguration.getExchange()).thenReturn(exchange);

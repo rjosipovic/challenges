@@ -25,7 +25,11 @@ public class CodeSenderHandler implements CodeGenerationHandler {
         var subject = codeGenerationConfig.getSubject();
         var messageTemplate = codeGenerationConfig.getNotificationMessageTemplate();
         var message = String.format(messageTemplate, code);
-        var authNotification = new AuthNotification(email, subject, message);
+        var authNotification = AuthNotification.builder()
+                .to(email)
+                .subject(subject)
+                .body(message)
+                .build();
         authMessageProducer.sendAuthCode(authNotification);
     }
 }
