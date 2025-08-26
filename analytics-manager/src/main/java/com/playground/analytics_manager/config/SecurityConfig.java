@@ -4,7 +4,6 @@ import com.playground.analytics_manager.outbound.auth.AuthConfig;
 import com.playground.analytics_manager.outbound.auth.JwtAuthenticationFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,15 +24,7 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    @Value("${app.cors.allowed-origins}")
-    private String[] allowedOrigins;
-
-    @Value("${app.cors.allowed-methods}")
-    private String[] allowedMethods;
-
-    @Value("${app.cors.allowed-headers}")
-    private String[] allowedHeaders;
-
+    private final CorsConfig corsConfig;
     private final AuthConfig authConfig;
 
     @Bean
@@ -63,9 +54,9 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         var config = new CorsConfiguration();
-        config.setAllowedOrigins(Arrays.stream(allowedOrigins).toList());
-        config.setAllowedMethods(Arrays.stream(allowedMethods).toList());
-        config.setAllowedHeaders(Arrays.stream(allowedHeaders).toList());
+        config.setAllowedOrigins(Arrays.stream(corsConfig.getAllowedOrigins()).toList());
+        config.setAllowedMethods(Arrays.stream(corsConfig.getAllowedMethods()).toList());
+        config.setAllowedHeaders(Arrays.stream(corsConfig.getAllowedHeaders()).toList());
         config.setAllowCredentials(true);
 
         var source = new UrlBasedCorsConfigurationSource();
