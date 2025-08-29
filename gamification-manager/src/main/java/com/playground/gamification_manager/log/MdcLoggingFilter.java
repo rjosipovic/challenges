@@ -28,6 +28,7 @@ public class MdcLoggingFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain) throws ServletException, IOException {
 
+        long startTime = System.currentTimeMillis();
         // We need to wrap the request and response to cache their content
         var requestWrapper = new ContentCachingRequestWrapper(request);
         var responseWrapper = new ContentCachingResponseWrapper(response);
@@ -40,9 +41,10 @@ public class MdcLoggingFilter extends OncePerRequestFilter {
             // This allows the framework to read the request body and populate the cache.
             filterChain.doFilter(requestWrapper, responseWrapper);
 
+            long duration = System.currentTimeMillis() - startTime;
             // Now that the chain has been processed, the cached content is available for logging.
             logRequestDetails(requestWrapper);
-            logResponseDetails(responseWrapper);
+            logResponseDetails(responseWrapper, duration);
 
         } finally {
             // This is critical to ensure the response is sent to the client
@@ -53,7 +55,9 @@ public class MdcLoggingFilter extends OncePerRequestFilter {
 
     private void logRequestDetails(ContentCachingRequestWrapper request) {
         var msg = new StringBuilder();
+        var requestId = MDC.get(MDC_REQUEST_ID_KEY);
         msg.append(REQUEST_PREFIX);
+        msg.append("ID: ").append(requestId).append("; ");
         msg.append("method=").append(request.getMethod()).append("; ");
         msg.append("uri=").append(request.getRequestURI());
 
@@ -70,10 +74,17 @@ public class MdcLoggingFilter extends OncePerRequestFilter {
         logger.info(msg.toString());
     }
 
-    private void logResponseDetails(ContentCachingResponseWrapper response) {
+    private void logResponseDetails(ContentCachingResponseWrapper response, long duration) {
         int status = response.getStatus();
+        var requestId = MDC.get(MDC_REQUEST_ID_KEY);
         var responseBody = getBody(response.getContentAsByteArray(), response.getCharacterEncoding());
-        logger.info(RESPONSE_PREFIX + "status=" + status + "; body=" + responseBody);
+        var msg = new StringBuilder();
+        msg.append(RESPONSE_PREFIX);
+        msg.append("ID: ").append(requestId).append("; ");
+        msg.append("status=").append(status).append("; ");
+        msg.append("duration=").append(duration).append("ms; ");
+        msg.append("body=").append(responseBody);
+        logger.info(msg.toString());
     }
 
     private String getBody(byte[] contentAsByteArray, String characterEncoding) {
