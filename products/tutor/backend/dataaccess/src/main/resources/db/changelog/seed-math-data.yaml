@@ -1,26 +1,5 @@
 databaseChangeLog:
   - changeSet:
-      id: seed-math-001-instructor
-      author: studioengine
-      context: math
-      changes:
-        - insert:
-            tableName: instructor
-            columns:
-              - column:
-                  name: id
-                  value: "a1b2c3d4-0001-4000-8000-000000000001"
-              - column:
-                  name: name
-                  value: "Marko Horvat"
-              - column:
-                  name: email
-                  value: "marko@math-studio.hr"
-              - column:
-                  name: created_at
-                  valueDate: "2025-01-01T00:00:00+01:00"
-
-  - changeSet:
       id: seed-math-002-service-categories
       author: studioengine
       context: math

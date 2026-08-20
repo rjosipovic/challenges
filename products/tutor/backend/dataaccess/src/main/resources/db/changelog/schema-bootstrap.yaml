@@ -717,3 +717,18 @@ databaseChangeLog:
             tableName: time_slot
             columnNames: slot_date, start_time
             constraintName: uq_time_slot_date_start_time
+  - changeSet:
+      id: 018-nullable-student-benefit-value
+      author: studioengine
+      changes:
+        - dropNotNullConstraint:
+            tableName: student_benefit
+            columnName: value
+            columnDataType: decimal(10,2)
+  - changeSet:
+      id: 019-drop-instructor-table
+      author: studioengine
+      changes:
+        - dropTable:
+            tableName: instructor
+

@@ -1,26 +1,5 @@
 databaseChangeLog:
   - changeSet:
-      id: seed-piano-001-instructor
-      author: studioengine
-      context: piano
-      changes:
-        - insert:
-            tableName: instructor
-            columns:
-              - column:
-                  name: id
-                  value: "a1b2c3d4-0002-4000-8000-000000000002"
-              - column:
-                  name: name
-                  value: "Ivana Jurić"
-              - column:
-                  name: email
-                  value: "ivana@piano-studio.hr"
-              - column:
-                  name: created_at
-                  valueDate: "2025-01-01T00:00:00+01:00"
-
-  - changeSet:
       id: seed-piano-002-service-categories
       author: studioengine
       context: piano
