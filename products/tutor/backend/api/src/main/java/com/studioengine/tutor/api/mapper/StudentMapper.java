@@ -41,9 +41,12 @@ public interface StudentMapper {
     NoteResponse toNoteResponse(NoteEntry noteEntry);
     UpdateNoteCommand toUpdateNoteCommand(NoteRequest request, UUID studentId, UUID noteId);
 
+    @Mapping(target = "type", source = "request.benefitType")
     AssignBenefitCommand toAssignBenefitCommand(AssignBenefitRequest request, UUID studentId);
+
     @Mapping(target = "consumed", constant = "false")
     @Mapping(target = "consumedAt", ignore = true)
     BenefitResponse toBenefitResponse(AssignedBenefit assignedBenefit);
+
     List<BenefitResponse> toBenefitResponseList(List<BenefitEntry> benefitEntries);
 }
