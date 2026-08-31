@@ -1,11 +1,12 @@
 package com.studioengine.tutor.api.controller;
 
-import com.studioengine.tutor.api.mapper.CalendarMapper;
+import com.studioengine.tutor.api.dto.calendar.CalendarSlotResponse;
 import com.studioengine.tutor.api.dto.calendar.CreateSlotsRequest;
 import com.studioengine.tutor.api.dto.calendar.DeleteSlotsRequest;
 import com.studioengine.tutor.api.dto.calendar.PublishSlotsRequest;
 import com.studioengine.tutor.api.dto.calendar.SlotResponse;
 import com.studioengine.tutor.api.dto.calendar.WithdrawSlotsRequest;
+import com.studioengine.tutor.api.mapper.CalendarMapper;
 import com.studioengine.tutor.scheduling.CreateSlotsCommand;
 import com.studioengine.tutor.scheduling.DeleteSlotsCommand;
 import com.studioengine.tutor.scheduling.PublishSlotsCommand;
@@ -38,15 +39,13 @@ public class DashboardCalendarController {
     private final CalendarMapper calendarMapper;
 
     @GetMapping
-    public ResponseEntity<List<SlotResponse>> getSlots(
+    public ResponseEntity<List<CalendarSlotResponse>> getSlots(
             @RequestParam(required = true, name = "from") LocalDate from,
             @RequestParam(required = true, name = "to") LocalDate to
             ) {
         log.info("GET /dashboard/slots from={} to={}", from, to);
         var result = timeSlotService.getSlotsByDateRange(from, to);
-        var response = calendarMapper.toSlotResponses(result);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(calendarMapper.toCalendarSlotResponseList(result));
     }
 
     @PostMapping

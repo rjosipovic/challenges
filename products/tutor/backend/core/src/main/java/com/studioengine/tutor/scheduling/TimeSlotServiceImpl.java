@@ -15,8 +15,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -35,9 +38,20 @@ public class TimeSlotServiceImpl implements TimeSlotService {
     private final TimeSlotStateLogRepository timeSlotStateLogRepository;
 
     @Override
-    public List<CreatedSlot> getSlotsByDateRange(LocalDate from, LocalDate to) {
-        return timeSlotRepository.findBySlotDateBetween(from, to).stream()
-                .map(timeSlotServiceMapper::toCreatedSlot)
+    public List<CalendarSlot> getSlotsByDateRange(LocalDate from, LocalDate to) {
+        var timeSlots = timeSlotRepository.findBySlotDateBetween(from, to);
+        var timeSlotIds = timeSlots.stream().map(TimeSlot::getId).toList();
+
+        var appointmentBySlotId = appointmentRepository.findByTimeSlotIdInAndStateIn(timeSlotIds, ACTIVE_APPOINTMENT_STATES).stream()
+                .collect(Collectors.toMap(a -> a.getTimeSlot().getId(), Function.identity()));
+
+        return timeSlots.stream()
+                .map(slot -> CalendarSlot.builder()
+                        .slot(timeSlotServiceMapper.toCreatedSlot(slot))
+                        .appointment(Optional.ofNullable(appointmentBySlotId.get(slot.getId()))
+                                .map(timeSlotServiceMapper::toAssociatedAppointment)
+                                .orElse(null))
+                        .build())
                 .toList();
     }
 

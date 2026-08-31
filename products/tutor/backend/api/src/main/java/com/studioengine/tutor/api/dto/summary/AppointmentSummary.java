@@ -14,6 +14,7 @@ import java.util.UUID;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @JsonDeserialize(builder = AppointmentSummary.AppointmentSummaryBuilder.class)
 public class AppointmentSummary {
+
     UUID id;
     String state;
 

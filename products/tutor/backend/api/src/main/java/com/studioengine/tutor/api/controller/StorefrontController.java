@@ -7,6 +7,7 @@ import com.studioengine.tutor.api.dto.storefront.AppointmentRescheduleRequest;
 import com.studioengine.tutor.api.dto.storefront.BrandingConfigurationResponse;
 import com.studioengine.tutor.api.dto.storefront.CheckoutRequest;
 import com.studioengine.tutor.api.dto.storefront.CheckoutResponse;
+import com.studioengine.tutor.api.dto.storefront.RescheduleBookingRequest;
 import com.studioengine.tutor.api.dto.storefront.RescheduleInitiationResponse;
 import com.studioengine.tutor.api.dto.storefront.ReservationRequest;
 import com.studioengine.tutor.api.dto.storefront.ReservationResponse;
@@ -135,5 +136,10 @@ public class StorefrontController {
         var response = storefrontMapper.toRescheduleInitiationResponse(result);
         return ResponseEntity.ok(response);
     }
-}
 
+    @PostMapping("/reservations/reschedule")
+    public ResponseEntity<Void> completeReschedule(@RequestBody RescheduleBookingRequest request) {
+        selfServiceManager.completeReschedule(request.getTimeSlotId(), request.getRescheduleToken());
+        return ResponseEntity.ok().build();
+    }
+}

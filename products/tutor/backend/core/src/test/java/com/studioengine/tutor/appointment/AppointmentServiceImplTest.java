@@ -4,12 +4,15 @@ import com.studioengine.tutor.config.BrandProperties;
 import com.studioengine.tutor.dataaccess.entities.Appointment;
 import com.studioengine.tutor.dataaccess.entities.TimeSlot;
 import com.studioengine.tutor.dataaccess.enums.AppointmentState;
+import com.studioengine.tutor.dataaccess.enums.TimeSlotState;
 import com.studioengine.tutor.dataaccess.repositories.AppointmentRepository;
+import com.studioengine.tutor.dataaccess.repositories.TimeSlotRepository;
 import com.studioengine.tutor.email.EmailService;
 import com.studioengine.tutor.errors.exceptions.MissingCancellationReasonException;
 import com.studioengine.tutor.errors.exceptions.PrematureClosureException;
 import com.studioengine.tutor.errors.exceptions.ResourceNotFoundException;
 import com.studioengine.tutor.scheduling.AppointmentStateMachine;
+import com.studioengine.tutor.scheduling.TimeSlotStateMachine;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -40,6 +43,10 @@ class AppointmentServiceImplTest {
     private AppointmentRepository appointmentRepository;
     @Mock
     private AppointmentStateMachine appointmentStateMachine;
+    @Mock
+    private TimeSlotStateMachine timeSlotStateMachine;
+    @Mock
+    private TimeSlotRepository timeSlotRepository;
     @Mock
     private BrandProperties brandProperties;
     @Mock
@@ -158,6 +165,7 @@ class AppointmentServiceImplTest {
     @Test
     void shouldCancel() {
         // given
+        var timeSlot = mock(TimeSlot.class);
         var appointmentId = UUID.randomUUID();
         var appointment = mock(Appointment.class);
         var command = CancelAppointmentCommand.builder()
@@ -167,13 +175,16 @@ class AppointmentServiceImplTest {
         when(appointmentRepository.findById(appointmentId)).thenReturn(Optional.of(appointment));
         when(appointment.getId()).thenReturn(appointmentId);
         when(appointment.getState()).thenReturn(AppointmentState.CANCELLED);
+        when(appointment.getTimeSlot()).thenReturn(timeSlot);
 
         // when
         var result = appointmentService.cancel(command);
 
         // then
         verify(appointmentStateMachine).transition(appointment, AppointmentState.CANCELLED, "TUTOR");
+        verify(timeSlotStateMachine).transition(timeSlot, TimeSlotState.AVAILABLE, "TUTOR");
         verify(appointmentRepository).save(appointment);
+        verify(timeSlotRepository).save(timeSlot);
         verify(emailService).sendCancellationNotification(appointment, "Conflict");
 
         assertThat(result).isNotNull();
@@ -195,7 +206,9 @@ class AppointmentServiceImplTest {
         // then
         verify(appointmentRepository).findById(appointmentId);
         verify(appointmentStateMachine, never()).transition(any(), any(), any());
+        verify(timeSlotStateMachine, never()).transition(any(), any(), any());
         verify(appointmentRepository, never()).save(any());
+        verify(timeSlotRepository, never()).save(any());
         verify(emailService, never()).sendCancellationNotification(any(), any());
     }
 
@@ -214,7 +227,9 @@ class AppointmentServiceImplTest {
         // then
         verify(appointmentRepository).findById(appointmentId);
         verify(appointmentStateMachine, never()).transition(any(), any(), any());
+        verify(timeSlotStateMachine, never()).transition(any(), any(), any());
         verify(appointmentRepository, never()).save(any());
+        verify(timeSlotRepository, never()).save(any());
         verify(emailService, never()).sendCancellationNotification(any(), any());
     }
 }

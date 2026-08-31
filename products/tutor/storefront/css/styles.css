@@ -1,0 +1,263 @@
+* {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+  }
+  
+  body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+  }
+  
+  .header {
+      background: #1e293b;
+      color: white;
+      padding: 1rem 2rem;
+      text-align: center;
+  }
+  
+  .header-brand {
+      font-size: 1.4rem;
+      font-weight: 700;
+  }
+  
+  .footer {
+      margin-top: auto;
+      background: #f1f5f9;
+      padding: 1rem;
+      text-align: center;
+      font-size: 0.85rem;
+      color: #64748b;
+  }
+  
+  #page-container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+      width: 100%;
+  }
+  
+  /* Cards */
+  .card {
+      background: white;
+      border-radius: 8px;
+      padding: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      margin-bottom: 1.5rem;
+  }
+  
+  .card h2 {
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+  }
+  
+  /* Services grid */
+  .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1rem;
+  }
+  
+  .service-card {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 1.5rem;
+      cursor: pointer;
+      transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  
+  .service-card:hover {
+      border-color: #2563eb;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+  }
+  
+  .service-card.selected {
+      border-color: #2563eb;
+      background: #eff6ff;
+  }
+  
+  .service-card h3 {
+      margin-bottom: 0.5rem;
+  }
+  
+  .service-card .price {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #2563eb;
+  }
+  
+  /* Availability grid */
+  .slots-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 0.75rem;
+  }
+  
+  .slot-card {
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 0.75rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+  }
+  
+  .slot-card:hover {
+      border-color: #2563eb;
+      background: #eff6ff;
+  }
+  
+  .slot-card.selected {
+      border-color: #2563eb;
+      background: #2563eb;
+      color: white;
+  }
+  
+  .slot-card .slot-date {
+      font-size: 0.8rem;
+      color: #64748b;
+  }
+  
+  .slot-card.selected .slot-date {
+      color: #bfdbfe;
+  }
+  
+  .slot-card .slot-time {
+      font-weight: 600;
+      font-size: 1rem;
+  }
+  
+  /* Buttons */
+  .btn {
+      padding: 0.6rem 1.2rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: background 0.2s;
+  }
+  
+  .btn-primary {
+      background: #2563eb;
+      color: white;
+  }
+  
+  .btn-primary:hover {
+      background: #1d4ed8;
+  }
+  
+  .btn-primary:disabled {
+      background: #93c5fd;
+      cursor: not-allowed;
+  }
+  
+  .btn-danger {
+      background: #dc2626;
+      color: white;
+  }
+  
+  .btn-danger:hover {
+      background: #b91c1c;
+  }
+  
+  .btn-lg {
+      padding: 0.8rem 2rem;
+      font-size: 1.1rem;
+  }
+  
+  /* Forms */
+  .form-group {
+      margin-bottom: 1rem;
+  }
+  
+  .form-group label {
+      display: block;
+      margin-bottom: 0.3rem;
+      font-weight: 500;
+      font-size: 0.9rem;
+  }
+  
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+      width: 100%;
+      padding: 0.6rem;
+      border: 1px solid #d1d5db;
+      border-radius: 4px;
+      font-size: 0.95rem;
+  }
+  
+  /* Steps indicator */
+  .steps {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-bottom: 2rem;
+  }
+  
+  .step {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #94a3b8;
+  }
+  
+  .step.active {
+      color: #2563eb;
+      font-weight: 600;
+  }
+  
+  .step.done {
+      color: #16a34a;
+  }
+  
+  .step-number {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      border: 2px solid currentColor;
+  }
+  
+  .step.active .step-number {
+      background: #2563eb;
+      color: white;
+      border-color: #2563eb;
+  }
+  
+  .step.done .step-number {
+      background: #16a34a;
+      color: white;
+      border-color: #16a34a;
+  }
+  
+  /* Utility */
+  .hidden { display: none !important; }
+  .text-muted { color: #64748b; font-size: 0.85rem; }
+  .text-center { text-align: center; }
+  .mt-1 { margin-top: 0.5rem; }
+  .mt-2 { margin-top: 1rem; }
+  .mb-1 { margin-bottom: 0.5rem; }
+  .mb-2 { margin-bottom: 1rem; }
+  
+  /* Success message */
+  .success-box {
+      background: #dcfce7;
+      border: 1px solid #86efac;
+      border-radius: 8px;
+      padding: 1.5rem;
+      text-align: center;
+  }
+  
+  .success-box h2 {
+      color: #16a34a;
+  }

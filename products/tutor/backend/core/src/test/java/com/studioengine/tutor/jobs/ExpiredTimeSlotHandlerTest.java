@@ -18,6 +18,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -48,19 +49,37 @@ class ExpiredTimeSlotHandlerTest {
         var skipStates = Set.of(AppointmentState.PENDING_PAYMENT);
         var reservedStateSet = Set.of(AppointmentState.RESERVED);
         var reservedAppointment = mock(Appointment.class);
+        when(timeSlotRepository.findById(timeSlotId)).thenReturn(Optional.of(timeSlot));
         when(appointmentRepository.findByTimeSlotIdAndStateIn(timeSlotId, skipStates)).thenReturn(Optional.empty());
         when(appointmentRepository.findByTimeSlotIdAndStateIn(timeSlotId, reservedStateSet)).thenReturn(Optional.of(reservedAppointment));
 
         // when
-        expiredTimeSlotHandler.handle(timeSlot);
+        expiredTimeSlotHandler.handle(timeSlotId);
 
         // then
+        verify(timeSlotRepository).findById(timeSlotId);
         verify(appointmentRepository).findByTimeSlotIdAndStateIn(timeSlotId, skipStates);
         verify(timeSlotStateMachine).transition(timeSlot, TimeSlotState.AVAILABLE, "SYSTEM_TIMEOUT");
         verify(timeSlotRepository).save(timeSlot);
         verify(appointmentRepository).findByTimeSlotIdAndStateIn(timeSlotId, reservedStateSet);
         verify(appointmentStateMachine).transition(reservedAppointment, AppointmentState.CANCELLED, "SYSTEM_TIMEOUT");
         verify(appointmentRepository).save(reservedAppointment);
+    }
+
+    @Test
+    void shouldNotReleaseTimeSlotAndCancelAppointmentWhenTimeSlotNotFound() {
+        // given
+        var timeSlotId = UUID.randomUUID();
+        when(timeSlotRepository.findById(timeSlotId)).thenReturn(Optional.empty());
+
+        // when
+        assertThatThrownBy(() ->  expiredTimeSlotHandler.handle(timeSlotId)).isInstanceOf(IllegalStateException.class);
+
+        // then
+        verify(timeSlotRepository).findById(timeSlotId);
+        verify(appointmentRepository, never()).findByTimeSlotIdAndStateIn(any(), any());
+        verify(timeSlotStateMachine, never()).transition(any(), any(), any());
+        verify(timeSlotRepository, never()).save(any());
     }
 
     @Test
@@ -71,12 +90,14 @@ class ExpiredTimeSlotHandlerTest {
         when(timeSlot.getId()).thenReturn(timeSlotId);
         var skipStates = Set.of(AppointmentState.PENDING_PAYMENT);
         var pendingPaymentAppointment = mock(Appointment.class);
+        when(timeSlotRepository.findById(timeSlotId)).thenReturn(Optional.of(timeSlot));
         when(appointmentRepository.findByTimeSlotIdAndStateIn(timeSlotId, skipStates)).thenReturn(Optional.of(pendingPaymentAppointment));
 
         // when
-        expiredTimeSlotHandler.handle(timeSlot);
+        expiredTimeSlotHandler.handle(timeSlotId);
 
         // then
+        verify(timeSlotRepository).findById(timeSlotId);
         verify(appointmentRepository).findByTimeSlotIdAndStateIn(timeSlotId, skipStates);
         verify(timeSlotStateMachine, never()).transition(any(), any(), any());
     }
@@ -89,13 +110,15 @@ class ExpiredTimeSlotHandlerTest {
         when(timeSlot.getId()).thenReturn(timeSlotId);
         var skipStates = Set.of(AppointmentState.PENDING_PAYMENT);
         var reservedStateSet = Set.of(AppointmentState.RESERVED);
+        when(timeSlotRepository.findById(timeSlotId)).thenReturn(Optional.of(timeSlot));
         when(appointmentRepository.findByTimeSlotIdAndStateIn(timeSlotId, skipStates)).thenReturn(Optional.empty());
         when(appointmentRepository.findByTimeSlotIdAndStateIn(timeSlotId, reservedStateSet)).thenReturn(Optional.empty());
 
         // when
-        expiredTimeSlotHandler.handle(timeSlot);
+        expiredTimeSlotHandler.handle(timeSlotId);
 
         // then
+        verify(timeSlotRepository).findById(timeSlotId);
         verify(appointmentRepository).findByTimeSlotIdAndStateIn(timeSlotId, skipStates);
         verify(timeSlotStateMachine).transition(timeSlot, TimeSlotState.AVAILABLE, "SYSTEM_TIMEOUT");
         verify(timeSlotRepository).save(timeSlot);

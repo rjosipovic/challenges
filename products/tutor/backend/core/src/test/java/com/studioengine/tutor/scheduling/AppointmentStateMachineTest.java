@@ -34,8 +34,6 @@ import static com.studioengine.tutor.dataaccess.enums.AppointmentState.PRE_BOOKE
 import static com.studioengine.tutor.dataaccess.enums.AppointmentState.RESERVED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
@@ -43,9 +41,6 @@ class AppointmentStateMachineTest {
 
     @Mock
     private AppointmentStateLogRepository stateLogRepository;
-
-    @Mock
-    private TimeSlotStateMachine timeSlotStateMachine;
 
     @InjectMocks
     private AppointmentStateMachine stateMachine;
@@ -130,32 +125,6 @@ class AppointmentStateMachineTest {
         assertThatThrownBy(() -> stateMachine.transition(appointment, PAID, "TEST"))
                 .isInstanceOf(InvalidStateTransitionException.class);
         assertThat(appointment.getState()).isEqualTo(terminalState);
-    }
-
-    // --- Slot release on cancellation ---
-    @Test
-    void shouldReleaseSlotOnCancellation() {
-        // given
-        var appointment = createAppointmentInState(PAID);
-        var slot = appointment.getTimeSlot();
-
-        // when
-        stateMachine.transition(appointment, CANCELLED, "TUTOR");
-
-        // then
-        verify(timeSlotStateMachine).transition(slot, TimeSlotState.AVAILABLE, "TUTOR");
-    }
-
-    @Test
-    void shouldNotReleaseSlotOnNonCancellationTransition() {
-        // given
-        var appointment = createAppointmentInState(PAID);
-
-        // when
-        stateMachine.transition(appointment, COMPLETED, "TUTOR");
-
-        // then
-        verify(timeSlotStateMachine, never()).transition(any(), any(), any());
     }
 
     // --- Audit log ---

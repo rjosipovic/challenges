@@ -12,12 +12,12 @@ import java.util.UUID;
 @Value
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@JsonDeserialize(builder = RescheduleInitiationResponse.RescheduleInitiationResponseBuilder.class)
-public class RescheduleInitiationResponse {
+@JsonDeserialize(builder = RescheduleBookingRequest.RescheduleBookingRequestBuilder.class)
+public class RescheduleBookingRequest {
 
-    UUID originalAppointmentId;
+    UUID timeSlotId;
     String rescheduleToken;
 
     @JsonPOJOBuilder(withPrefix = "")
-    public static class RescheduleInitiationResponseBuilder {}
+    public static class RescheduleBookingRequestBuilder {}
 }

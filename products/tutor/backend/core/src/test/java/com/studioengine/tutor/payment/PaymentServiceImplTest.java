@@ -21,6 +21,7 @@ import com.studioengine.tutor.payment.provider.ProviderResult;
 import com.studioengine.tutor.payment.provider.ProviderSession;
 import com.studioengine.tutor.scheduling.AppointmentStateMachine;
 import com.studioengine.tutor.scheduling.TimeSlotStateMachine;
+import com.studioengine.tutor.selfservice.TokenService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -60,6 +61,8 @@ class PaymentServiceImplTest {
     private EmailService emailService;
     @Mock
     private PaymentRecordRepository paymentRecordRepository;
+    @Mock
+    private TokenService tokenService;
 
     @InjectMocks
     private PaymentServiceImpl paymentService;
@@ -105,13 +108,16 @@ class PaymentServiceImplTest {
                 .appointment(appointment)
                 .paymentMethod(PaymentMethodChoice.BANK_TRANSFER)
                 .build();
+        when(tokenService.generateManageLink(appointment)).thenReturn("http://localhost:8080/manage.html?token=x");
+
         // when
         paymentService.initPayment(command);
 
         // then
         verify(appointmentStateMachine).transition(appointment, AppointmentState.PENDING_PAYMENT, "SYSTEM_BANK_TRANSFER");
         verify(appointmentRepository).save(appointment);
-        verify(emailService).sendPendingPaymentEmail(appointment);
+        verify(tokenService).generateManageLink(appointment);
+        verify(emailService).sendPendingPaymentEmail(appointment, "http://localhost:8080/manage.html?token=x");
     }
 
     // --- Webhook confirmation: happy path ---
@@ -124,6 +130,7 @@ class PaymentServiceImplTest {
         appointment.updateStripeSessionId(sessionId);
         setId(appointment, appointmentId);
         var slot = appointment.getTimeSlot();
+        when(tokenService.generateManageLink(appointment)).thenReturn("http://localhost:8080/manage.html?token=x");
 
         var providerResult = ProviderResult.builder()
                 .appointmentId(appointmentId)
@@ -153,7 +160,7 @@ class PaymentServiceImplTest {
         assertThat(paymentRecord.getPaymentDate()).isEqualTo(LocalDate.now());
         assertThat(paymentRecord.getStripePaymentId()).isEqualTo(sessionId);
 
-        verify(emailService).sendConfirmationEmail(appointment);
+        verify(emailService).sendConfirmationEmail(appointment, "http://localhost:8080/manage.html?token=x");
     }
 
     // --- Webhook confirmation: idempotent (already PAID) ---

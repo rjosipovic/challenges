@@ -2,6 +2,8 @@ package com.studioengine.tutor.checkout;
 
 import com.studioengine.tutor.benefit.BenefitApplication;
 import com.studioengine.tutor.benefit.BenefitService;
+import com.studioengine.tutor.email.EmailService;
+import com.studioengine.tutor.selfservice.TokenService;
 import com.studioengine.tutor.dataaccess.entities.Appointment;
 import com.studioengine.tutor.dataaccess.entities.ServiceCategory;
 import com.studioengine.tutor.dataaccess.entities.Student;
@@ -59,6 +61,10 @@ class CheckoutServiceImplTest {
     private PaymentService paymentService;
     @Mock
     private BenefitService benefitService;
+    @Mock
+    private EmailService emailService;
+    @Mock
+    private TokenService tokenService;
 
     @InjectMocks
     private CheckoutServiceImpl checkoutService;
@@ -214,6 +220,7 @@ class CheckoutServiceImplTest {
         when(benefitService.apply(student, categoryPrice)).thenReturn(benefitApplication);
         when(appointmentRepository.save(any(Appointment.class))).thenReturn(appointment);
         when(appointmentRepository.findById(appointmentId)).thenReturn(Optional.of(appointment));
+        when(tokenService.generateManageLink(appointment)).thenReturn("http://localhost:8080/manage.html?token=x");
 
         // when
         checkoutService.checkout(command);
@@ -230,6 +237,8 @@ class CheckoutServiceImplTest {
 
         verify(appointmentRepository).findById(any());
         verify(benefitService).consume(benefitApplication, appointment);
+        verify(tokenService).generateManageLink(appointment);
+        verify(emailService).sendConfirmationEmail(appointment, "http://localhost:8080/manage.html?token=x");
         verify(paymentService, never()).initPayment(any());
     }
 

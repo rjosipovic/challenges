@@ -12,12 +12,14 @@ import com.studioengine.tutor.dataaccess.repositories.AppointmentRepository;
 import com.studioengine.tutor.dataaccess.repositories.ServiceCategoryRepository;
 import com.studioengine.tutor.dataaccess.repositories.StudentRepository;
 import com.studioengine.tutor.dataaccess.repositories.TimeSlotRepository;
+import com.studioengine.tutor.email.EmailService;
 import com.studioengine.tutor.errors.exceptions.InvalidReservationException;
 import com.studioengine.tutor.errors.exceptions.ResourceNotFoundException;
 import com.studioengine.tutor.payment.PaymentCommand;
 import com.studioengine.tutor.payment.PaymentService;
 import com.studioengine.tutor.scheduling.AppointmentStateMachine;
 import com.studioengine.tutor.scheduling.TimeSlotStateMachine;
+import com.studioengine.tutor.selfservice.TokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +41,8 @@ public class CheckoutServiceImpl implements CheckoutService {
     private final AppointmentStateMachine appointmentStateMachine;
     private final PaymentService paymentService;
     private final BenefitService benefitService;
+    private final TokenService tokenService;
+    private final EmailService emailService;
 
     @Override
     @Transactional
@@ -136,6 +140,9 @@ public class CheckoutServiceImpl implements CheckoutService {
 
         timeSlotStateMachine.transition(slot, TimeSlotState.BOOKED, TRIGGERED_BY_ZERO_PRICE);
         timeSlotRepository.save(slot);
+
+        var manageLink = tokenService.generateManageLink(appointment);
+        emailService.sendConfirmationEmail(appointment, manageLink);
 
         return Checkout.builder()
                 .appointmentId(appointment.getId())

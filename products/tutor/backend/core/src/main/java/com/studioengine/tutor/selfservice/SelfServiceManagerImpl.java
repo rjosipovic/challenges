@@ -1,9 +1,9 @@
 package com.studioengine.tutor.selfservice;
 
-import com.studioengine.tutor.config.InstanceProperties;
 import com.studioengine.tutor.config.SchedulingProperties;
 import com.studioengine.tutor.dataaccess.entities.Appointment;
 import com.studioengine.tutor.dataaccess.entities.CancellationToken;
+import com.studioengine.tutor.dataaccess.enums.AppointmentOrigin;
 import com.studioengine.tutor.dataaccess.enums.AppointmentState;
 import com.studioengine.tutor.dataaccess.enums.TimeSlotState;
 import com.studioengine.tutor.dataaccess.enums.TokenType;
@@ -24,11 +24,19 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.util.Set;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class SelfServiceManagerImpl implements SelfServiceManager {
+
+    private static final Set<AppointmentState> RESCHEDULABLE_STATES = Set.of(
+            AppointmentState.PENDING_PAYMENT,
+            AppointmentState.PAID,
+            AppointmentState.CONFIRMED
+    );
 
     private static final String TRIGGERED_BY = "STUDENT_SELF_SERVICE";
 
@@ -39,9 +47,10 @@ public class SelfServiceManagerImpl implements SelfServiceManager {
     private final TimeSlotStateMachine timeSlotStateMachine;
     private final TimeSlotRepository timeSlotRepository;
     private final EmailService emailService;
-    private final InstanceProperties instanceProperties;
+    private final TokenService tokenService;
 
     @Override
+    @Transactional(readOnly = true)
     public AppointmentDetails validateToken(String token) {
         var cancellationToken = findAndValidateToken(token);
         var appointment = cancellationToken.getAppointment();
@@ -86,22 +95,73 @@ public class SelfServiceManagerImpl implements SelfServiceManager {
         );
         cancellationTokenRepository.save(rescheduleToken);
 
-        var redirectUrl = "%s%s%s".formatted(
-                instanceProperties.getBaseUrl(),
-                "/api/v1/storefront/availability?rescheduleToken=",
-                rescheduleToken.getToken());
-
         return RescheduleInitiation.builder()
                 .originalAppointmentId(appointment.getId())
                 .rescheduleToken(rescheduleToken.getToken())
-                .redirectUrl(redirectUrl)
                 .build();
+    }
+
+    @Override
+    @Transactional
+    public void completeReschedule(UUID slotId, String rescheduleToken) {
+        // 1. Validate reschedule token
+        var token = cancellationTokenRepository.findByToken(rescheduleToken).orElseThrow(() -> new TokenExpiredException("Reschedule token not found"));
+        if (token.isUsed()) throw new TokenExpiredException("Token already used");
+        if (token.isExpired()) throw new TokenExpiredException("Token expired");
+
+        // 2. Get student from original appointment
+        var originalAppointment = token.getAppointment();
+        var student = originalAppointment.getStudent();
+        var category = originalAppointment.getServiceCategory();
+
+        // 3. Reserve and book slot atomically
+        var slot = timeSlotRepository.findById(slotId).orElseThrow(() -> new ResourceNotFoundException("TimeSlot not found"));
+        if (slot.getState() != TimeSlotState.AVAILABLE) throw new IllegalStateException("Slot not available");
+        var appointmentState = originalAppointment.getState();
+
+        if (!RESCHEDULABLE_STATES.contains(appointmentState)) {
+            throw new IllegalStateException("Appointment in state %s cannot be rescheduled".formatted(appointmentState));
+        }
+
+        var slotState = (appointmentState == AppointmentState.PENDING_PAYMENT) ? TimeSlotState.RESERVED : TimeSlotState.BOOKED;
+        timeSlotStateMachine.transition(slot, slotState, "RESCHEDULE");
+        timeSlotRepository.save(slot);
+
+        // 4. Create appointment directly in PAID state
+        var appointment = Appointment.create(
+                slot, category, student,
+                appointmentState,
+                originalAppointment.getOriginalPrice(),
+                originalAppointment.getFinalPrice(),
+                AppointmentOrigin.STOREFRONT,
+                null);
+        appointmentRepository.save(appointment);
+
+        // 5. Mark token used
+        token.markUsed();
+        cancellationTokenRepository.save(token);
+
+        // 6. Send confirmation + generate manage link
+        var manageLink = tokenService.generateManageLink(appointment);
+        if (appointmentState == AppointmentState.PENDING_PAYMENT) {
+            emailService.sendPendingPaymentEmail(appointment, manageLink);
+        } else {
+            emailService.sendConfirmationEmail(appointment, manageLink);
+        }
+
+        // 7. notify tutor
+        emailService.sendRescheduleNotification(originalAppointment, appointment);
     }
 
     private Appointment cancelAndRelease(String token) {
         var cancellationToken = findAndValidateToken(token);
         var appointment = cancellationToken.getAppointment();
+        var appointmentState = appointment.getState();
         var slot = appointment.getTimeSlot();
+
+        if (!RESCHEDULABLE_STATES.contains(appointmentState)) {
+            throw new IllegalStateException("Appointment in state %s cannot be canceled".formatted(appointmentState));
+        }
 
         enforceDeadline(slot.getSlotDate().atTime(slot.getStartTime()));
 

@@ -4,9 +4,9 @@ import com.studioengine.tutor.dataaccess.entities.Appointment;
 
 public interface EmailService {
 
-    void sendConfirmationEmail(Appointment appointment);
+    void sendConfirmationEmail(Appointment appointment, String manageLink);
 
-    void sendPendingPaymentEmail(Appointment appointment);
+    void sendPendingPaymentEmail(Appointment appointment, String manageLink);
 
     void sendOverdueNotificationToTutor(Appointment appointment);
 
@@ -21,4 +21,6 @@ public interface EmailService {
     void sendCancellationNotification(Appointment appointment, String reason);
 
     void sendOtpEmail(String email, String otp);
+
+    void sendRescheduleNotification(Appointment originalAppointment, Appointment newAppointment);
 }

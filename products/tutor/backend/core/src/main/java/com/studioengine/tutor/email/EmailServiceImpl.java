@@ -34,7 +34,7 @@ public class EmailServiceImpl implements EmailService {
     private final AuthProperties authProperties;
 
     @Override
-    public void sendConfirmationEmail(Appointment appointment) {
+    public void sendConfirmationEmail(Appointment appointment, String manageLink) {
         var student = appointment.getStudent();
         var serviceCategory = appointment.getServiceCategory();
         var slot = appointment.getTimeSlot();
@@ -49,12 +49,14 @@ public class EmailServiceImpl implements EmailService {
                     <li><strong>Vrijeme:</strong> %s</li>
                 </ul>
                 <p>U privitku se nalazi kalendarski poziv (.ics) koji možete dodati u kalendar.</p>
+                <p><a href="%s">Upravljanje terminom</a></p>
                 <p>Srdačan pozdrav,<br/>%s</p>
                 """.formatted(
                 student.getName(),
                 serviceCategory.getName(),
                 slot.getSlotDate().format(DATE_FMT),
                 slot.getStartTime().format(TIME_FMT),
+                manageLink,
                 brandProperties.getName()
         );
         var icsFile = icsGeneratorService.generateIcsFile(appointment);
@@ -66,7 +68,7 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public void sendPendingPaymentEmail(Appointment appointment) {
+    public void sendPendingPaymentEmail(Appointment appointment, String manageLink) {
         var student = appointment.getStudent();
         var slot = appointment.getTimeSlot();
         var serviceCategory = appointment.getServiceCategory();
@@ -83,6 +85,7 @@ public class EmailServiceImpl implements EmailService {
                     <li><strong>Iznos:</strong> %s %s</li>
                 </ul>
                 <p>U privitku se nalazi račun s HUB3 barkodom za plaćanje.</p>
+                <p><a href="%s">Upravljanje terminom</a></p>
                 <p>Srdačan pozdrav, <br/>%s</p>
                 """.formatted(
                 student.getName(),
@@ -91,6 +94,7 @@ public class EmailServiceImpl implements EmailService {
                 slot.getStartTime().format(TIME_FMT),
                 appointment.getFinalPrice(),
                 brandProperties.getCurrency(),
+                manageLink,
                 brandProperties.getName()
         );
         var pdfFile = pdfGeneratorService.generateInvoicePdf(appointment);
@@ -251,6 +255,30 @@ public class EmailServiceImpl implements EmailService {
                 """.formatted(otp);
 
         sendHtmlEmail(email, subject, body, null, null);
+    }
+
+    @Override
+    public void sendRescheduleNotification(Appointment originalAppointment, Appointment newAppointment) {
+        var student = newAppointment.getStudent();
+        var oldSlot = originalAppointment.getTimeSlot();
+        var newSlot = newAppointment.getTimeSlot();
+        var subject = "%s — Termin premješten".formatted(brandProperties.getName());
+        var body = """
+              <h2>Termin premješten</h2>
+              <p>Student <strong>%s</strong> je premjestio termin:</p>
+              <ul>
+                  <li><strong>Stari termin:</strong> %s u %s</li>
+                  <li><strong>Novi termin:</strong> %s u %s</li>
+              </ul>
+              """.formatted(
+                student.getName(),
+                oldSlot.getSlotDate().format(DATE_FMT),
+                oldSlot.getStartTime().format(TIME_FMT),
+                newSlot.getSlotDate().format(DATE_FMT),
+                newSlot.getStartTime().format(TIME_FMT)
+        );
+
+        sendHtmlEmail(getTutorEmail(), subject, body, null, null);
     }
 
     // --- Private helpers ---

@@ -4,6 +4,7 @@ import com.studioengine.tutor.api.mapper.CalendarMapper;
 import com.studioengine.tutor.api.dto.calendar.CreateSlotsRequest;
 import com.studioengine.tutor.api.dto.calendar.DeleteSlotsRequest;
 import com.studioengine.tutor.api.dto.calendar.PublishSlotsRequest;
+import com.studioengine.tutor.api.dto.calendar.CalendarSlotResponse;
 import com.studioengine.tutor.api.dto.calendar.SlotResponse;
 import com.studioengine.tutor.api.dto.calendar.WithdrawSlotsRequest;
 import com.studioengine.tutor.dataaccess.enums.TimeSlotState;
@@ -14,6 +15,7 @@ import com.studioengine.tutor.errors.exceptions.ResourceNotFoundException;
 import com.studioengine.tutor.errors.exceptions.SlotConflictException;
 import com.studioengine.tutor.errors.exceptions.SlotWithdrawalBlockedException;
 import com.studioengine.tutor.scheduling.CreateSlotsCommand;
+import com.studioengine.tutor.scheduling.CalendarSlot;
 import com.studioengine.tutor.scheduling.CreatedSlot;
 import com.studioengine.tutor.scheduling.DeleteSlotsCommand;
 import com.studioengine.tutor.scheduling.PublishSlotsCommand;
@@ -66,6 +68,7 @@ class DashboardCalendarControllerTest {
 
     private JacksonTester<CreateSlotsRequest> createSlotRequestJson;
     private JacksonTester<List<SlotResponse>> slotResponseListJson;
+    private JacksonTester<List<CalendarSlotResponse>> calendarSlotResponseListJson;
     private JacksonTester<PublishSlotsRequest> publishSlotRequestJson;
     private JacksonTester<WithdrawSlotsRequest> withdrawSlotsRequestJson;
     private JacksonTester<DeleteSlotsRequest> deleteSlotsRequestJson;
@@ -414,11 +417,11 @@ class DashboardCalendarControllerTest {
         // given
         var from = "2026-08-18";
         var to = "2026-08-24";
-        var createdSlot = mock(CreatedSlot.class);
-        var slotResponse = mock(SlotResponse.class);
+        var calendarSlot = mock(CalendarSlot.class);
+        var calendarSlotResponse = mock(CalendarSlotResponse.class);
 
-        when(timeSlotService.getSlotsByDateRange(any(), any())).thenReturn(List.of(createdSlot));
-        when(calendarMapper.toSlotResponses(List.of(createdSlot))).thenReturn(List.of(slotResponse));
+        when(timeSlotService.getSlotsByDateRange(any(), any())).thenReturn(List.of(calendarSlot));
+        when(calendarMapper.toCalendarSlotResponseList(List.of(calendarSlot))).thenReturn(List.of(calendarSlotResponse));
 
         // when
         var response = mockMvc.perform(get("/api/v1/dashboard/slots")
@@ -429,9 +432,9 @@ class DashboardCalendarControllerTest {
 
         // then
         verify(timeSlotService).getSlotsByDateRange(any(), any());
-        verify(calendarMapper).toSlotResponses(List.of(createdSlot));
+        verify(calendarMapper).toCalendarSlotResponseList(List.of(calendarSlot));
 
-        var content = slotResponseListJson.parse(response.getContentAsString());
+        var content = calendarSlotResponseListJson.parse(response.getContentAsString());
         assertThat(content.getObject()).hasSize(1);
     }
 
@@ -442,7 +445,7 @@ class DashboardCalendarControllerTest {
         var to = "2026-08-24";
 
         when(timeSlotService.getSlotsByDateRange(any(), any())).thenReturn(List.of());
-        when(calendarMapper.toSlotResponses(List.of())).thenReturn(List.of());
+        when(calendarMapper.toCalendarSlotResponseList(List.of())).thenReturn(List.of());
 
         // when
         var response = mockMvc.perform(get("/api/v1/dashboard/slots")
@@ -453,7 +456,7 @@ class DashboardCalendarControllerTest {
 
         // then
         verify(timeSlotService).getSlotsByDateRange(any(), any());
-        var content = slotResponseListJson.parse(response.getContentAsString());
+        var content = calendarSlotResponseListJson.parse(response.getContentAsString());
         assertThat(content.getObject()).isEmpty();
     }
 

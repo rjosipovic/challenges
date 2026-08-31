@@ -11,12 +11,12 @@ import org.springframework.stereotype.Component;
 public class NoOpEmailService implements EmailService {
 
     @Override
-    public void sendConfirmationEmail(Appointment appointment) {
+    public void sendConfirmationEmail(Appointment appointment, String manageLink) {
         log.info("[NO-OP] Confirmation email for appointment {}", appointment.getId());
     }
 
     @Override
-    public void sendPendingPaymentEmail(Appointment appointment) {
+    public void sendPendingPaymentEmail(Appointment appointment, String manageLink) {
         log.info("[NO-OP] Pending payment email for appointment {}", appointment.getId());
     }
 
@@ -53,5 +53,10 @@ public class NoOpEmailService implements EmailService {
     @Override
     public void sendOtpEmail(String email, String otp) {
         log.info("[NO-OP] Sending OTP {} to {}", otp, email);
+    }
+
+    @Override
+    public void sendRescheduleNotification(Appointment originalAppointment, Appointment newAppointment) {
+        log.info("[NO-OP] Reschedule notification for appointment {}", newAppointment.getId());
     }
 }

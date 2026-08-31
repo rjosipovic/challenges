@@ -19,7 +19,7 @@ import { getToken, isAuthenticated, logout } from './auth.js';
   
       const response = await fetch(`${BASE_URL}${path}`, options);
   
-      if (response.status === 401 && isAuthenticated()) {
+      if ((response.status === 401 || response.status === 403) && isAuthenticated()) {
           logout();
           window.location.reload();
           return;

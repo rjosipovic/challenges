@@ -3,7 +3,6 @@ package com.studioengine.tutor.scheduling;
 import com.studioengine.tutor.dataaccess.entities.Appointment;
 import com.studioengine.tutor.dataaccess.entities.AppointmentStateLog;
 import com.studioengine.tutor.dataaccess.enums.AppointmentState;
-import com.studioengine.tutor.dataaccess.enums.TimeSlotState;
 import com.studioengine.tutor.dataaccess.repositories.AppointmentStateLogRepository;
 import com.studioengine.tutor.errors.exceptions.InvalidStateTransitionException;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +35,6 @@ public class AppointmentStateMachine {
     private static final Set<AppointmentState> TERMINAL_STATES = Set.of(COMPLETED, NO_SHOW, CANCELLED);
 
     private final AppointmentStateLogRepository stateLogRepository;
-    private final TimeSlotStateMachine timeSlotStateMachine;
 
     public void transition(Appointment appointment, AppointmentState target, String triggeredBy) {
         var current = appointment.getState();
@@ -46,10 +44,6 @@ public class AppointmentStateMachine {
         var log = AppointmentStateLog.create(appointment, current, target, triggeredBy);
         appointment.transitionTo(target);
         stateLogRepository.save(log);
-
-        if (target == CANCELLED) {
-            releaseSlot(appointment, triggeredBy);
-        }
     }
 
     private void verifyNotTerminal(AppointmentState current) {
@@ -67,10 +61,5 @@ public class AppointmentStateMachine {
                     "Appointment cannot transition from %s to %s".formatted(current, target)
             );
         }
-    }
-
-    private void releaseSlot(Appointment appointment, String triggeredBy) {
-        var slot = appointment.getTimeSlot();
-        timeSlotStateMachine.transition(slot, TimeSlotState.AVAILABLE, triggeredBy);
     }
 }

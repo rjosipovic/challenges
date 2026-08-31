@@ -6,6 +6,7 @@ import com.studioengine.tutor.dataaccess.enums.AppointmentState;
 import com.studioengine.tutor.dataaccess.repositories.AppointmentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -26,6 +27,7 @@ public class LandingServiceImpl implements LandingService {
     private final BrandProperties brandProperties;
 
     @Override
+    @Transactional(readOnly = true)
     public DashboardOverview getLandingPageData() {
 
         var timezone = ZoneId.of(brandProperties.getTimezone());

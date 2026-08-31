@@ -2,6 +2,7 @@ package com.studioengine.tutor.jobs;
 
 import com.studioengine.tutor.config.BrandProperties;
 import com.studioengine.tutor.config.SchedulingProperties;
+import com.studioengine.tutor.dataaccess.entities.Appointment;
 import com.studioengine.tutor.dataaccess.enums.AppointmentState;
 import com.studioengine.tutor.dataaccess.repositories.AppointmentRepository;
 import lombok.RequiredArgsConstructor;
@@ -39,11 +40,14 @@ public class TutorNudgeJob {
         var today = LocalDate.now(timezone);
         var nudgeAfter = now.minus(schedulingProperties.getNudgeDelay());
 
-        var unclosedAppointments = appointmentRepository.findUnclosedPastAppointments(UNCLOSED_STATES, today, nudgeAfter);
+        var unclosedAppointmentIds = appointmentRepository
+                .findUnclosedPastAppointments(UNCLOSED_STATES, today, nudgeAfter).stream()
+                .map(Appointment::getId)
+                .toList();
 
-        log.info("TutorNudgeJob: found {} unclosed appointment past nudge delay", unclosedAppointments.size());
+        log.info("TutorNudgeJob: found {} unclosed appointment past nudge delay", unclosedAppointmentIds.size());
 
-        unclosedAppointments.forEach(tutorNudgeHandler::handle);
+        unclosedAppointmentIds.forEach(tutorNudgeHandler::handle);
 
         log.info("TutorNudgeJob: completed");
     }

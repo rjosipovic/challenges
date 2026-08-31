@@ -3,12 +3,15 @@ package com.studioengine.tutor.appointment;
 import com.studioengine.tutor.config.BrandProperties;
 import com.studioengine.tutor.dataaccess.entities.Appointment;
 import com.studioengine.tutor.dataaccess.enums.AppointmentState;
+import com.studioengine.tutor.dataaccess.enums.TimeSlotState;
 import com.studioengine.tutor.dataaccess.repositories.AppointmentRepository;
+import com.studioengine.tutor.dataaccess.repositories.TimeSlotRepository;
 import com.studioengine.tutor.email.EmailService;
 import com.studioengine.tutor.errors.exceptions.MissingCancellationReasonException;
 import com.studioengine.tutor.errors.exceptions.PrematureClosureException;
 import com.studioengine.tutor.errors.exceptions.ResourceNotFoundException;
 import com.studioengine.tutor.scheduling.AppointmentStateMachine;
+import com.studioengine.tutor.scheduling.TimeSlotStateMachine;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +28,8 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     private final AppointmentRepository appointmentRepository;
     private final AppointmentStateMachine appointmentStateMachine;
+    private final TimeSlotStateMachine timeSlotStateMachine;
+    private final TimeSlotRepository timeSlotRepository;
     private final BrandProperties brandProperties;
     private final EmailService emailService;
 
@@ -51,10 +56,16 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Transactional
     public CanceledAppointment cancel(CancelAppointmentCommand command) {
         var appointment = findAppointment(command.getAppointmentId());
+        var timeSlot = appointment.getTimeSlot();
         var reason = command.getReason();
+
         verifyReasonProvided(reason);
+
         appointmentStateMachine.transition(appointment, AppointmentState.CANCELLED, "TUTOR");
+        timeSlotStateMachine.transition(timeSlot, TimeSlotState.AVAILABLE, "TUTOR");
+
         appointmentRepository.save(appointment);
+        timeSlotRepository.save(timeSlot);
 
         emailService.sendCancellationNotification(appointment, reason);
 

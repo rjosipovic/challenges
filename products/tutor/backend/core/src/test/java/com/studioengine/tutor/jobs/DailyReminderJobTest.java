@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -35,8 +36,12 @@ class DailyReminderJobTest {
     @Test
     void shouldTriggerReminders() {
         // given
+        var appointmentId1 = UUID.randomUUID();
+        var appointmentId2 = UUID.randomUUID();
         var appointment1 = mock(Appointment.class);
         var appointment2 = mock(Appointment.class);
+        when(appointment1.getId()).thenReturn(appointmentId1);
+        when(appointment2.getId()).thenReturn(appointmentId2);
         when(brandProperties.getTimezone()).thenReturn("Europe/Zagreb");
         when(appointmentRepository.findByStatesAndSlotDate(any(), any())).thenReturn(List.of(appointment1, appointment2));
 
@@ -45,7 +50,7 @@ class DailyReminderJobTest {
 
         // then
         verify(appointmentRepository).findByStatesAndSlotDate(any(), any());
-        verify(dailyReminderHandler, times(2)).handle(argThat(a -> a.equals(appointment1) || a.equals(appointment2)));
+        verify(dailyReminderHandler, times(2)).handle(argThat(a -> a.equals(appointment1.getId()) || a.equals(appointment2.getId())));
     }
 
     @Test

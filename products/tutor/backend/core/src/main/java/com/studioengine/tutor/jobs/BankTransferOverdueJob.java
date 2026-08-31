@@ -1,6 +1,7 @@
 package com.studioengine.tutor.jobs;
 
 import com.studioengine.tutor.config.SchedulingProperties;
+import com.studioengine.tutor.dataaccess.entities.Appointment;
 import com.studioengine.tutor.dataaccess.repositories.AppointmentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,11 +25,13 @@ public class BankTransferOverdueJob {
     public void notifyOverduePayments() {
 
         var cutoff = OffsetDateTime.now().minus(schedulingProperties.getPaymentOverdueThreshold());
-        var overdueAppointments = appointmentRepository.findOverduePendingPayments(cutoff);
+        var overdueAppointmentIds = appointmentRepository.findOverduePendingPayments(cutoff).stream()
+                .map(Appointment::getId)
+                .toList();
 
-        log.info("BankTransferOverdueJob: found {} overdue pending payments", overdueAppointments.size());
+        log.info("BankTransferOverdueJob: found {} overdue pending payments", overdueAppointmentIds.size());
 
-        overdueAppointments.forEach(overduePaymentHandler::handle);
+        overdueAppointmentIds.forEach(overduePaymentHandler::handle);
 
         log.info("BankTransferOverdueJob: completed");
     }

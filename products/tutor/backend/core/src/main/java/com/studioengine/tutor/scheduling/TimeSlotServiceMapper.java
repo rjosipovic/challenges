@@ -1,5 +1,6 @@
 package com.studioengine.tutor.scheduling;
 
+import com.studioengine.tutor.dataaccess.entities.Appointment;
 import com.studioengine.tutor.dataaccess.entities.TimeSlot;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -12,4 +13,6 @@ public interface TimeSlotServiceMapper {
 
     @Mapping(source = "slotDate", target = "date")
     CreatedSlot toCreatedSlot(TimeSlot slot);
+
+    AssociatedAppointment toAssociatedAppointment(Appointment appointment);
 }

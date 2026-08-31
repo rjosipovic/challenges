@@ -1,6 +1,7 @@
 package com.studioengine.tutor.jobs;
 
 import com.studioengine.tutor.config.BrandProperties;
+import com.studioengine.tutor.dataaccess.entities.Appointment;
 import com.studioengine.tutor.dataaccess.enums.AppointmentState;
 import com.studioengine.tutor.dataaccess.repositories.AppointmentRepository;
 import lombok.RequiredArgsConstructor;
@@ -34,11 +35,13 @@ public class DailyReminderJob {
         var timezone = ZoneId.of(brandProperties.getTimezone());
         var today = LocalDate.now(timezone);
 
-        var appointments = appointmentRepository.findByStatesAndSlotDate(REMINDER_STATES, today);
+        var appointmentIds = appointmentRepository.findByStatesAndSlotDate(REMINDER_STATES, today).stream()
+                .map(Appointment::getId)
+                .toList();
 
-        log.info("DailyReminderJob: found {} appointments for today ({})", appointments.size(), today);
+        log.info("DailyReminderJob: found {} appointments for today ({})", appointmentIds.size(), today);
 
-        appointments.forEach(dailyReminderHandler::handle);
+        appointmentIds.forEach(dailyReminderHandler::handle);
 
         log.info("DailyReminderJob: completed");
     }

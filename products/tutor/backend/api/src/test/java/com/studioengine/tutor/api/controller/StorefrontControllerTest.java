@@ -815,7 +815,6 @@ class StorefrontControllerTest {
 
             when(rescheduleInitiationResponse.getOriginalAppointmentId()).thenReturn(UUID.randomUUID());
             when(rescheduleInitiationResponse.getRescheduleToken()).thenReturn(UUID.randomUUID().toString());
-            when(rescheduleInitiationResponse.getRedirectUrl()).thenReturn("http://localhost:3000/api/v1/storefront/availability?rescheduleToken=" + UUID.randomUUID());
             when(selfServiceManager.confirmReschedule(token)).thenReturn(rescheduleInitiation);
             when(storefrontMapper.toRescheduleInitiationResponse(rescheduleInitiation)).thenReturn(rescheduleInitiationResponse);
 

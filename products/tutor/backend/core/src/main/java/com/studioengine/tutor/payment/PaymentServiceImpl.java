@@ -16,6 +16,7 @@ import com.studioengine.tutor.payment.provider.ProviderResult;
 import com.studioengine.tutor.payment.provider.ProviderSession;
 import com.studioengine.tutor.scheduling.AppointmentStateMachine;
 import com.studioengine.tutor.scheduling.TimeSlotStateMachine;
+import com.studioengine.tutor.selfservice.TokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -37,6 +38,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final BrandProperties brandProperties;
     private final EmailService emailService;
     private final PaymentRecordRepository paymentRecordRepository;
+    private final TokenService tokenService;
 
 
     @Override
@@ -78,7 +80,8 @@ public class PaymentServiceImpl implements PaymentService {
         appointmentStateMachine.transition(appointment, AppointmentState.PENDING_PAYMENT, "SYSTEM_BANK_TRANSFER");
         appointmentRepository.save(appointment);
 
-        emailService.sendPendingPaymentEmail(appointment);
+        var manageLink = tokenService.generateManageLink(appointment);
+        emailService.sendPendingPaymentEmail(appointment, manageLink);
 
         return PaymentInitiation.builder()
                 .appointmentId(appointment.getId())
@@ -101,7 +104,8 @@ public class PaymentServiceImpl implements PaymentService {
                     appointment.getStripeSessionId()
             );
             paymentRecordRepository.save(paymentRecord);
-            emailService.sendConfirmationEmail(appointment);
+            var manageLink = tokenService.generateManageLink(appointment);
+            emailService.sendConfirmationEmail(appointment, manageLink);
         });
     }
 

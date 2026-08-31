@@ -14,6 +14,7 @@ import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -41,8 +42,12 @@ class ReservationTimeoutJobTest {
     void shouldTriggerReleaseExpiredReservations() {
         // given
         var min15 = Duration.of(900, ChronoUnit.SECONDS);
+        var tsId1 = UUID.randomUUID();
+        var tsId2 = UUID.randomUUID();
         var ts1 = mock(TimeSlot.class);
         var ts2 = mock(TimeSlot.class);
+        when(ts1.getId()).thenReturn(tsId1);
+        when(ts2.getId()).thenReturn(tsId2);
         when(schedulingProperties.getReservationTimeout()).thenReturn(min15);
         when(timeSlotRepository.findExpiredReservations(any(OffsetDateTime.class))).thenReturn(List.of(ts1, ts2));
 
@@ -57,7 +62,7 @@ class ReservationTimeoutJobTest {
         var cutoff = captor.getValue();
         assertThat(Duration.between(cutoff, OffsetDateTime.now())).isGreaterThanOrEqualTo(min15);
 
-        verify(expiredTimeSlotHandler, times(2)).handle(argThat(slot -> slot.equals(ts1) || slot.equals(ts2)));
+        verify(expiredTimeSlotHandler, times(2)).handle(argThat(slot -> slot.equals(ts1.getId()) || slot.equals(ts2.getId())));
     }
 
     @Test

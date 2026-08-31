@@ -259,20 +259,37 @@ class TimeSlotServiceImplTest {
         // given
         var from = LocalDate.of(2026, 8, 18);
         var to = LocalDate.of(2026, 8, 24);
-        var slot1 = createSlot(TimeSlotState.DRAFT);
-        var slot2 = createSlot(TimeSlotState.AVAILABLE);
+        var slotWithAppointment = createSlot(TimeSlotState.BOOKED);
+        var slotWithoutAppointment = createSlot(TimeSlotState.AVAILABLE);
         var createdSlot = mock(CreatedSlot.class);
+        var associatedAppointment = mock(AssociatedAppointment.class);
 
-        when(timeSlotRepository.findBySlotDateBetween(from, to)).thenReturn(List.of(slot1, slot2));
+        var appointment = mock(Appointment.class);
+        when(appointment.getTimeSlot()).thenReturn(slotWithAppointment);
+
+        when(timeSlotRepository.findBySlotDateBetween(from, to))
+                .thenReturn(List.of(slotWithAppointment, slotWithoutAppointment));
+        when(appointmentRepository.findByTimeSlotIdInAndStateIn(anyList(), any()))
+                .thenReturn(List.of(appointment));
         when(timeSlotServiceMapper.toCreatedSlot(any())).thenReturn(createdSlot);
+        when(timeSlotServiceMapper.toAssociatedAppointment(appointment)).thenReturn(associatedAppointment);
 
         // when
         var result = timeSlotService.getSlotsByDateRange(from, to);
 
         // then
         verify(timeSlotRepository).findBySlotDateBetween(from, to);
+        verify(appointmentRepository).findByTimeSlotIdInAndStateIn(anyList(), any());
         verify(timeSlotServiceMapper, times(2)).toCreatedSlot(any());
         assertThat(result).hasSize(2);
+
+        var withAppointment = result.stream()
+                .filter(cs -> cs.getAppointment() != null).toList();
+        var withoutAppointment = result.stream()
+                .filter(cs -> cs.getAppointment() == null).toList();
+        assertThat(withAppointment).hasSize(1);
+        assertThat(withAppointment.getFirst().getAppointment()).isEqualTo(associatedAppointment);
+        assertThat(withoutAppointment).hasSize(1);
     }
 
     @Test

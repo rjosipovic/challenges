@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -28,8 +29,9 @@ public class ExpiredTimeSlotHandler {
     private final AppointmentStateMachine appointmentStateMachine;
 
     @Transactional
-    public void handle(TimeSlot timeSlot) {
+    public void handle(UUID timeSlotId) {
 
+        var timeSlot = findTimeSlot(timeSlotId);
         var shouldSkip = appointmentRepository.findByTimeSlotIdAndStateIn(timeSlot.getId(), SKIP_STATES).isPresent();
 
         if (shouldSkip) {
@@ -47,5 +49,10 @@ public class ExpiredTimeSlotHandler {
                     appointmentRepository.save(a);
                     log.info("Released slot {} and canceled appointment {}", timeSlot.getId(), a.getId());
                 });
+    }
+
+    private TimeSlot findTimeSlot(UUID timeSlotId) {
+        return timeSlotRepository.findById(timeSlotId)
+                .orElseThrow(() -> new IllegalStateException("TimeSlot not found: " + timeSlotId));
     }
 }

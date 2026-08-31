@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -39,8 +40,12 @@ class TutorNudgeJobTest {
     @Test
     void shouldTriggerNudges() {
         // given
+        var appointmentId1 = UUID.randomUUID();
+        var appointmentId2 = UUID.randomUUID();
         var appointment1 = mock(Appointment.class);
         var appointment2 = mock(Appointment.class);
+        when(appointment1.getId()).thenReturn(appointmentId1);
+        when(appointment2.getId()).thenReturn(appointmentId2);
         when(brandProperties.getTimezone()).thenReturn("Europe/Zagreb");
         when(schedulingProperties.getNudgeDelay()).thenReturn(Duration.ofHours(2));
         when(appointmentRepository.findUnclosedPastAppointments(any(), any(), any())).thenReturn(List.of(appointment1, appointment2));
@@ -50,7 +55,7 @@ class TutorNudgeJobTest {
 
         // then
         verify(appointmentRepository).findUnclosedPastAppointments(any(), any(), any());
-        verify(tutorNudgeHandler, times(2)).handle(argThat(a -> a.equals(appointment1) || a.equals(appointment2)));
+        verify(tutorNudgeHandler, times(2)).handle(argThat(a -> a.equals(appointment1.getId()) || a.equals(appointment2.getId())));
     }
 
     @Test

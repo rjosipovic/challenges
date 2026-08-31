@@ -58,6 +58,7 @@ public class FinanceServiceImpl implements FinanceService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<PendingPayment> getPendingPayments() {
         var pendingPaymentAppointments = appointmentRepository.findByStateIn(Set.of(AppointmentState.PENDING_PAYMENT));
         return pendingPaymentAppointments.stream()

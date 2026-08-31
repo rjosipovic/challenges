@@ -1,5 +1,6 @@
-package com.studioengine.tutor.selfservice;
+package com.studioengine.tutor.scheduling;
 
+import com.studioengine.tutor.dataaccess.enums.AppointmentState;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,8 +11,8 @@ import java.util.UUID;
 @Value
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class RescheduleInitiation {
+public class AssociatedAppointment {
 
-    UUID originalAppointmentId;
-    String rescheduleToken;
+    UUID id;
+    AppointmentState state;
 }

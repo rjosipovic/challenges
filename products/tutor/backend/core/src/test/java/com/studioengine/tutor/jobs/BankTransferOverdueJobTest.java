@@ -13,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -40,8 +41,12 @@ class BankTransferOverdueJobTest {
     void shouldTriggerOverdueNotifications() {
         // given
         var threshold = Duration.ofHours(48);
+        var appointmentId1 = UUID.randomUUID();
+        var appointmentId2 = UUID.randomUUID();
         var appointment1 = mock(Appointment.class);
         var appointment2 = mock(Appointment.class);
+        when(appointment1.getId()).thenReturn(appointmentId1);
+        when(appointment2.getId()).thenReturn(appointmentId2);
         when(schedulingProperties.getPaymentOverdueThreshold()).thenReturn(threshold);
         when(appointmentRepository.findOverduePendingPayments(any(OffsetDateTime.class))).thenReturn(List.of(appointment1, appointment2));
 
@@ -56,7 +61,7 @@ class BankTransferOverdueJobTest {
         var cutoff = captor.getValue();
         assertThat(Duration.between(cutoff, OffsetDateTime.now())).isGreaterThanOrEqualTo(threshold);
 
-        verify(overduePaymentHandler, times(2)).handle(argThat(a -> a.equals(appointment1) || a.equals(appointment2)));
+        verify(overduePaymentHandler, times(2)).handle(argThat(a -> a.equals(appointment1.getId()) || a.equals(appointment2.getId())));
     }
 
     @Test

@@ -43,6 +43,11 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/dashboard/**").authenticated()
                         .anyRequest().denyAll()
                 )
+                .exceptionHandling(ex -> ex.authenticationEntryPoint(((request, response, authException) -> {
+                    response.setStatus(401);
+                    response.setContentType("application/json");
+                    response.getWriter().write("{\"message\":\"Unauthorized\",\"code\":\"T010\"}");
+                })))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }

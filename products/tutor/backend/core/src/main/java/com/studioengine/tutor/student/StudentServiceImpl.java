@@ -72,6 +72,7 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public StudentProfile getProfile(UUID studentId) {
         var student = findStudent(studentId);
         var metrics = calculateMetrics(studentId);
@@ -79,6 +80,7 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<AppointmentHistory> getAppointmentHistory(UUID studentId) {
         findStudent(studentId); // verify student exists
 

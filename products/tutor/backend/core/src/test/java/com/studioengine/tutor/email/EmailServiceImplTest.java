@@ -64,7 +64,7 @@ class EmailServiceImplTest {
         when(pdfGeneratorService.generateInvoicePdf(appointment)).thenReturn("pdf-content".getBytes());
 
         // when
-        emailService.sendConfirmationEmail(appointment);
+        emailService.sendConfirmationEmail(appointment, "");
 
         // then
         verify(icsGeneratorService).generateIcsFile(appointment);
@@ -79,7 +79,7 @@ class EmailServiceImplTest {
         when(icsGeneratorService.generateIcsFile(appointment)).thenReturn("ics-content".getBytes());
 
         // when
-        emailService.sendConfirmationEmail(appointment);
+        emailService.sendConfirmationEmail(appointment, "");
 
         // then
         verify(icsGeneratorService).generateIcsFile(appointment);
@@ -96,7 +96,7 @@ class EmailServiceImplTest {
         doThrow(new MailSendException("SMTP error")).when(mailSender).send(any(MimeMessage.class));
 
         // when / then — no exception thrown
-        assertDoesNotThrow(() -> emailService.sendConfirmationEmail(appointment));
+        assertDoesNotThrow(() -> emailService.sendConfirmationEmail(appointment, ""));
     }
 
     private Appointment mockAppointment(BigDecimal price) {
