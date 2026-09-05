@@ -248,11 +248,12 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendOtpEmail(String email, String otp) {
         var subject = "%s - Vaš kod za prijavu".formatted(brandProperties.getName());
+        var validityMinutes = authProperties.getOtpExpiration().toMinutes();
         var body = """
                 <h2>Prijava</h2>
                 <p>Kod za prijavu: <strong>%s</strong></p>
-                <p>Ovaj kod je validan 10 minuta</p>
-                """.formatted(otp);
+                <p>Ovaj kod je validan %s minuta</p>
+                """.formatted(otp, validityMinutes);
 
         sendHtmlEmail(email, subject, body, null, null);
     }
