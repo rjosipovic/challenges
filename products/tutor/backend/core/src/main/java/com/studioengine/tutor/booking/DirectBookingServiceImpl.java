@@ -65,7 +65,7 @@ public class DirectBookingServiceImpl implements DirectBookingService {
     }
 
     private TimeSlot findTimeSlot(UUID id) {
-        return timeSlotRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("TimeSlot not found: " + id));
+        return timeSlotRepository.findByIdForUpdate(id).orElseThrow(() -> new ResourceNotFoundException("TimeSlot not found: " + id));
     }
 
     private void verifyTimeSlotInAllowedState(TimeSlot slot) {

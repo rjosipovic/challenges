@@ -73,7 +73,7 @@ class DirectBookingServiceImplTest {
                 .build();
         var directBooking = mock(DirectBooking.class);
 
-        when(timeSlotRepository.findById(timeSlotId)).thenReturn(Optional.of(timeSlot));
+        when(timeSlotRepository.findByIdForUpdate(timeSlotId)).thenReturn(Optional.of(timeSlot));
         when(timeSlot.getState()).thenReturn(allowedState);
         when(studentRepository.findById(studentId)).thenReturn(Optional.of(student));
         when(serviceCategory.getPrice()).thenReturn(serviceCategoryPrice);
@@ -84,6 +84,7 @@ class DirectBookingServiceImplTest {
         var result = directBookingService.book(command);
 
         // then
+        verify(timeSlotRepository).findByIdForUpdate(timeSlotId);
         var captor = ArgumentCaptor.forClass(Appointment.class);
         verify(appointmentRepository).save(captor.capture());
         var appointmentValue = captor.getValue();
@@ -116,13 +117,13 @@ class DirectBookingServiceImplTest {
                 .serviceCategoryId(serviceCategoryId)
                 .build();
 
-        when(timeSlotRepository.findById(timeSlotId)).thenReturn(Optional.empty());
+        when(timeSlotRepository.findByIdForUpdate(timeSlotId)).thenReturn(Optional.empty());
 
         // when
         assertThatThrownBy(() -> directBookingService.book(command)).isInstanceOf(ResourceNotFoundException.class);
 
         // then
-        verify(timeSlotRepository).findById(timeSlotId);
+        verify(timeSlotRepository).findByIdForUpdate(timeSlotId);
         verify(studentRepository, never()).findById(studentId);
     }
 
@@ -141,14 +142,14 @@ class DirectBookingServiceImplTest {
                 .serviceCategoryId(serviceCategoryId)
                 .build();
 
-        when(timeSlotRepository.findById(timeSlotId)).thenReturn(Optional.of(timeSlot));
+        when(timeSlotRepository.findByIdForUpdate(timeSlotId)).thenReturn(Optional.of(timeSlot));
         when(timeSlot.getState()).thenReturn(unallowedState);
 
         // when
         assertThatThrownBy(() -> directBookingService.book(command)).isInstanceOf(InvalidStateTransitionException.class);
 
         // then
-        verify(timeSlotRepository).findById(timeSlotId);
+        verify(timeSlotRepository).findByIdForUpdate(timeSlotId);
         verify(studentRepository, never()).findById(any());
     }
 
@@ -166,7 +167,7 @@ class DirectBookingServiceImplTest {
                 .serviceCategoryId(serviceCategoryId)
                 .build();
 
-        when(timeSlotRepository.findById(timeSlotId)).thenReturn(Optional.of(timeSlot));
+        when(timeSlotRepository.findByIdForUpdate(timeSlotId)).thenReturn(Optional.of(timeSlot));
         when(timeSlot.getState()).thenReturn(TimeSlotState.DRAFT);
         when(studentRepository.findById(studentId)).thenReturn(Optional.empty());
 
@@ -174,7 +175,7 @@ class DirectBookingServiceImplTest {
         assertThatThrownBy(() -> directBookingService.book(command)).isInstanceOf(ResourceNotFoundException.class);
 
         // then
-        verify(timeSlotRepository).findById(timeSlotId);
+        verify(timeSlotRepository).findByIdForUpdate(timeSlotId);
         verify(studentRepository).findById(studentId);
         verify(serviceCategoryRepository, never()).findById(any());
     }
@@ -194,7 +195,7 @@ class DirectBookingServiceImplTest {
                 .serviceCategoryId(serviceCategoryId)
                 .build();
 
-        when(timeSlotRepository.findById(timeSlotId)).thenReturn(Optional.of(timeSlot));
+        when(timeSlotRepository.findByIdForUpdate(timeSlotId)).thenReturn(Optional.of(timeSlot));
         when(timeSlot.getState()).thenReturn(TimeSlotState.DRAFT);
         when(studentRepository.findById(studentId)).thenReturn(Optional.of(student));
         when(serviceCategoryRepository.findById(serviceCategoryId)).thenReturn(Optional.empty());
@@ -203,7 +204,7 @@ class DirectBookingServiceImplTest {
         assertThatThrownBy(() -> directBookingService.book(command)).isInstanceOf(ResourceNotFoundException.class);
 
         // then
-        verify(timeSlotRepository).findById(timeSlotId);
+        verify(timeSlotRepository).findByIdForUpdate(timeSlotId);
         verify(studentRepository).findById(studentId);
         verify(serviceCategoryRepository).findById(serviceCategoryId);
         verify(appointmentRepository, never()).save(any());

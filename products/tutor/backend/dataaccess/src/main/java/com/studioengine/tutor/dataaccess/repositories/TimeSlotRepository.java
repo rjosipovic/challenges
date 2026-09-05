@@ -3,9 +3,11 @@ package com.studioengine.tutor.dataaccess.repositories;
 import com.studioengine.tutor.dataaccess.entities.TimeSlot;
 import com.studioengine.tutor.dataaccess.enums.TimeSlotState;
 import jakarta.persistence.LockModeType;
+import jakarta.persistence.QueryHint;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -19,8 +21,14 @@ import java.util.UUID;
 public interface TimeSlotRepository extends JpaRepository<TimeSlot, UUID> {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @QueryHints(@QueryHint(name = "jakarta.persistence.lock.timeout", value = "3000"))
     @Query("SELECT t FROM TimeSlot t WHERE t.id = :id")
     Optional<TimeSlot> findByIdForUpdate(UUID id);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @QueryHints(@QueryHint(name = "jakarta.persistence.lock.timeout", value = "3000"))
+    @Query("SELECT t FROM TimeSlot t WHERE t.id IN :ids")
+    List<TimeSlot> findAllByIdForUpdate(List<UUID> ids);
 
     @Query("SELECT t FROM TimeSlot t WHERE t.state = 'RESERVED' AND t.stateChangedAt < :cutoff")
     List<TimeSlot> findExpiredReservations(OffsetDateTime cutoff);

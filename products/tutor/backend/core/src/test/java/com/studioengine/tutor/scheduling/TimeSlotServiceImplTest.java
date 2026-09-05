@@ -155,6 +155,27 @@ class TimeSlotServiceImplTest {
         verify(timeSlotRepository, never()).saveAll(any());
     }
 
+    @Test
+    void shouldNotCreateSlotsWhenBatchContainsDuplicate() {
+        // given
+        var date = LocalDate.of(2026, 7, 1);
+        var time = LocalTime.of(13, 0);
+        var command = CreateSlotsCommand.builder()
+                .slots(List.of(
+                        CreateSlotsCommand.SlotDefinition.builder().date(date).startTime(time).build(),
+                        CreateSlotsCommand.SlotDefinition.builder().date(date).startTime(time).build()  // duplicate
+                ))
+                .build();
+
+        // when / then
+        assertThatThrownBy(() -> timeSlotService.createSlots(command))
+                .isInstanceOf(SlotConflictException.class);
+
+        // duplicate is detected before any DB existence check or save
+        verify(timeSlotRepository, never()).existsBySlotDateAndStartTime(any(), any());
+        verify(timeSlotRepository, never()).saveAll(any());
+    }
+
     // --- publishSlots ---
     @Test
     void shouldPublishDraftSlots() {
@@ -165,7 +186,7 @@ class TimeSlotServiceImplTest {
         var ids = List.of(slot1.getId(), slot2.getId());
         var command = PublishSlotsCommand.builder().slotIds(ids).build();
 
-        when(timeSlotRepository.findAllById(ids)).thenReturn(slots);
+        when(timeSlotRepository.findAllByIdForUpdate(ids)).thenReturn(slots);
         when(brandProperties.getTimezone()).thenReturn("Europe/Zagreb");
         when(timeSlotRepository.saveAll(slots)).thenAnswer(inv -> inv.getArgument(0));
 
@@ -173,6 +194,7 @@ class TimeSlotServiceImplTest {
         var result = timeSlotService.publishSlots(command);
 
         // then
+        verify(timeSlotRepository).findAllByIdForUpdate(ids);
         assertThat(result).hasSize(2);
         verify(stateMachine).transition(slot1, TimeSlotState.AVAILABLE, "TUTOR");
         verify(stateMachine).transition(slot2, TimeSlotState.AVAILABLE, "TUTOR");
@@ -188,14 +210,14 @@ class TimeSlotServiceImplTest {
         var ids = List.of(slot1.getId(), slot2.getId());
         var command = PublishSlotsCommand.builder().slotIds(ids).build();
 
-        when(timeSlotRepository.findAllById(ids)).thenReturn(slots);
+        when(timeSlotRepository.findAllByIdForUpdate(ids)).thenReturn(slots);
         when(brandProperties.getTimezone()).thenReturn("Europe/Zagreb");
 
         // when
         assertThatThrownBy(() -> timeSlotService.publishSlots(command)).isInstanceOf(PastSlotException.class);
 
         // then
-        verify(timeSlotRepository).findAllById(ids);
+        verify(timeSlotRepository).findAllByIdForUpdate(ids);
         verify(brandProperties, times(2)).getTimezone();
         verify(stateMachine, never()).transition(any(), any(), any());
         verify(timeSlotRepository, never()).saveAll(any());
@@ -207,11 +229,14 @@ class TimeSlotServiceImplTest {
         var ids = List.of(UUID.randomUUID(), UUID.randomUUID());
         var command = PublishSlotsCommand.builder().slotIds(ids).build();
 
-        when(timeSlotRepository.findAllById(ids)).thenReturn(List.of(createSlot(TimeSlotState.DRAFT, false)));
+        when(timeSlotRepository.findAllByIdForUpdate(ids)).thenReturn(List.of(createSlot(TimeSlotState.DRAFT, false)));
 
-        // when / then
+        // when
         assertThatThrownBy(() -> timeSlotService.publishSlots(command))
                 .isInstanceOf(ResourceNotFoundException.class);
+
+        // then
+        verify(timeSlotRepository).findAllByIdForUpdate(ids);
     }
 
     // --- withdrawSlot ---
@@ -224,13 +249,14 @@ class TimeSlotServiceImplTest {
         var ids = List.of(slot1.getId(), slot2.getId());
         var command = WithdrawSlotsCommand.builder().slotIds(ids).build();
 
-        when(timeSlotRepository.findAllById(ids)).thenReturn(slots);
+        when(timeSlotRepository.findAllByIdForUpdate(ids)).thenReturn(slots);
         when(appointmentRepository.findByTimeSlotIdInAndStateIn(anyList(), any())).thenReturn(List.of());
 
         // when
         timeSlotService.withdrawSlots(command);
 
         // then
+        verify(timeSlotRepository).findAllByIdForUpdate(ids);
         verify(stateMachine).transition(slot1, TimeSlotState.DRAFT, "TUTOR");
         verify(stateMachine).transition(slot2, TimeSlotState.DRAFT, "TUTOR");
         verify(timeSlotRepository).saveAll(slots);
@@ -246,12 +272,14 @@ class TimeSlotServiceImplTest {
         var command = WithdrawSlotsCommand.builder().slotIds(ids).build();
         when(appointment.getTimeSlot()).thenReturn(slot);
 
-        when(timeSlotRepository.findAllById(ids)).thenReturn(slots);
+        when(timeSlotRepository.findAllByIdForUpdate(ids)).thenReturn(slots);
         when(appointmentRepository.findByTimeSlotIdInAndStateIn(anyList(), any())).thenReturn(List.of(appointment));
 
-        // when / then
+        // when
         assertThatThrownBy(() -> timeSlotService.withdrawSlots(command))
                 .isInstanceOf(SlotWithdrawalBlockedException.class);
+        // then
+        verify(timeSlotRepository).findAllByIdForUpdate(ids);
         verify(stateMachine, never()).transition(any(), any(), any());
     }
 
@@ -261,11 +289,14 @@ class TimeSlotServiceImplTest {
         var slotId = UUID.randomUUID();
         var ids = List.of(slotId);
         var command = WithdrawSlotsCommand.builder().slotIds(ids).build();
-        when(timeSlotRepository.findAllById(ids)).thenReturn(List.of());
+        when(timeSlotRepository.findAllByIdForUpdate(ids)).thenReturn(List.of());
 
-        // when / then
+        // when
         assertThatThrownBy(() -> timeSlotService.withdrawSlots(command))
                 .isInstanceOf(ResourceNotFoundException.class);
+
+        // then
+        verify(timeSlotRepository).findAllByIdForUpdate(ids);
     }
 
     // --- deleteSlots ---
@@ -277,13 +308,14 @@ class TimeSlotServiceImplTest {
         var ids = List.of(slot1.getId(), slot2.getId());
         var command = DeleteSlotsCommand.builder().slotIds(ids).build();
 
-        when(timeSlotRepository.findAllById(ids)).thenReturn(List.of(slot1, slot2));
+        when(timeSlotRepository.findAllByIdForUpdate(ids)).thenReturn(List.of(slot1, slot2));
         when(appointmentRepository.findByTimeSlotIdInAndStateIn(anyList(), any())).thenReturn(List.of());
 
         // when
         timeSlotService.deleteSlots(command);
 
         // then
+        verify(timeSlotRepository).findAllByIdForUpdate(ids);
         verify(timeSlotStateLogRepository).deleteAllByTimeSlotIdIn(ids);
         verify(timeSlotRepository).deleteAll(List.of(slot1, slot2));
     }
@@ -297,12 +329,15 @@ class TimeSlotServiceImplTest {
         var appointment = mock(Appointment.class);
         when(appointment.getTimeSlot()).thenReturn(slot);
 
-        when(timeSlotRepository.findAllById(ids)).thenReturn(List.of(slot));
+        when(timeSlotRepository.findAllByIdForUpdate(ids)).thenReturn(List.of(slot));
         when(appointmentRepository.findByTimeSlotIdInAndStateIn(anyList(), any())).thenReturn(List.of(appointment));
 
-        // when / then
+        // when
         assertThatThrownBy(() -> timeSlotService.deleteSlots(command))
                 .isInstanceOf(SlotWithdrawalBlockedException.class);
+
+        // then
+        verify(timeSlotRepository).findAllByIdForUpdate(ids);
         verify(timeSlotRepository, never()).deleteAll(any());
     }
 

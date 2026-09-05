@@ -19,6 +19,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -74,6 +75,8 @@ public class TimeSlotServiceImpl implements TimeSlotService {
     public List<CreatedSlot> createSlots(CreateSlotsCommand command) {
         var slotDefinitions = command.getSlots();
 
+        rejectDuplicatedIfExist(slotDefinitions);
+
         slotDefinitions.forEach(slotDefinition -> {
             verifySlotNotExists(slotDefinition);
             verifyNotInPast(slotDefinition.getDate(), slotDefinition.getStartTime());
@@ -123,7 +126,7 @@ public class TimeSlotServiceImpl implements TimeSlotService {
 
     // --- Private helpers ---
     private List<TimeSlot> findAllByIds(List<UUID> ids) {
-        var slots = timeSlotRepository.findAllById(ids);
+        var slots = timeSlotRepository.findAllByIdForUpdate(ids);
         if (slots.size() != ids.size()) {
             throw new ResourceNotFoundException("One or more TimeSlots not found");
         }
@@ -156,6 +159,16 @@ public class TimeSlotServiceImpl implements TimeSlotService {
         if (!slotStart.isAfter(now)) {   // start <= now → reject
             throw new PastSlotException("Cannot create or publish a slot in the past: %s %s".formatted(date, startTime));
         }
+    }
+
+    private void rejectDuplicatedIfExist(List<CreateSlotsCommand.SlotDefinition> slots) {
+        var seen = new HashSet<String>();
+        slots.forEach(def -> {
+            var key = def.getDate() + "T" + def.getStartTime();
+            if (!seen.add(key)) {
+                throw new SlotConflictException("Duplicate slot in request: %s %s".formatted(def.getDate(), def.getStartTime()) );
+            }
+        });
     }
 }
 
