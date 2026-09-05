@@ -1,11 +1,13 @@
 package com.studioengine.tutor.scheduling;
 
+import com.studioengine.tutor.config.BrandProperties;
 import com.studioengine.tutor.dataaccess.entities.Appointment;
 import com.studioengine.tutor.dataaccess.entities.TimeSlot;
 import com.studioengine.tutor.dataaccess.enums.TimeSlotState;
 import com.studioengine.tutor.dataaccess.repositories.AppointmentRepository;
 import com.studioengine.tutor.dataaccess.repositories.TimeSlotRepository;
 import com.studioengine.tutor.dataaccess.repositories.TimeSlotStateLogRepository;
+import com.studioengine.tutor.errors.exceptions.PastSlotException;
 import com.studioengine.tutor.errors.exceptions.ResourceNotFoundException;
 import com.studioengine.tutor.errors.exceptions.SlotConflictException;
 import com.studioengine.tutor.errors.exceptions.SlotWithdrawalBlockedException;
@@ -50,6 +52,9 @@ class TimeSlotServiceImplTest {
     @Mock
     private TimeSlotStateLogRepository timeSlotStateLogRepository;
 
+    @Mock
+    private BrandProperties brandProperties;
+
     @InjectMocks
     private TimeSlotServiceImpl timeSlotService;
 
@@ -60,9 +65,9 @@ class TimeSlotServiceImplTest {
     @Test
     void shouldCreateSlotsInDraftState() {
         // given
-        var date1 = LocalDate.of(2026, 7, 1);
+        var date1 = LocalDate.now().plusDays(5);
         var time1 = LocalTime.of(10, 0);
-        var date2 = LocalDate.of(2026, 7, 1);
+        var date2 = LocalDate.now().plusDays(5);
         var time2 = LocalTime.of(11, 0);
         var command = CreateSlotsCommand.builder()
                 .slots(List.of(
@@ -74,6 +79,7 @@ class TimeSlotServiceImplTest {
         var createdSlot = mock(CreatedSlot.class);
         when(timeSlotRepository.existsBySlotDateAndStartTime(date1, time1)).thenReturn(false);
         when(timeSlotRepository.existsBySlotDateAndStartTime(date2, time2)).thenReturn(false);
+        when(brandProperties.getTimezone()).thenReturn("Europe/Zagreb");
         when(timeSlotRepository.saveAll(anyList())).thenAnswer(inv -> inv.getArgument(0));
         when(timeSlotServiceMapper.toCreatedSlot(any())).thenReturn(createdSlot);
 
@@ -99,6 +105,30 @@ class TimeSlotServiceImplTest {
         assertThat(secondSlot.getStartTime()).isEqualTo(time2);
         assertThat(secondSlot.getEndTime()).isEqualTo(time2.plusHours(1));
         assertThat(secondSlot.getState()).isEqualTo(TimeSlotState.DRAFT);
+    }
+
+    @Test
+    void shouldNotCreateSlotsWhenInPast() {
+        // given
+        var date1 = LocalDate.now().minusDays(1);
+        var time1 = LocalTime.of(10, 0);
+        var date2 = LocalDate.now().minusDays(1);
+        var time2 = LocalTime.of(11, 0);
+        var command = CreateSlotsCommand.builder()
+                .slots(List.of(
+                        CreateSlotsCommand.SlotDefinition.builder().date(date1).startTime(time1).build(),
+                        CreateSlotsCommand.SlotDefinition.builder().date(date2).startTime(time2).build()
+                ))
+                .build();
+        when(timeSlotRepository.existsBySlotDateAndStartTime(date1, time1)).thenReturn(false);
+        when(brandProperties.getTimezone()).thenReturn("Europe/Zagreb");
+
+        // when
+        assertThatThrownBy(() -> timeSlotService.createSlots(command)).isInstanceOf(PastSlotException.class);
+
+        // then
+        verify(timeSlotRepository).existsBySlotDateAndStartTime(date1, time1);
+        verify(timeSlotRepository, never()).saveAll(any());
     }
 
     @Test
@@ -129,13 +159,14 @@ class TimeSlotServiceImplTest {
     @Test
     void shouldPublishDraftSlots() {
         // given
-        var slot1 = createSlot(TimeSlotState.DRAFT);
-        var slot2 = createSlot(TimeSlotState.DRAFT);
+        var slot1 = createSlot(TimeSlotState.DRAFT, false);
+        var slot2 = createSlot(TimeSlotState.DRAFT, false);
         var slots = List.of(slot1, slot2);
         var ids = List.of(slot1.getId(), slot2.getId());
         var command = PublishSlotsCommand.builder().slotIds(ids).build();
 
         when(timeSlotRepository.findAllById(ids)).thenReturn(slots);
+        when(brandProperties.getTimezone()).thenReturn("Europe/Zagreb");
         when(timeSlotRepository.saveAll(slots)).thenAnswer(inv -> inv.getArgument(0));
 
         // when
@@ -149,12 +180,34 @@ class TimeSlotServiceImplTest {
     }
 
     @Test
+    void shouldNotPublishWhenSlotInPast() {
+        // given
+        var slot1 = createSlot(TimeSlotState.DRAFT, false);
+        var slot2 = createSlot(TimeSlotState.DRAFT, true);
+        var slots = List.of(slot1, slot2);
+        var ids = List.of(slot1.getId(), slot2.getId());
+        var command = PublishSlotsCommand.builder().slotIds(ids).build();
+
+        when(timeSlotRepository.findAllById(ids)).thenReturn(slots);
+        when(brandProperties.getTimezone()).thenReturn("Europe/Zagreb");
+
+        // when
+        assertThatThrownBy(() -> timeSlotService.publishSlots(command)).isInstanceOf(PastSlotException.class);
+
+        // then
+        verify(timeSlotRepository).findAllById(ids);
+        verify(brandProperties, times(2)).getTimezone();
+        verify(stateMachine, never()).transition(any(), any(), any());
+        verify(timeSlotRepository, never()).saveAll(any());
+    }
+
+    @Test
     void shouldThrowWhenPublishSlotNotFound() {
         // given
         var ids = List.of(UUID.randomUUID(), UUID.randomUUID());
         var command = PublishSlotsCommand.builder().slotIds(ids).build();
 
-        when(timeSlotRepository.findAllById(ids)).thenReturn(List.of(createSlot(TimeSlotState.DRAFT)));
+        when(timeSlotRepository.findAllById(ids)).thenReturn(List.of(createSlot(TimeSlotState.DRAFT, false)));
 
         // when / then
         assertThatThrownBy(() -> timeSlotService.publishSlots(command))
@@ -165,8 +218,8 @@ class TimeSlotServiceImplTest {
     @Test
     void shouldWithdrawAvailableSlot() {
         // given
-        var slot1 = createSlot(TimeSlotState.AVAILABLE);
-        var slot2 = createSlot(TimeSlotState.AVAILABLE);
+        var slot1 = createSlot(TimeSlotState.AVAILABLE, false);
+        var slot2 = createSlot(TimeSlotState.AVAILABLE, false);
         var slots = List.of(slot1, slot2);
         var ids = List.of(slot1.getId(), slot2.getId());
         var command = WithdrawSlotsCommand.builder().slotIds(ids).build();
@@ -186,7 +239,7 @@ class TimeSlotServiceImplTest {
     @Test
     void shouldThrowWhenWithdrawSlotsHasActiveAppointment() {
         // given
-        var slot = createSlot(TimeSlotState.AVAILABLE);
+        var slot = createSlot(TimeSlotState.AVAILABLE, false);
         var slots = List.of(slot);
         var ids = List.of(slot.getId());
         var appointment = mock(Appointment.class);
@@ -219,8 +272,8 @@ class TimeSlotServiceImplTest {
     @Test
     void shouldDeleteSlotsWithNoActiveAppointments() {
         // given
-        var slot1 = createSlot(TimeSlotState.DRAFT);
-        var slot2 = createSlot(TimeSlotState.AVAILABLE);
+        var slot1 = createSlot(TimeSlotState.DRAFT, false);
+        var slot2 = createSlot(TimeSlotState.AVAILABLE, false);
         var ids = List.of(slot1.getId(), slot2.getId());
         var command = DeleteSlotsCommand.builder().slotIds(ids).build();
 
@@ -238,7 +291,7 @@ class TimeSlotServiceImplTest {
     @Test
     void shouldThrowWhenDeleteSlotHasActiveAppointment() {
         // given
-        var slot = createSlot(TimeSlotState.AVAILABLE);
+        var slot = createSlot(TimeSlotState.AVAILABLE, false);
         var ids = List.of(slot.getId());
         var command = DeleteSlotsCommand.builder().slotIds(ids).build();
         var appointment = mock(Appointment.class);
@@ -259,8 +312,8 @@ class TimeSlotServiceImplTest {
         // given
         var from = LocalDate.of(2026, 8, 18);
         var to = LocalDate.of(2026, 8, 24);
-        var slotWithAppointment = createSlot(TimeSlotState.BOOKED);
-        var slotWithoutAppointment = createSlot(TimeSlotState.AVAILABLE);
+        var slotWithAppointment = createSlot(TimeSlotState.BOOKED,false);
+        var slotWithoutAppointment = createSlot(TimeSlotState.AVAILABLE, false);
         var createdSlot = mock(CreatedSlot.class);
         var associatedAppointment = mock(AssociatedAppointment.class);
 
@@ -311,8 +364,10 @@ class TimeSlotServiceImplTest {
 
     // --- Helper ---
 
-    private TimeSlot createSlot(TimeSlotState state) {
-        var slot = TimeSlot.create(LocalDate.of(2026, 7, 1), LocalTime.of(10, 0));
+    private TimeSlot createSlot(TimeSlotState state, boolean inPast) {
+        var date = inPast ? LocalDate.now().minusDays(5) : LocalDate.now().plusDays(5);
+        var time = LocalTime.of(10, 0);
+        var slot = TimeSlot.create(date, time);
         if (state != TimeSlotState.DRAFT) {
             slot.transitionTo(state);
         }

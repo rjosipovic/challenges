@@ -1,11 +1,13 @@
 package com.studioengine.tutor.scheduling;
 
+import com.studioengine.tutor.config.BrandProperties;
 import com.studioengine.tutor.dataaccess.entities.TimeSlot;
 import com.studioengine.tutor.dataaccess.enums.AppointmentState;
 import com.studioengine.tutor.dataaccess.enums.TimeSlotState;
 import com.studioengine.tutor.dataaccess.repositories.AppointmentRepository;
 import com.studioengine.tutor.dataaccess.repositories.TimeSlotRepository;
 import com.studioengine.tutor.dataaccess.repositories.TimeSlotStateLogRepository;
+import com.studioengine.tutor.errors.exceptions.PastSlotException;
 import com.studioengine.tutor.errors.exceptions.ResourceNotFoundException;
 import com.studioengine.tutor.errors.exceptions.SlotConflictException;
 import com.studioengine.tutor.errors.exceptions.SlotWithdrawalBlockedException;
@@ -14,6 +16,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -36,6 +41,7 @@ public class TimeSlotServiceImpl implements TimeSlotService {
     private final AppointmentRepository appointmentRepository;
     private final TimeSlotServiceMapper timeSlotServiceMapper;
     private final TimeSlotStateLogRepository timeSlotStateLogRepository;
+    private final BrandProperties brandProperties;
 
     @Override
     public List<CalendarSlot> getSlotsByDateRange(LocalDate from, LocalDate to) {
@@ -68,7 +74,10 @@ public class TimeSlotServiceImpl implements TimeSlotService {
     public List<CreatedSlot> createSlots(CreateSlotsCommand command) {
         var slotDefinitions = command.getSlots();
 
-        slotDefinitions.forEach(this::verifySlotNotExists);
+        slotDefinitions.forEach(slotDefinition -> {
+            verifySlotNotExists(slotDefinition);
+            verifyNotInPast(slotDefinition.getDate(), slotDefinition.getStartTime());
+        });
 
         var slots = slotDefinitions.stream()
                 .map(def -> TimeSlot.create(def.getDate(), def.getStartTime()))
@@ -84,6 +93,7 @@ public class TimeSlotServiceImpl implements TimeSlotService {
     public List<CreatedSlot> publishSlots(PublishSlotsCommand command) {
         var slots = findAllByIds(command.getSlotIds());
 
+        slots.forEach(s -> this.verifyNotInPast(s.getSlotDate(), s.getStartTime()));
         slots.forEach(slot -> stateMachine.transition(slot, TimeSlotState.AVAILABLE, "TUTOR"));
         timeSlotRepository.saveAll(slots);
 
@@ -136,6 +146,15 @@ public class TimeSlotServiceImpl implements TimeSlotService {
         var startTime = def.getStartTime();
         if (timeSlotRepository.existsBySlotDateAndStartTime(date, startTime)) {
             throw new SlotConflictException("Slot already exists for %s at %s".formatted(date, startTime));
+        }
+    }
+
+    private void verifyNotInPast(LocalDate date, LocalTime startTime) {
+        var timezone = ZoneId.of(brandProperties.getTimezone());
+        var now = LocalDateTime.now(timezone);
+        var slotStart = date.atTime(startTime);
+        if (!slotStart.isAfter(now)) {   // start <= now → reject
+            throw new PastSlotException("Cannot create or publish a slot in the past: %s %s".formatted(date, startTime));
         }
     }
 }

@@ -16,6 +16,7 @@ import static com.studioengine.tutor.errors.ErrorCode.PREMATURE_CLOSURE;
 import static com.studioengine.tutor.errors.ErrorCode.PRE_BOOKED_SELF_SERVICE;
 import static com.studioengine.tutor.errors.ErrorCode.RESOURCE_NOT_FOUND;
 import static com.studioengine.tutor.errors.ErrorCode.SLOT_CONFLICT;
+import static com.studioengine.tutor.errors.ErrorCode.SLOT_IN_PAST;
 import static com.studioengine.tutor.errors.ErrorCode.SLOT_WITHDRAWAL_BLOCKED;
 import static com.studioengine.tutor.errors.ErrorCode.TOKEN_EXPIRED;
 import static com.studioengine.tutor.errors.ErrorCode.WEBHOOK_VERIFICATION_FAILED;
@@ -43,7 +44,8 @@ public final class ErrorHttpStatusMapping {
             Map.entry(RESOURCE_NOT_FOUND, NOT_FOUND),
             Map.entry(PRE_BOOKED_SELF_SERVICE, BAD_REQUEST),
             Map.entry(CHECKOUT_VALIDATION_FAILED, BAD_REQUEST),
-            Map.entry(EMAIL_ALREADY_IN_USE, BAD_REQUEST)
+            Map.entry(EMAIL_ALREADY_IN_USE, BAD_REQUEST),
+            Map.entry(SLOT_IN_PAST, BAD_REQUEST)
     );
 
     public static HttpStatus resolve(ErrorCode errorCode) {
