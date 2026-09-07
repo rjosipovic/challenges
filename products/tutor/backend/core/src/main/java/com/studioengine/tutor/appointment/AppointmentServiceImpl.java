@@ -62,7 +62,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         verifyReasonProvided(reason);
 
         appointmentStateMachine.transition(appointment, AppointmentState.CANCELLED, "TUTOR");
-        timeSlotStateMachine.transition(timeSlot, TimeSlotState.AVAILABLE, "TUTOR");
+        timeSlotStateMachine.transition(timeSlot, TimeSlotState.DRAFT, "TUTOR");
 
         appointmentRepository.save(appointment);
         timeSlotRepository.save(timeSlot);

@@ -182,7 +182,7 @@ class AppointmentServiceImplTest {
 
         // then
         verify(appointmentStateMachine).transition(appointment, AppointmentState.CANCELLED, "TUTOR");
-        verify(timeSlotStateMachine).transition(timeSlot, TimeSlotState.AVAILABLE, "TUTOR");
+        verify(timeSlotStateMachine).transition(timeSlot, TimeSlotState.DRAFT, "TUTOR");
         verify(appointmentRepository).save(appointment);
         verify(timeSlotRepository).save(timeSlot);
         verify(emailService).sendCancellationNotification(appointment, "Conflict");

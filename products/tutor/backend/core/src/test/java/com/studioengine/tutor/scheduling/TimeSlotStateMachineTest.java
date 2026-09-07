@@ -50,6 +50,9 @@ class TimeSlotStateMachineTest {
                 new Transition(RESERVED, BOOKED),
                 new Transition(RESERVED, AVAILABLE),
                 new Transition(BOOKED, AVAILABLE),
+                new Transition(BOOKED, DRAFT),
+                new Transition(PRE_BOOKED, DRAFT),
+                new Transition(RESERVED, DRAFT),
                 new Transition(PRE_BOOKED, AVAILABLE)
         );
     }
@@ -72,12 +75,9 @@ class TimeSlotStateMachineTest {
         return Stream.of(
                 new Transition(DRAFT, RESERVED),
                 new Transition(DRAFT, BOOKED),
-                new Transition(RESERVED, DRAFT),
                 new Transition(RESERVED, PRE_BOOKED),
-                new Transition(BOOKED, DRAFT),
                 new Transition(BOOKED, RESERVED),
                 new Transition(BOOKED, PRE_BOOKED),
-                new Transition(PRE_BOOKED, DRAFT),
                 new Transition(PRE_BOOKED, RESERVED),
                 new Transition(PRE_BOOKED, BOOKED)
         );

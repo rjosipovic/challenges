@@ -18,9 +18,9 @@ public class TimeSlotStateMachine {
     private static final Map<TimeSlotState, Set<TimeSlotState>> TRANSITIONS = Map.of(
             TimeSlotState.DRAFT, Set.of(TimeSlotState.AVAILABLE, TimeSlotState.PRE_BOOKED),
             TimeSlotState.AVAILABLE, Set.of(TimeSlotState.RESERVED, TimeSlotState.BOOKED, TimeSlotState.PRE_BOOKED, TimeSlotState.DRAFT),
-            TimeSlotState.RESERVED, Set.of(TimeSlotState.BOOKED, TimeSlotState.AVAILABLE),
-            TimeSlotState.BOOKED, Set.of(TimeSlotState.AVAILABLE),
-            TimeSlotState.PRE_BOOKED, Set.of(TimeSlotState.AVAILABLE)
+            TimeSlotState.RESERVED, Set.of(TimeSlotState.BOOKED, TimeSlotState.AVAILABLE, TimeSlotState.DRAFT),
+            TimeSlotState.BOOKED, Set.of(TimeSlotState.AVAILABLE, TimeSlotState.DRAFT),
+            TimeSlotState.PRE_BOOKED, Set.of(TimeSlotState.AVAILABLE, TimeSlotState.DRAFT)
     );
 
     private final TimeSlotStateLogRepository slotStateLogRepository;
