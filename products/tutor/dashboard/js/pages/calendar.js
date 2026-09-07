@@ -249,6 +249,7 @@ import { api } from '../api.js';
   
       if (slot.state === 'DRAFT') {
           actions.push(`<button class="btn btn-success btn-sm" data-publish="${slot.id}">Objavi</button>`);
+          actions.push(`<button class="btn btn-primary btn-sm" data-direct-book="${slot.id}">Zauzmi</button>`);
           actions.push(`<button class="btn btn-danger btn-sm" data-delete="${slot.id}">Obriši</button>`);
       }
   
