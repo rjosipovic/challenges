@@ -1,5 +1,6 @@
 package com.studioengine.tutor.booking;
 
+import com.studioengine.tutor.config.BrandProperties;
 import com.studioengine.tutor.dataaccess.entities.Appointment;
 import com.studioengine.tutor.dataaccess.entities.ServiceCategory;
 import com.studioengine.tutor.dataaccess.entities.Student;
@@ -12,6 +13,7 @@ import com.studioengine.tutor.dataaccess.repositories.ServiceCategoryRepository;
 import com.studioengine.tutor.dataaccess.repositories.StudentRepository;
 import com.studioengine.tutor.dataaccess.repositories.TimeSlotRepository;
 import com.studioengine.tutor.errors.exceptions.InvalidStateTransitionException;
+import com.studioengine.tutor.errors.exceptions.PastSlotException;
 import com.studioengine.tutor.errors.exceptions.ResourceNotFoundException;
 import com.studioengine.tutor.scheduling.TimeSlotStateMachine;
 import org.junit.jupiter.api.Test;
@@ -24,6 +26,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -51,6 +55,8 @@ class DirectBookingServiceImplTest {
     private TimeSlotStateMachine timeSlotStateMachine;
     @Mock
     private DirectBookingServiceMapper directBookingServiceMapper;
+    @Mock
+    private BrandProperties brandProperties;
 
     @InjectMocks
     private DirectBookingServiceImpl directBookingService;
@@ -60,6 +66,8 @@ class DirectBookingServiceImplTest {
     void shouldBookWhenSlotInAllowedState(TimeSlotState allowedState) {
         // given
         var timeSlotId = UUID.randomUUID();
+        var timeSlotDate = LocalDate.now().plusDays(1);
+        var timeSlotStartTime = LocalTime.now();
         var timeSlot = mock(TimeSlot.class);
         var studentId = UUID.randomUUID();
         var student = mock(Student.class);
@@ -75,6 +83,9 @@ class DirectBookingServiceImplTest {
 
         when(timeSlotRepository.findByIdForUpdate(timeSlotId)).thenReturn(Optional.of(timeSlot));
         when(timeSlot.getState()).thenReturn(allowedState);
+        when(timeSlot.getSlotDate()).thenReturn(timeSlotDate);
+        when(timeSlot.getStartTime()).thenReturn(timeSlotStartTime);
+        when(brandProperties.getTimezone()).thenReturn("Europe/Zagreb");
         when(studentRepository.findById(studentId)).thenReturn(Optional.of(student));
         when(serviceCategory.getPrice()).thenReturn(serviceCategoryPrice);
         when(serviceCategoryRepository.findById(serviceCategoryId)).thenReturn(Optional.of(serviceCategory));
@@ -153,10 +164,41 @@ class DirectBookingServiceImplTest {
         verify(studentRepository, never()).findById(any());
     }
 
+    @ParameterizedTest
+    @MethodSource("allowedStates")
+    void shouldNotBookWhenTimeSlotInPast(TimeSlotState allowedState) {
+        // given
+        var timeSlotId = UUID.randomUUID();
+        var timeSlotDate = LocalDate.now().minusDays(1);
+        var timeSlotStartTime = LocalTime.now();
+        var timeSlot = mock(TimeSlot.class);
+        var studentId = UUID.randomUUID();
+        var serviceCategoryId = UUID.randomUUID();
+        var command = DirectBookingCommand.builder()
+                .timeSlotId(timeSlotId)
+                .studentId(studentId)
+                .serviceCategoryId(serviceCategoryId)
+                .build();
+
+        when(timeSlotRepository.findByIdForUpdate(timeSlotId)).thenReturn(Optional.of(timeSlot));
+        when(timeSlot.getState()).thenReturn(allowedState);
+        when(timeSlot.getSlotDate()).thenReturn(timeSlotDate);
+        when(timeSlot.getStartTime()).thenReturn(timeSlotStartTime);
+        when(brandProperties.getTimezone()).thenReturn("Europe/Zagreb");
+
+        // when
+        assertThatThrownBy(() -> directBookingService.book(command)).isInstanceOf(PastSlotException.class);
+
+        // then
+        verify(timeSlotRepository).findByIdForUpdate(timeSlotId);
+    }
+
     @Test
     void shouldNotBookWhenStudentNotFound() {
         // given
         var timeSlotId = UUID.randomUUID();
+        var timeSlotDate = LocalDate.now().plusDays(1);
+        var timeSlotStartTime = LocalTime.now();
         var timeSlot = mock(TimeSlot.class);
         var studentId = UUID.randomUUID();
         var serviceCategoryId = UUID.randomUUID();
@@ -169,6 +211,9 @@ class DirectBookingServiceImplTest {
 
         when(timeSlotRepository.findByIdForUpdate(timeSlotId)).thenReturn(Optional.of(timeSlot));
         when(timeSlot.getState()).thenReturn(TimeSlotState.DRAFT);
+        when(timeSlot.getSlotDate()).thenReturn(timeSlotDate);
+        when(timeSlot.getStartTime()).thenReturn(timeSlotStartTime);
+        when(brandProperties.getTimezone()).thenReturn("Europe/Zagreb");
         when(studentRepository.findById(studentId)).thenReturn(Optional.empty());
 
         // when
@@ -184,6 +229,8 @@ class DirectBookingServiceImplTest {
     void shouldNotBookWhenServiceCategoryNotFound() {
         // given
         var timeSlotId = UUID.randomUUID();
+        var timeSlotDate = LocalDate.now().plusDays(1);
+        var timeSlotStartTime = LocalTime.now();
         var timeSlot = mock(TimeSlot.class);
         var studentId = UUID.randomUUID();
         var student = mock(Student.class);
@@ -197,6 +244,9 @@ class DirectBookingServiceImplTest {
 
         when(timeSlotRepository.findByIdForUpdate(timeSlotId)).thenReturn(Optional.of(timeSlot));
         when(timeSlot.getState()).thenReturn(TimeSlotState.DRAFT);
+        when(timeSlot.getSlotDate()).thenReturn(timeSlotDate);
+        when(timeSlot.getStartTime()).thenReturn(timeSlotStartTime);
+        when(brandProperties.getTimezone()).thenReturn("Europe/Zagreb");
         when(studentRepository.findById(studentId)).thenReturn(Optional.of(student));
         when(serviceCategoryRepository.findById(serviceCategoryId)).thenReturn(Optional.empty());
 

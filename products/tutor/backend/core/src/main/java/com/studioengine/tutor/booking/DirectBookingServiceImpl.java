@@ -1,5 +1,6 @@
 package com.studioengine.tutor.booking;
 
+import com.studioengine.tutor.config.BrandProperties;
 import com.studioengine.tutor.dataaccess.entities.Appointment;
 import com.studioengine.tutor.dataaccess.entities.ServiceCategory;
 import com.studioengine.tutor.dataaccess.entities.Student;
@@ -12,12 +13,15 @@ import com.studioengine.tutor.dataaccess.repositories.ServiceCategoryRepository;
 import com.studioengine.tutor.dataaccess.repositories.StudentRepository;
 import com.studioengine.tutor.dataaccess.repositories.TimeSlotRepository;
 import com.studioengine.tutor.errors.exceptions.InvalidStateTransitionException;
+import com.studioengine.tutor.errors.exceptions.PastSlotException;
 import com.studioengine.tutor.errors.exceptions.ResourceNotFoundException;
 import com.studioengine.tutor.scheduling.TimeSlotStateMachine;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Set;
 import java.util.UUID;
 
@@ -33,6 +37,7 @@ public class DirectBookingServiceImpl implements DirectBookingService {
     private final AppointmentRepository appointmentRepository;
     private final TimeSlotStateMachine timeSlotStateMachine;
     private final DirectBookingServiceMapper directBookingServiceMapper;
+    private final BrandProperties brandProperties;
 
     @Override
     @Transactional
@@ -43,6 +48,7 @@ public class DirectBookingServiceImpl implements DirectBookingService {
 
         var slot = findTimeSlot(slotId);
         verifyTimeSlotInAllowedState(slot);
+        verifyNotInPast(slot);
         var student = findStudent(studentId);
         var category = findServiceCategory(serviceCategoryId);
 
@@ -71,6 +77,17 @@ public class DirectBookingServiceImpl implements DirectBookingService {
     private void verifyTimeSlotInAllowedState(TimeSlot slot) {
         if (!ALLOWED_SLOT_STATES.contains(slot.getState())) {
             throw new InvalidStateTransitionException("Slot %s is in state %s, expected %s".formatted(slot.getId(), slot.getState(), ALLOWED_SLOT_STATES));
+        }
+    }
+
+    private void verifyNotInPast(TimeSlot slot) {
+        var timezone = ZoneId.of(brandProperties.getTimezone());
+        var now = LocalDateTime.now(timezone);
+        var date = slot.getSlotDate();
+        var startTime = slot.getStartTime();
+        var slotStart = date.atTime(startTime);
+        if (!slotStart.isAfter(now)) {   // start <= now → reject
+            throw new PastSlotException("Cannot book a slot in the past: %s %s".formatted(date, startTime));
         }
     }
 
