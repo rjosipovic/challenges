@@ -33,9 +33,9 @@ public interface TimeSlotRepository extends JpaRepository<TimeSlot, UUID> {
     @Query("SELECT t FROM TimeSlot t WHERE t.state = 'RESERVED' AND t.stateChangedAt < :cutoff")
     List<TimeSlot> findExpiredReservations(OffsetDateTime cutoff);
 
-    List<TimeSlot> findBySlotDateBetween(LocalDate from, LocalDate to);
+    List<TimeSlot> findBySlotDateBetweenOrderBySlotDateAscStartTimeAsc(LocalDate from, LocalDate to);
 
-    List<TimeSlot> findBySlotDateBetweenAndState(LocalDate from, LocalDate to, TimeSlotState state);
+    List<TimeSlot> findBySlotDateBetweenAndStateOrderBySlotDateAscStartTimeAsc(LocalDate from, LocalDate to, TimeSlotState state);
 
     boolean existsBySlotDateAndStartTime(LocalDate date, LocalTime startTime);
 }

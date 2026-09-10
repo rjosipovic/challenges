@@ -46,7 +46,7 @@ public class TimeSlotServiceImpl implements TimeSlotService {
 
     @Override
     public List<CalendarSlot> getSlotsByDateRange(LocalDate from, LocalDate to) {
-        var timeSlots = timeSlotRepository.findBySlotDateBetween(from, to);
+        var timeSlots = timeSlotRepository.findBySlotDateBetweenOrderBySlotDateAscStartTimeAsc(from, to);
         var timeSlotIds = timeSlots.stream().map(TimeSlot::getId).toList();
 
         var appointmentBySlotId = appointmentRepository.findByTimeSlotIdInAndStateIn(timeSlotIds, ACTIVE_APPOINTMENT_STATES).stream()
@@ -64,7 +64,7 @@ public class TimeSlotServiceImpl implements TimeSlotService {
 
     @Override
     public List<AvailableSlot> getAvailability(LocalDate from, LocalDate to) {
-        return timeSlotRepository.findBySlotDateBetweenAndState(from, to, TimeSlotState.AVAILABLE)
+        return timeSlotRepository.findBySlotDateBetweenAndStateOrderBySlotDateAscStartTimeAsc(from, to, TimeSlotState.AVAILABLE)
                 .stream()
                 .map(timeSlotServiceMapper::toAvailableSlot)
                 .toList();

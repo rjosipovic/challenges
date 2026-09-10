@@ -355,7 +355,7 @@ class TimeSlotServiceImplTest {
         var appointment = mock(Appointment.class);
         when(appointment.getTimeSlot()).thenReturn(slotWithAppointment);
 
-        when(timeSlotRepository.findBySlotDateBetween(from, to))
+        when(timeSlotRepository.findBySlotDateBetweenOrderBySlotDateAscStartTimeAsc(from, to))
                 .thenReturn(List.of(slotWithAppointment, slotWithoutAppointment));
         when(appointmentRepository.findByTimeSlotIdInAndStateIn(anyList(), any()))
                 .thenReturn(List.of(appointment));
@@ -366,7 +366,7 @@ class TimeSlotServiceImplTest {
         var result = timeSlotService.getSlotsByDateRange(from, to);
 
         // then
-        verify(timeSlotRepository).findBySlotDateBetween(from, to);
+        verify(timeSlotRepository).findBySlotDateBetweenOrderBySlotDateAscStartTimeAsc(from, to);
         verify(appointmentRepository).findByTimeSlotIdInAndStateIn(anyList(), any());
         verify(timeSlotServiceMapper, times(2)).toCreatedSlot(any());
         assertThat(result).hasSize(2);
@@ -386,13 +386,13 @@ class TimeSlotServiceImplTest {
         var from = LocalDate.of(2026, 8, 18);
         var to = LocalDate.of(2026, 8, 24);
 
-        when(timeSlotRepository.findBySlotDateBetween(from, to)).thenReturn(List.of());
+        when(timeSlotRepository.findBySlotDateBetweenOrderBySlotDateAscStartTimeAsc(from, to)).thenReturn(List.of());
 
         // when
         var result = timeSlotService.getSlotsByDateRange(from, to);
 
         // then
-        verify(timeSlotRepository).findBySlotDateBetween(from, to);
+        verify(timeSlotRepository).findBySlotDateBetweenOrderBySlotDateAscStartTimeAsc(from, to);
         verify(timeSlotServiceMapper, never()).toCreatedSlot(any());
         assertThat(result).isEmpty();
     }
