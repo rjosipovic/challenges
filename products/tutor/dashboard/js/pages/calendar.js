@@ -1,6 +1,7 @@
 import { api } from '../api.js';
-  import { formatDate, formatTime, escapeHtml } from '../utils.js';
-  
+import { formatDate, formatTime, escapeHtml } from '../utils.js';
+import { closeAppointment } from '../actions/appointmentActions.js';
+
   let currentWeekStart = getMonday(new Date());
   let bookingSlotId = null;
   let cancelAppointmentId = null;
@@ -224,12 +225,13 @@ import { api } from '../api.js';
   
       const rows = entries.map(entry => {
           const slot = entry.slot;
+          const past = isSlotPast(slot);
           return `
-          <tr style="background: ${stateColors[slot.state] || 'white'}">
+          <tr style="background: ${stateColors[slot.state] || 'white'}; ${past ? 'opacity:0.55;' : ''}">
               <td>${formatDate(slot.date)}</td>
               <td>${formatTime(slot.startTime)} – ${formatTime(slot.endTime)}</td>
               <td>${stateLabels[slot.state] || slot.state}</td>
-              <td>${renderSlotActions(slot, entry.appointment)}</td>
+              <td>${renderSlotActions(slot, entry.appointment, past)}</td>
           </tr>
       `;
       }).join('');
@@ -244,8 +246,17 @@ import { api } from '../api.js';
       attachSlotActionHandlers(grid);
   }
   
-  function renderSlotActions(slot, appointment) {
+  function renderSlotActions(slot, appointment, isPast) {
       const actions = [];
+
+      if (isPast) {
+        // Past slot: only closing a still opened appointment makes sense
+        if (appointment && (appointment.state === 'PAID' || appointment.state === 'CONFIRMED' || appointment.state === 'PRE_BOOKED')) {
+            actions.push(`<button class="btn btn-success btn-sm" data-close-complete="${appointment.id}">Održan</button>`);
+            actions.push(`<button class="btn btn-danger btn-sm" data-close-noshow="${appointment.id}">Neostvaren</button>`);
+        }
+        return actions.join(' ');
+      }
   
       if (slot.state === 'DRAFT') {
           actions.push(`<button class="btn btn-success btn-sm" data-publish="${slot.id}">Objavi</button>`);
@@ -305,6 +316,16 @@ import { api } from '../api.js';
 
       grid.querySelectorAll('[data-cancel-appointment]').forEach(btn => {
         btn.addEventListener('click', () => openCancelModal(btn.dataset.cancelAppointment));
+      });
+
+      grid.querySelectorAll('[data-close-complete]').forEach(btn => {
+        btn.addEventListener('click', () =>
+          closeAppointment(btn.dataset.closeComplete, 'COMPLETED', loadWeekGrid));
+      });
+
+      grid.querySelectorAll('[data-close-noshow]').forEach(btn => {
+        btn.addEventListener('click', () =>
+          closeAppointment(btn.dataset.closeNoshow, 'NO_SHOW', loadWeekGrid));
       });
   }
 
@@ -376,3 +397,10 @@ import { api } from '../api.js';
   function toISODate(date) {
       return date.toISOString().split('T')[0];
   }
+
+  function isSlotPast(slot) {
+    // slot.date (YYYY-MM-DD) + slot.startTime (HH:mm) vs now, local time
+    const slotStart = new Date(`${slot.date}T${slot.startTime}`);
+    return slotStart <= new Date();
+  }
+

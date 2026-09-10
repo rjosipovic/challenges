@@ -1,5 +1,7 @@
 import { api } from '../api.js';
-  import { formatDate, formatTime, formatCurrency, escapeHtml } from '../utils.js';
+import { formatDate, formatTime, formatCurrency, escapeHtml } from '../utils.js';
+import { closeAppointment } from '../actions/appointmentActions.js';
+
   
   export async function renderLanding(container) {
       container.innerHTML = '<p>Učitavanje...</p>';
@@ -71,23 +73,10 @@ import { api } from '../api.js';
   
   function attachClosureHandlers(container) {
       container.querySelectorAll('[data-action="complete"]').forEach(btn => {
-          btn.addEventListener('click', () => closeAppointment(btn.dataset.id, 'COMPLETED', container));
+          btn.addEventListener('click', () => closeAppointment(btn.dataset.id, 'COMPLETED', () => renderLanding(container)));
       });
   
       container.querySelectorAll('[data-action="noshow"]').forEach(btn => {
-          btn.addEventListener('click', () => closeAppointment(btn.dataset.id, 'NO_SHOW', container));
+          btn.addEventListener('click', () => closeAppointment(btn.dataset.id, 'NO_SHOW', () => renderLanding(container)));
       });
-  }
-  
-  async function closeAppointment(appointmentId, outcome, container) {
-      try {
-          await api.post(`/dashboard/appointments/${appointmentId}/close`, {
-              outcome,
-              sendFollowup: outcome === 'COMPLETED'
-          });
-          // Re-render to reflect changes
-          renderLanding(container);
-      } catch (err) {
-          alert(err.reason || 'Greška pri zatvaranju termina');
-      }
   }
